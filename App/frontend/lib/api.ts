@@ -4,9 +4,12 @@
  * Matches FastAPI Pydantic models in backend/models.py exactly.
  */
 
-// Empty base → relative URLs. Vercel rewrites /api/* → EC2 backend (no mixed-content).
-// next.config.ts BACKEND_URL controls the proxy destination (default: EC2 IP).
-const API_BASE = "";
+// Server components (SSR on Vercel): fetch EC2 directly — server-to-server, no mixed-content restriction.
+// Client components (browser): use relative URL so Vercel rewrite proxies to EC2 (avoids HTTPS→HTTP block).
+const API_BASE =
+  typeof window === "undefined"
+    ? (process.env.BACKEND_URL ?? "http://43.205.229.130:8000")
+    : "";
 
 // ─── Shared atoms ─────────────────────────────────────────────────────────────
 

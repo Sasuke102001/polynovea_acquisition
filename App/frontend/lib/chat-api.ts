@@ -3,7 +3,8 @@
  * Client-side streaming wrapper for Polynovea venue intelligence AI.
  */
 
-// Empty base → relative URLs. Vercel rewrites /api/* → EC2 backend (no mixed-content).
+// chat-api is only called from client components (ChatDrawer), so relative URL is correct.
+// Vercel rewrite proxies /api/* → EC2 backend, avoiding HTTPS→HTTP mixed-content block.
 const API_BASE = "";
 
 export interface ChatStreamOptions {
