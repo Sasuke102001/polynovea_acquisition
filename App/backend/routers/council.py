@@ -31,19 +31,19 @@ COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]"
 _NEMOTRON = {
     "name":    "nemotron",
     "key_env": "NVIDIA_API_KEY_CREATIVE",
-    "model":   "nvidia/llama-3.1-nemotron-70b-instruct",
+    "model":   os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-30b-a3b"),
     "temp":    0.30,
 }
 _DEEPSEEK = {
     "name":    "deepseek",
     "key_env": "NVIDIA_API_KEY_ANALYTICAL",
-    "model":   "deepseek/deepseek-v4-pro",
+    "model":   os.getenv("NVIDIA_MODEL_ANALYTICAL", "deepseek/deepseek-v4-pro"),
     "temp":    0.40,
 }
 _QWEN = {
     "name":    "qwen",
     "key_env": "NVIDIA_API_KEY_COUNCIL",
-    "model":   "qwen/qwen3.5-397b-a17b",
+    "model":   os.getenv("NVIDIA_MODEL_COUNCIL", "qwen/qwen3.5-397b-a17b"),
     "temp":    0.50,
 }
 
