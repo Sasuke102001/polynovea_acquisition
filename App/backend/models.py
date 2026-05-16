@@ -409,6 +409,7 @@ class AudienceResponse(BaseModel):
 class ChatRequest(BaseModel):
     tab: str        # "marketing", "competitors", "transform", "deep_risk"
     question: str
+    mode: str = "fast"   # "fast" = single model | "council" = 3-model debate
 
 
 class ChatMessage(BaseModel):

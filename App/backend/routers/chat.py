@@ -274,15 +274,20 @@ async def chat_with_venue(venue_id: int, request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error building prompt: {str(e)}")
 
-    # Stream via the Council of Models (Nemotron + DeepSeek + Qwen)
-    # The council yields COUNCIL_DELIBERATING first so the frontend can show
-    # a deliberating spinner, then streams the synthesised answer live.
     async def response_generator():
         try:
-            async for chunk in run_council(
-                venue_id, request.tab, request.question, system_prompt
-            ):
-                yield chunk
+            if request.mode == "council":
+                # Council of Models: 3-model debate → Nemotron synthesis (15–20s)
+                async for chunk in run_council(
+                    venue_id, request.tab, request.question, system_prompt
+                ):
+                    yield chunk
+            else:
+                # Fast path: single Nemotron stream, responds in ~3s
+                async for chunk in stream_from_nvidia(
+                    system_prompt, request.question, request.tab
+                ):
+                    yield chunk
         except Exception as exc:
             yield f"\n\n[Error: {exc}]"
 

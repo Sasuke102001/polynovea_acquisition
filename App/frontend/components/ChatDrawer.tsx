@@ -148,7 +148,10 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent | React.MouseEvent,
+    mode: "fast" | "council" = "fast",
+  ) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -164,15 +167,14 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
 
     await streamChat(venueId, tab, userQuestion, {
       onChunk: (chunk) => {
-        // First chunk from council is the deliberating sentinel — don't render it
+        // Council sentinel — show deliberating spinner, strip the marker
         if (!deliberatingDone && chunk.includes(COUNCIL_DELIBERATING)) {
           setIsDeliberating(true);
           deliberatingDone = true;
-          // Strip the sentinel (rest of chunk, if any, is real content)
           chunk = chunk.replace(COUNCIL_DELIBERATING, "");
           if (!chunk) return;
         }
-        // Real content arriving — switch from deliberating to streaming
+        // Real content arriving — dismiss deliberating state
         if (isDeliberating || deliberatingDone) setIsDeliberating(false);
 
         currentResponse += chunk;
@@ -195,7 +197,7 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
         setIsDeliberating(false);
         setIsLoading(false);
       },
-    });
+    }, mode);
   };
 
   const { label, subtitle } = TAB_META[tab] ?? { label: "AI Assistant", subtitle: "" };
@@ -306,7 +308,7 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="px-lg py-md border-t border-outline-variant bg-surface-dim rounded-b-xl shrink-0">
+          <form onSubmit={(e) => handleSubmit(e, "fast")} className="px-lg py-md border-t border-outline-variant bg-surface-dim rounded-b-xl shrink-0">
             <div className="flex gap-sm">
               <input
                 ref={inputRef}
@@ -317,13 +319,32 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
                 disabled={isLoading}
                 className="flex-1 bg-surface border border-outline-variant rounded-lg px-md py-sm text-[16px] text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary disabled:opacity-50"
               />
+              {/* Fast send */}
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
                 className="bg-primary text-surface rounded-lg px-md py-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+                title="Quick answer"
               >
                 <span className="material-symbols-outlined text-[24px]">send</span>
               </button>
+            </div>
+
+            {/* Council button */}
+            <div className="flex flex-col items-end mt-xs gap-[2px]">
+              <button
+                type="button"
+                onClick={(e) => handleSubmit(e, "council")}
+                disabled={!input.trim() || isLoading}
+                className="flex items-center gap-xs bg-surface border border-[#7C3AED]/50 text-[#7C3AED] rounded-lg px-sm py-[5px] text-[12px] font-label-sm hover:bg-[#7C3AED]/10 disabled:opacity-40 transition-colors"
+                title="Ask the Council of Models"
+              >
+                <span className="material-symbols-outlined text-[15px]">hub</span>
+                Ask the Council
+              </button>
+              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+                3 models · may take 15–20 sec
+              </span>
             </div>
           </form>
         </div>

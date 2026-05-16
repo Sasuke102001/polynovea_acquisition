@@ -23,6 +23,7 @@ export async function streamChat(
   tab: string,
   question: string,
   options: ChatStreamOptions,
+  mode: "fast" | "council" = "fast",
 ): Promise<void> {
   let response: Response;
 
@@ -30,7 +31,7 @@ export async function streamChat(
     response = await fetch(`${API_BASE}/api/venues/${venueId}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tab, question }),
+      body: JSON.stringify({ tab, question, mode }),
     });
   } catch {
     options.onError?.("Could not reach the server. Check your connection.");
