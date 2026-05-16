@@ -53,8 +53,13 @@ _ALL = [_NEMOTRON, _DEEPSEEK, _QWEN]
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def _strip_thinking(text: str) -> str:
-    """Remove <think>...</think> blocks (DeepSeek R1 / Qwen thinking mode)."""
-    return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
+    """Remove <think>...</think> blocks (DeepSeek R1 / Qwen thinking mode).
+    Also strips unclosed <think> blocks that hit max_tokens mid-thought."""
+    # Complete blocks
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    # Unclosed block — model hit token limit inside thinking
+    text = re.sub(r"<think>.*$", "", text, flags=re.DOTALL)
+    return text.strip()
 
 
 async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
@@ -64,11 +69,14 @@ async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
         return f"[{member['name']} unavailable — {member['key_env']} not set]"
     try:
         client = AsyncOpenAI(api_key=api_key, base_url=NVIDIA_API_BASE)
+        # Disable thinking mode on Qwen — otherwise it burns all tokens on <think> blocks
+        extra = {"chat_template_kwargs": {"enable_thinking": False}} if member["name"] == "qwen" else {}
         resp = await client.chat.completions.create(
             model=member["model"],
             messages=messages,
             temperature=member["temp"],
             max_tokens=max_tokens,
+            extra_body=extra if extra else None,
         )
         return _strip_thinking(resp.choices[0].message.content or "")
     except Exception as exc:
