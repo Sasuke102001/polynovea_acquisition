@@ -14,7 +14,7 @@ git pull origin master
 
 echo "── Installing/updating dependencies ─────────────────"
 cd App/backend
-pip install -r requirements.txt --quiet
+pip install -r requirements.txt --quiet --break-system-packages
 
 echo "── Restarting service ───────────────────────────────"
 sudo systemctl restart "$SERVICE"
