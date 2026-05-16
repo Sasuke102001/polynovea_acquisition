@@ -119,7 +119,7 @@ function NoTarget({ id }: { id: string }) {
       <div className="flex-1 flex flex-col items-center justify-center gap-md text-center p-margin">
         <span className="material-symbols-outlined text-[56px] text-on-surface-variant/30">flag</span>
         <h2 className="text-headline-md font-headline-md text-on-surface">No growth target set</h2>
-        <p className="text-body-md font-body-md text-on-surface-variant max-w-sm">
+        <p className="text-body-md font-body-md text-on-surface-variant max-w-sm w-full">
           Go to Transform, pick a segment to grow into, and click{" "}
           <span className="text-[#C4B5FD]">View Campaign Strategy</span> to build your plan here.
         </p>
