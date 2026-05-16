@@ -8,7 +8,7 @@
 
 ## ✅ DATABASE STATUS — ALL 14 SCRIPTS COMPLETE
 
-**RDS Endpoint:** `polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com`
+**RDS Endpoint:** `your-rds-instance.xxxxxxxxxxxx.ap-south-1.rds.amazonaws.com`
 **DB Name:** `polynovea_module2`
 **Credentials:** `.env` file at `Database/.env`
 **Pipeline Runner:** `Database/scripts/run_pipeline.py`
@@ -32,7 +32,7 @@
 **To re-run the full pipeline:**
 ```powershell
 # Load .env then run:
-$env:PG_HOST='polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'
+$env:PG_HOST='your-rds-instance.xxxxxxxxxxxx.ap-south-1.rds.amazonaws.com'
 $env:PG_DB='polynovea_module2'
 $env:PG_USER='polynovea_admin'
 $env:PG_PASSWORD='<from .env>'

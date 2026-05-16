@@ -1,9 +1,15 @@
 import psycopg2, os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 conn = psycopg2.connect(
-    host=os.getenv('PG_HOST', 'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
-    port=5432, dbname='polynovea_module2',
-    user='polynovea_admin', password='9167032236Subro', sslmode='require'
+    host=os.getenv('PG_HOST'),
+    port=int(os.getenv('PG_PORT', 5432)),
+    dbname=os.getenv('PG_DB'),
+    user=os.getenv('PG_USER'),
+    password=os.getenv('PG_PASSWORD'),
+    sslmode='require'
 )
 cur = conn.cursor()
 cur.execute("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")
