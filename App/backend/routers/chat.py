@@ -17,6 +17,7 @@ from database import get_pool
 from models import ChatRequest, ChatMessage
 from prompts import get_system_prompt
 from routers.utils import SEGMENT_LABELS
+from routers.council import run_council, COUNCIL_DELIBERATING
 import httpx
 
 router = APIRouter()
@@ -273,22 +274,16 @@ async def chat_with_venue(venue_id: int, request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error building prompt: {str(e)}")
 
-    # Collect full response for logging
-    full_response = ""
-
+    # Stream via the Council of Models (Nemotron + DeepSeek + Qwen)
+    # The council yields COUNCIL_DELIBERATING first so the frontend can show
+    # a deliberating spinner, then streams the synthesised answer live.
     async def response_generator():
-        nonlocal full_response
         try:
-            async for chunk in stream_from_nvidia(system_prompt, request.question, request.tab):
-                full_response += chunk
+            async for chunk in run_council(
+                venue_id, request.tab, request.question, system_prompt
+            ):
                 yield chunk
-        except Exception as e:
-            yield f"\n\n[Error: {str(e)}]"
-            full_response += f"\n\n[Error: {str(e)}]"
-        finally:
-            # Log to Supabase asynchronously after streaming completes
-            asyncio.create_task(
-                log_chat_to_supabase(venue_id, request.tab, request.question, context, full_response)
-            )
+        except Exception as exc:
+            yield f"\n\n[Error: {exc}]"
 
     return StreamingResponse(response_generator(), media_type="text/event-stream")

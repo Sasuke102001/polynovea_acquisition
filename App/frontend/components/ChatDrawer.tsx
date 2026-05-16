@@ -128,14 +128,17 @@ const TAB_META: Record<Tab, { label: string; subtitle: string }> = {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
+const COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]";
+
 export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
-  const [isOpen, setIsOpen]       = useState(false);
-  const [messages, setMessages]   = useState<Message[]>([]);
-  const [input, setInput]         = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
-  const messagesEndRef            = useRef<HTMLDivElement>(null);
-  const inputRef                  = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen]             = useState(false);
+  const [messages, setMessages]         = useState<Message[]>([]);
+  const [input, setInput]               = useState("");
+  const [isLoading, setIsLoading]       = useState(false);
+  const [isDeliberating, setIsDeliberating] = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const messagesEndRef                  = useRef<HTMLDivElement>(null);
+  const inputRef                        = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -157,8 +160,21 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
     setIsLoading(true);
 
     let currentResponse = "";
+    let deliberatingDone = false;
+
     await streamChat(venueId, tab, userQuestion, {
       onChunk: (chunk) => {
+        // First chunk from council is the deliberating sentinel — don't render it
+        if (!deliberatingDone && chunk.includes(COUNCIL_DELIBERATING)) {
+          setIsDeliberating(true);
+          deliberatingDone = true;
+          // Strip the sentinel (rest of chunk, if any, is real content)
+          chunk = chunk.replace(COUNCIL_DELIBERATING, "");
+          if (!chunk) return;
+        }
+        // Real content arriving — switch from deliberating to streaming
+        if (isDeliberating || deliberatingDone) setIsDeliberating(false);
+
         currentResponse += chunk;
         setMessages((prev) => {
           const msgs = [...prev];
@@ -171,10 +187,14 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
         });
       },
       onError: (msg) => {
+        setIsDeliberating(false);
         setError(msg);
         setIsLoading(false);
       },
-      onComplete: () => setIsLoading(false),
+      onComplete: () => {
+        setIsDeliberating(false);
+        setIsLoading(false);
+      },
     });
   };
 
@@ -246,7 +266,27 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
               </div>
             ))}
 
-            {isLoading && messages[messages.length - 1]?.role === "user" && (
+            {isDeliberating && (
+              <div className="flex justify-start">
+                <div className="bg-surface-dim border border-[#7C3AED]/40 rounded-xl rounded-bl-sm px-md py-sm flex flex-col gap-xs max-w-[88%]">
+                  <div className="flex items-center gap-sm">
+                    <div className="flex gap-[3px]">
+                      <div className="w-1.5 h-1.5 bg-[#7C3AED] rounded-full animate-bounce [animation-delay:0ms]" />
+                      <div className="w-1.5 h-1.5 bg-[#7C3AED] rounded-full animate-bounce [animation-delay:120ms]" />
+                      <div className="w-1.5 h-1.5 bg-[#7C3AED] rounded-full animate-bounce [animation-delay:240ms]" />
+                    </div>
+                    <span className="text-[12px] font-data-mono text-[#7C3AED] uppercase tracking-wider">
+                      Council deliberating
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant/60 font-body-sm">
+                    3 models analysing · debating · synthesising
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {isLoading && !isDeliberating && messages[messages.length - 1]?.role === "user" && (
               <div className="flex justify-start">
                 <div className="bg-surface-dim border border-outline-variant rounded-xl rounded-bl-sm px-md py-sm flex items-center gap-xs">
                   <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
