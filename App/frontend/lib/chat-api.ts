@@ -3,7 +3,7 @@
  * Client-side streaming wrapper for Polynovea venue intelligence AI.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://43.205.229.130:8000";
 
 export interface ChatStreamOptions {
   onChunk: (chunk: string) => void;
