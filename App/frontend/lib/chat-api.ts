@@ -3,7 +3,8 @@
  * Client-side streaming wrapper for Polynovea venue intelligence AI.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://43.205.229.130:8000";
+// Empty base → relative URLs. Vercel rewrites /api/* → EC2 backend (no mixed-content).
+const API_BASE = "";
 
 export interface ChatStreamOptions {
   onChunk: (chunk: string) => void;

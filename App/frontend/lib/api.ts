@@ -4,8 +4,9 @@
  * Matches FastAPI Pydantic models in backend/models.py exactly.
  */
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://43.205.229.130:8000";
+// Empty base → relative URLs. Vercel rewrites /api/* → EC2 backend (no mixed-content).
+// next.config.ts BACKEND_URL controls the proxy destination (default: EC2 IP).
+const API_BASE = "";
 
 // ─── Shared atoms ─────────────────────────────────────────────────────────────
 

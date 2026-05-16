@@ -26,15 +26,9 @@ function OfflineBanner() {
         </span>
       </div>
       <p className="text-on-surface-variant text-body-sm font-body-sm">
-        The API server at{" "}
-        <code className="text-primary-container font-data-mono text-[13px] bg-surface-container px-xs py-[1px] rounded">
-          http://localhost:8000
-        </code>{" "}
-        is unreachable. Start it with:
+        Cannot reach the backend. Check that the EC2 instance is running and
+        port 8000 is open.
       </p>
-      <div className="bg-[#0d0d11] border border-[#27272a] rounded p-sm font-data-mono text-[13px] text-primary-container select-all">
-        cd App/backend &amp;&amp; uvicorn main:app --reload --port 8000
-      </div>
     </div>
   );
 }
