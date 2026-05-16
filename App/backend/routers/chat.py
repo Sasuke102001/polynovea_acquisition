@@ -17,24 +17,24 @@ from database import get_pool
 from models import ChatRequest, ChatMessage
 from prompts import get_system_prompt
 from routers.utils import SEGMENT_LABELS
-from supabase import create_client
+import httpx
 
 router = APIRouter()
 
-# Supabase client (lazy initialization)
-_supabase_client = None
+_SUPABASE_URL = None
+_SUPABASE_KEY = None
 
-def get_supabase_client():
-    """Lazy-load Supabase client to ensure .env is loaded."""
-    global _supabase_client
-    if _supabase_client is None:
-        supabase_url = os.getenv("SUPABASE_URL")
-        # Use service role key for backend inserts — bypasses RLS, never exposed to browser
-        supabase_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY")
-        if not supabase_url or not supabase_key:
-            raise RuntimeError("SUPABASE_URL and SUPABASE_SECRET_KEY must be set in .env")
-        _supabase_client = create_client(supabase_url, supabase_key)
-    return _supabase_client
+def _supabase_headers() -> dict:
+    global _SUPABASE_URL, _SUPABASE_KEY
+    if not _SUPABASE_URL:
+        _SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+        _SUPABASE_KEY = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY", "")
+    return {
+        "apikey":        _SUPABASE_KEY,
+        "Authorization": f"Bearer {_SUPABASE_KEY}",
+        "Content-Type":  "application/json",
+        "Prefer":        "return=minimal",
+    }
 
 # Nvidia API config — single model for all tabs
 NVIDIA_API_BASE        = "https://integrate.api.nvidia.com/v1"
@@ -230,21 +230,22 @@ async def stream_from_nvidia(
 async def log_chat_to_supabase(
     venue_id: int, tab: str, question: str, context_snapshot: dict, response: str
 ) -> None:
-    """Async logging of chat to Supabase (fire-and-forget after response)."""
+    """Fire-and-forget: POST one row to Supabase REST API via httpx."""
     try:
-        supabase = get_supabase_client()
-        supabase.table("venue_chat_logs").insert({
-            "venue_id":        str(venue_id),
-            "tab":             tab,
-            "question":        question,
+        url = f"{_SUPABASE_URL or os.getenv('SUPABASE_URL', '').rstrip('/')}/rest/v1/venue_chat_logs"
+        payload = {
+            "venue_id":         str(venue_id),
+            "tab":              tab,
+            "question":         question,
             "context_snapshot": context_snapshot,
-            "response":        response,
-            "model_version":   "kimi-v1",
-            "source_type":     "ai_generated",
-            "schema_version":  1,
-        }).execute()
+            "response":         response,
+            "model_version":    "kimi-v1",
+            "source_type":      "ai_generated",
+            "schema_version":   1,
+        }
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(url, json=payload, headers=_supabase_headers())
     except Exception as e:
-        # Log error but don't fail the request
         print(f"Supabase logging failed: {e}")
 
 
