@@ -29,9 +29,10 @@ def get_supabase_client():
     global _supabase_client
     if _supabase_client is None:
         supabase_url = os.getenv("SUPABASE_URL")
-        supabase_key = os.getenv("SUPABASE_ANON_KEY")
+        # Use service role key for backend inserts — bypasses RLS, never exposed to browser
+        supabase_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY")
         if not supabase_url or not supabase_key:
-            raise RuntimeError("SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env")
+            raise RuntimeError("SUPABASE_URL and SUPABASE_SECRET_KEY must be set in .env")
         _supabase_client = create_client(supabase_url, supabase_key)
     return _supabase_client
 
@@ -233,12 +234,14 @@ async def log_chat_to_supabase(
     try:
         supabase = get_supabase_client()
         supabase.table("venue_chat_logs").insert({
-            "venue_id": str(venue_id),
-            "tab": tab,
-            "question": question,
+            "venue_id":        str(venue_id),
+            "tab":             tab,
+            "question":        question,
             "context_snapshot": context_snapshot,
-            "response": response,
-            "model_version": "kimi-v1",
+            "response":        response,
+            "model_version":   "kimi-v1",
+            "source_type":     "ai_generated",
+            "schema_version":  1,
         }).execute()
     except Exception as e:
         # Log error but don't fail the request
