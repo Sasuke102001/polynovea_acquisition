@@ -131,6 +131,7 @@ function NoTarget({ id }: { id: string }) {
           Set target in Transform
         </Link>
       </div>
+      <ChatDrawer venueId={parseInt(id)} tab="marketing" />
     </div>
   );
 }
