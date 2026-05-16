@@ -1,7 +1,7 @@
 """
 routers/chat.py
 AI chat endpoint for venue intelligence across Marketing, Competitors, Transform, and Deep/Risk tabs.
-Integrates with Nvidia/Kimi API for streaming responses.
+Supports fast (single-model) and council (3-model debate) modes.
 Logs all conversations to Supabase for training data collection.
 """
 
