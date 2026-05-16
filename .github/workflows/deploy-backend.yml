@@ -20,4 +20,14 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            bash ~/polynovea_acquisition/scripts/deploy-backend.sh
+            set -e
+            cd ~/polynovea_acquisition
+            echo "── Pulling latest code ──"
+            git pull origin master
+            echo "── Installing dependencies ──"
+            cd App/backend
+            pip install -r requirements.txt --quiet --break-system-packages
+            echo "── Restarting service ──"
+            sudo systemctl restart polynovea
+            sleep 2
+            sudo systemctl status polynovea --no-pager
