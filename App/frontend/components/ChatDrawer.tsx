@@ -206,7 +206,7 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 bg-primary text-surface rounded-full p-3 md:p-4 shadow-lg hover:opacity-90 transition-opacity"
+          className="fixed bottom-6 left-6 md:bottom-8 md:left-8 z-40 bg-primary text-surface rounded-full p-3 md:p-4 shadow-lg hover:opacity-90 transition-opacity"
           title="Open AI Chat"
         >
           <span className="material-symbols-outlined text-[24px] md:text-[28px]">smart_toy</span>
