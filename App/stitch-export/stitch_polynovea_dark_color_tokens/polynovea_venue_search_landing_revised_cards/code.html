@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea Intelligence System - Venue Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#979083",
+                      "surface-container-lowest": "#0e0e11",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-highest": "#353438",
+                      "surface-container-high": "#2a2a2d",
+                      "surface-container": "#1f1f22",
+                      "inverse-surface": "#e4e1e6",
+                      "primary-fixed": "#f5e1b0",
+                      "on-primary": "#3a2f0d",
+                      "inverse-primary": "#6b5d37",
+                      "on-surface": "#e4e1e6",
+                      "on-secondary-container": "#c9aeff",
+                      "surface-dim": "#131316",
+                      "surface-container-low": "#1b1b1e",
+                      "surface": "#131316",
+                      "on-primary-container": "#685a34",
+                      "primary": "#fff0cc",
+                      "error": "#ffb4ab",
+                      "on-primary-fixed": "#241a00",
+                      "background": "#131316",
+                      "tertiary-container": "#d4d1f2",
+                      "surface-variant": "#353438",
+                      "primary-fixed-dim": "#d8c596",
+                      "on-secondary-fixed-variant": "#5a00c6",
+                      "on-primary-fixed-variant": "#524621",
+                      "secondary": "#d2bbff",
+                      "on-tertiary-fixed": "#1a1931",
+                      "on-tertiary": "#2f2e47",
+                      "primary-container": "#e6d3a3",
+                      "on-surface-variant": "#cec6b7",
+                      "surface-bright": "#39393c",
+                      "tertiary-fixed-dim": "#c6c3e4",
+                      "on-background": "#e4e1e6",
+                      "on-secondary": "#3f008e",
+                      "tertiary-fixed": "#e2dfff",
+                      "on-tertiary-fixed-variant": "#45445f",
+                      "on-tertiary-container": "#5a5975",
+                      "tertiary": "#f2efff",
+                      "inverse-on-surface": "#303033",
+                      "secondary-fixed-dim": "#d2bbff",
+                      "on-secondary-fixed": "#25005a",
+                      "error-container": "#93000a",
+                      "secondary-fixed": "#eaddff",
+                      "on-error": "#690005",
+                      "surface-tint": "#d8c596",
+                      "outline-variant": "#4b463b",
+                      "secondary-container": "#6001d1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "md": "16px",
+                      "base": "4px",
+                      "margin": "24px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "xl": "40px"
+              },
+              "fontFamily": {
+                      "headline-md": ["JetBrains Mono"],
+                      "headline-lg": ["JetBrains Mono"],
+                      "label-md": ["JetBrains Mono"],
+                      "body-lg": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "display-lg": ["JetBrains Mono"],
+                      "label-sm": ["JetBrains Mono"],
+                      "data-mono": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "1", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                      "data-mono": ["14px", {"lineHeight": "1", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { background-color: #131316; }
+        .score-ring { stroke-dasharray: 220; stroke-dashoffset: 220; transform: rotate(-90deg); transform-origin: 50% 50%; }
+        .score-ring.green { stroke: #22c55e; }
+        .score-ring.amber { stroke: #f59e0b; }
+        .venue-card {
+            border-color: #27272A;
+            transition: all 0.2s ease-in-out;
+        }
+        .venue-card:hover {
+            border-color: #e6d3a3;
+            box-shadow: 0 0 0 1px #e6d3a3, 0 0 15px rgba(230, 211, 163, 0.1);
+            transform: scale(1.01);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style data-stitch-cursor=""></style><style data-stitch-scroll-lock=""></style></head>
+<body class="text-on-surface min-h-screen flex flex-col font-body-md bg-background">
+<!-- TopAppBar -->
+<header class="bg-surface-dim dark:bg-surface-dim w-full top-0 sticky border-b border-outline-variant flex items-center justify-between px-md h-16 w-full z-50">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary">terminal</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary tracking-tighter">Polynovea Intelligence System</h1>
+</div>
+<div>
+<span class="material-symbols-outlined text-primary dark:text-primary cursor-pointer active:opacity-80 hover:bg-surface-container-highest transition-colors p-sm rounded">search</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-7xl mx-auto px-md md:px-lg py-xl flex flex-col gap-xl">
+<!-- Hero Section -->
+<section class="flex flex-col gap-sm items-center text-center max-w-2xl mx-auto">
+<h2 class="font-display-lg text-display-lg text-primary">Find Your Venue</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Analyze intelligence risk and reliability across high-density locations.</p>
+</section>
+<!-- Search Bar -->
+<section class="w-full max-w-3xl mx-auto">
+<div class="relative w-full group">
+<div class="absolute inset-y-0 left-0 flex items-center pl-sm pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<input class="w-full bg-[#121212] border border-[#27272A] text-on-surface font-body-md rounded pl-xl pr-sm py-md focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all placeholder-on-surface-variant" placeholder="Search by venue name, area, or city..." type="text"/>
+</div>
+</section>
+<!-- Filter Chips -->
+<section class="w-full max-w-3xl mx-auto overflow-x-auto pb-sm hide-scrollbar">
+<div class="flex gap-sm items-center flex-nowrap w-max">
+<button class="px-sm py-xs rounded border border-[#27272A] bg-[#121212] text-on-surface-variant font-label-sm text-label-sm uppercase hover:bg-surface-container-high transition-colors whitespace-nowrap">Navi Mumbai</button>
+<button class="px-sm py-xs rounded border border-[#27272A] bg-[#121212] text-on-surface-variant font-label-sm text-label-sm uppercase hover:bg-surface-container-high transition-colors whitespace-nowrap">Mumbai SoBo</button>
+<button class="px-sm py-xs rounded border border-[#27272A] bg-[#121212] text-on-surface-variant font-label-sm text-label-sm uppercase hover:bg-surface-container-high transition-colors whitespace-nowrap">Mumbai Main</button>
+<button class="px-sm py-xs rounded border border-[#27272A] bg-[#121212] text-on-surface-variant font-label-sm text-label-sm uppercase hover:bg-surface-container-high transition-colors whitespace-nowrap">Thane</button>
+</div>
+</section>
+<!-- Results Grid -->
+<section class="w-full max-w-4xl mx-auto flex flex-col gap-md md:grid md:grid-cols-2 lg:grid-cols-1"><!-- Venue Card 1 -->
+<div class="venue-card bg-surface rounded p-md flex flex-row items-center justify-between border cursor-pointer group">
+<div class="flex flex-col gap-sm">
+<div>
+<h3 class="font-['Inter'] text-[14px] font-bold text-white tracking-tight">Café Social Mumbai</h3>
+<p class="font-['Inter'] text-[12px] text-[#8B8B9E]">SoBo Area, Mumbai</p>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Casual Dine</span>
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">All-Day Café</span>
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Quick Bites</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center px-xs py-[1px] rounded text-[10px] uppercase bg-secondary-container/10 text-secondary-container border border-secondary-container/20">Habit Former</span>
+<span class="inline-flex items-center px-xs py-[1px] rounded text-[10px] uppercase bg-secondary-container/10 text-secondary-container border border-secondary-container/20">Trusted Regular</span>
+</div>
+</div>
+<div class="relative w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 80 80">
+<circle cx="40" cy="40" fill="none" r="35" stroke="#27272A" stroke-width="4"></circle>
+<circle class="score-ring green" cx="40" cy="40" fill="none" r="35" stroke-dashoffset="61.6" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-data-mono text-data-mono text-[#22c55e]">72</span>
+</div>
+</div>
+</div>
+<!-- Venue Card 2 -->
+<div class="venue-card bg-surface rounded p-md flex flex-row items-center justify-between border cursor-pointer group">
+<div class="flex flex-col gap-sm">
+<div>
+<h3 class="font-['Inter'] text-[14px] font-bold text-white tracking-tight">The Vault Restaurant</h3>
+<p class="font-['Inter'] text-[12px] text-[#8B8B9E]">Main Area, Mumbai</p>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Fine Dine</span>
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Bar</span>
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Lounge</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center px-xs py-[1px] rounded text-[10px] uppercase bg-secondary-container/10 text-secondary-container border border-secondary-container/20">Scene Seeker</span>
+<span class="inline-flex items-center px-xs py-[1px] rounded text-[10px] uppercase bg-secondary-container/10 text-secondary-container border border-secondary-container/20">Lifestyle Regular</span>
+</div>
+</div>
+<div class="relative w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 80 80">
+<circle cx="40" cy="40" fill="none" r="35" stroke="#27272A" stroke-width="4"></circle>
+<circle class="score-ring amber" cx="40" cy="40" fill="none" r="35" stroke-dashoffset="92.4" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span #f59e0b"="" class="font-data-mono text-data-mono text=">58</span>
+</div>
+</div>
+</div>
+<!-- Venue Card 3 -->
+<div class="venue-card bg-surface rounded p-md flex flex-row items-center justify-between border cursor-pointer group">
+<div class="flex flex-col gap-sm">
+<div>
+<h3 class="font-['Inter'] text-[14px] font-bold text-white tracking-tight">Navi Club Lounge</h3>
+<p class="font-['Inter'] text-[12px] text-[#8B8B9E]">Navi Mumbai Area, Mumbai</p>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Lounge</span>
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Bar</span>
+<span class="inline-flex items-center px-xs py-[2px] rounded font-label-sm text-label-sm uppercase bg-primary-container/10 text-primary-container border border-primary-container/20">Nightclub</span>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="inline-flex items-center px-xs py-[1px] rounded text-[10px] uppercase bg-secondary-container/10 text-secondary-container border border-secondary-container/20">Party Seeker</span>
+<span class="inline-flex items-center px-xs py-[1px] rounded text-[10px] uppercase bg-secondary-container/10 text-secondary-container border border-secondary-container/20">Trend Hunter</span>
+</div>
+</div>
+<div class="relative w-[80px] h-[80px] flex-shrink-0 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 80 80">
+<circle cx="40" cy="40" fill="none" r="35" stroke="#27272A" stroke-width="4"></circle>
+<circle class="score-ring green" cx="40" cy="40" fill="none" r="35" stroke-dashoffset="41.8" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-data-mono text-data-mono text-[#22c55e]">81</span>
+</div>
+</div>
+</div></section>
+</main>
+</body></html>

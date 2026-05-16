@@ -1,0 +1,778 @@
+{
+  "version": "1.0",
+  "description": "PostgreSQL Schema Definition - 17 Core Tables",
+  "last_updated": "2026-05-14",
+  "database": "polynovea_module2",
+  "tables": {
+    "venues": {
+      "description": "Venue metadata from step_5_behavioral_scores.json",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique venue identifier"
+        },
+        {
+          "name": "place_id",
+          "type": "VARCHAR(255) UNIQUE NOT NULL",
+          "description": "Google Places API place_id"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(255) NOT NULL",
+          "description": "Venue name"
+        },
+        {
+          "name": "area",
+          "type": "VARCHAR(255)",
+          "description": "Geographic area (navi-mumbai, mumbai-sobo, mumbai-main, thane)"
+        },
+        {
+          "name": "category",
+          "type": "VARCHAR(100)",
+          "description": "Surface category (casual_dining, premium_dining, etc.)"
+        },
+        {
+          "name": "latitude",
+          "type": "DECIMAL(9,6)",
+          "description": "Geographic latitude"
+        },
+        {
+          "name": "longitude",
+          "type": "DECIMAL(9,6)",
+          "description": "Geographic longitude"
+        },
+        {
+          "name": "types",
+          "type": "TEXT",
+          "description": "Google Places API types (JSON array)"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "Record creation timestamp"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "Record last update timestamp"
+        }
+      ]
+    },
+    "primitives_scores": {
+      "description": "54-dimensional behavioral scores per venue (Google-only in Phase 1)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "venue_id",
+          "type": "INTEGER NOT NULL REFERENCES venues(id)",
+          "description": "Foreign key to venue"
+        },
+        {
+          "name": "source",
+          "type": "VARCHAR(50) DEFAULT 'google'",
+          "description": "Data source (google, zomato, magicpin)"
+        },
+        {
+          "name": "primitive_id",
+          "type": "VARCHAR(100) NOT NULL",
+          "description": "Reference to primitives.json ID"
+        },
+        {
+          "name": "score",
+          "type": "DECIMAL(3,2)",
+          "description": "Primitive score (0-1 range)"
+        },
+        {
+          "name": "confidence",
+          "type": "DECIMAL(3,2)",
+          "description": "Confidence level of score extraction"
+        },
+        {
+          "name": "last_updated",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When this score was last calculated"
+        }
+      ]
+    },
+    "venue_fitness_dimensions": {
+      "description": "5 revenue mechanism fitness scores per venue",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "venue_id",
+          "type": "INTEGER NOT NULL UNIQUE REFERENCES venues(id)",
+          "description": "Foreign key to venue"
+        },
+        {
+          "name": "fitness_for_office_lunch",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for office lunch use case (0-1)"
+        },
+        {
+          "name": "fitness_for_repeat_habit",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for repeat habit/loyalty (0-1)"
+        },
+        {
+          "name": "fitness_for_social_dwell",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for social group hanging out (0-1)"
+        },
+        {
+          "name": "fitness_for_group_energy",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for high-energy group events (0-1)"
+        },
+        {
+          "name": "fitness_for_destination_visit",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness as a destination venue (0-1)"
+        },
+        {
+          "name": "operational_quality",
+          "type": "DECIMAL(3,2)",
+          "description": "How well venue executes its patterns (0-1)"
+        },
+        {
+          "name": "retention_strength",
+          "type": "DECIMAL(3,2)",
+          "description": "Loyalty/repeat visit potential (0-1)"
+        },
+        {
+          "name": "monetization_potential",
+          "type": "DECIMAL(3,2)",
+          "description": "Revenue opportunity (0-1)"
+        }
+      ]
+    },
+    "behavioral_patterns": {
+      "description": "Market-level behavioral patterns from step_4_patterns_recognized.json",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique pattern identifier"
+        },
+        {
+          "name": "area",
+          "type": "VARCHAR(255) NOT NULL",
+          "description": "Geographic area where pattern identified"
+        },
+        {
+          "name": "co_occurring_primitives",
+          "type": "TEXT NOT NULL",
+          "description": "Array of primitive IDs that cluster (JSON)"
+        },
+        {
+          "name": "pattern_name",
+          "type": "VARCHAR(255)",
+          "description": "Human-readable pattern name"
+        },
+        {
+          "name": "total_venues_in_city",
+          "type": "INTEGER",
+          "description": "Total venues analyzed for pattern"
+        },
+        {
+          "name": "prevalence_percentage",
+          "type": "DECIMAL(5,2)",
+          "description": "Percentage of venues matching pattern"
+        },
+        {
+          "name": "detected_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When pattern was detected"
+        }
+      ]
+    },
+    "pattern_venues": {
+      "description": "Mapping of venues to patterns",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "venue_id",
+          "type": "INTEGER NOT NULL REFERENCES venues(id)",
+          "description": "Foreign key to venue"
+        },
+        {
+          "name": "pattern_id",
+          "type": "INTEGER NOT NULL REFERENCES behavioral_patterns(id)",
+          "description": "Foreign key to pattern"
+        },
+        {
+          "name": "match_strength",
+          "type": "DECIMAL(3,2)",
+          "description": "How strongly venue matches pattern (0-1)"
+        }
+      ]
+    },
+    "pattern_scores": {
+      "description": "Confidence-weighted metrics from step_5_patterns_scored.json",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "pattern_id",
+          "type": "INTEGER NOT NULL UNIQUE REFERENCES behavioral_patterns(id)",
+          "description": "Foreign key to pattern"
+        },
+        {
+          "name": "confidence_score",
+          "type": "DECIMAL(5,2)",
+          "description": "Market confidence this pattern is real (0-100)"
+        },
+        {
+          "name": "evidence_density",
+          "type": "DECIMAL(3,2)",
+          "description": "Strength of evidence supporting pattern (0-1)"
+        },
+        {
+          "name": "temporal_consistency",
+          "type": "DECIMAL(3,2)",
+          "description": "Consistency over time (0-1)"
+        },
+        {
+          "name": "evidence_diversity",
+          "type": "DECIMAL(3,2)",
+          "description": "Diversity of evidence sources (0-1)"
+        },
+        {
+          "name": "commercial_reliability",
+          "type": "DECIMAL(3,2)",
+          "description": "Reliability for business decisions (0-1)"
+        },
+        {
+          "name": "venue_count",
+          "type": "INTEGER",
+          "description": "Number of venues matching pattern"
+        }
+      ]
+    },
+    "pattern_fitness_dimensions": {
+      "description": "Per-pattern fitness scores for 5 use cases",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "pattern_id",
+          "type": "INTEGER NOT NULL UNIQUE REFERENCES behavioral_patterns(id)",
+          "description": "Foreign key to pattern"
+        },
+        {
+          "name": "fitness_for_office_lunch",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for office lunch (0-1)"
+        },
+        {
+          "name": "fitness_for_repeat_habit",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for repeat habit (0-1)"
+        },
+        {
+          "name": "fitness_for_social_dwell",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for social dwell (0-1)"
+        },
+        {
+          "name": "fitness_for_group_energy",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for group energy (0-1)"
+        },
+        {
+          "name": "fitness_for_destination_visit",
+          "type": "DECIMAL(3,2)",
+          "description": "Fitness for destination visit (0-1)"
+        }
+      ]
+    },
+    "intervention_triggers": {
+      "description": "Actionable business signals per pattern",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "pattern_id",
+          "type": "INTEGER NOT NULL REFERENCES behavioral_patterns(id)",
+          "description": "Foreign key to pattern"
+        },
+        {
+          "name": "intervention_type",
+          "type": "VARCHAR(100)",
+          "description": "Type of intervention (operational_optimization, premium_justification, etc.)"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "description": "Description of intervention opportunity"
+        },
+        {
+          "name": "expected_roi_impact",
+          "type": "VARCHAR(100)",
+          "description": "Expected ROI multiplier (e.g., '1.57x revenue')"
+        }
+      ]
+    },
+    "venue_similarity": {
+      "description": "Similarity scores between venues from step_5b_similarity.json",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "venue_id_1",
+          "type": "INTEGER NOT NULL REFERENCES venues(id)",
+          "description": "First venue"
+        },
+        {
+          "name": "venue_id_2",
+          "type": "INTEGER NOT NULL REFERENCES venues(id)",
+          "description": "Second venue"
+        },
+        {
+          "name": "similarity_score",
+          "type": "DECIMAL(3,2)",
+          "description": "Similarity score (0-1)"
+        },
+        {
+          "name": "shared_primitives",
+          "type": "TEXT",
+          "description": "Array of shared primitive IDs (JSON)"
+        },
+        {
+          "name": "shared_primitive_count",
+          "type": "INTEGER",
+          "description": "Count of shared primitives"
+        }
+      ]
+    },
+    "venue_vectors": {
+      "description": "5-dimensional fitness vectors per venue",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "venue_id",
+          "type": "INTEGER NOT NULL UNIQUE REFERENCES venues(id)",
+          "description": "Foreign key to venue"
+        },
+        {
+          "name": "vector_stability",
+          "type": "NUMERIC[] NOT NULL",
+          "description": "5-d fitness vector (long-term behavior)"
+        },
+        {
+          "name": "vector_realtime",
+          "type": "NUMERIC[]",
+          "description": "5-d fitness vector (current vibe, Phase 2)"
+        },
+        {
+          "name": "last_computed",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When vector was last computed"
+        }
+      ]
+    },
+    "data_quality_metrics": {
+      "description": "Overall metrics from step_4b_governance_report.json",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "area",
+          "type": "VARCHAR(255) UNIQUE NOT NULL",
+          "description": "Geographic area"
+        },
+        {
+          "name": "avg_confidence",
+          "type": "DECIMAL(3,3)",
+          "description": "Average signal confidence across venues"
+        },
+        {
+          "name": "avg_reliability",
+          "type": "DECIMAL(3,3)",
+          "description": "Pattern stability and evidence strength"
+        },
+        {
+          "name": "reliability_score",
+          "type": "DECIMAL(3,3)",
+          "description": "Overall data quality score"
+        },
+        {
+          "name": "high_reliability_clusters",
+          "type": "INTEGER",
+          "description": "Count of high-quality patterns"
+        },
+        {
+          "name": "total_clusters",
+          "type": "INTEGER",
+          "description": "Total patterns analyzed"
+        },
+        {
+          "name": "measured_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When metrics were measured"
+        }
+      ]
+    },
+    "drift_signals": {
+      "description": "Emerging new patterns with confidence scores",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique record identifier"
+        },
+        {
+          "name": "area",
+          "type": "VARCHAR(255) NOT NULL",
+          "description": "Geographic area"
+        },
+        {
+          "name": "pattern_description",
+          "type": "TEXT NOT NULL",
+          "description": "Description of emerging pattern"
+        },
+        {
+          "name": "confidence_score",
+          "type": "DECIMAL(3,2)",
+          "description": "Confidence in new pattern (0-1)"
+        },
+        {
+          "name": "trend_direction",
+          "type": "VARCHAR(50)",
+          "description": "Emerging or declining"
+        },
+        {
+          "name": "detected_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When drift signal detected"
+        }
+      ]
+    },
+    "survey_responses_canonical": {
+      "description": "Normalized survey responses (45 total)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique response identifier"
+        },
+        {
+          "name": "response_id",
+          "type": "VARCHAR(100) UNIQUE NOT NULL",
+          "description": "Original response ID from form"
+        },
+        {
+          "name": "form_version",
+          "type": "VARCHAR(10)",
+          "description": "Form version (v1, v2)"
+        },
+        {
+          "name": "age_group",
+          "type": "VARCHAR(50)",
+          "description": "Age group from demographics"
+        },
+        {
+          "name": "city",
+          "type": "VARCHAR(100)",
+          "description": "City from demographics"
+        },
+        {
+          "name": "company_size",
+          "type": "VARCHAR(50)",
+          "description": "Number of people in typical group"
+        },
+        {
+          "name": "visit_frequency",
+          "type": "VARCHAR(50)",
+          "description": "How often visits restaurants"
+        },
+        {
+          "name": "energy_preference",
+          "type": "VARCHAR(50)",
+          "description": "Preferred energy level (high, medium, low)"
+        },
+        {
+          "name": "place_preference",
+          "type": "VARCHAR(50)",
+          "description": "Preferred place type (casual, premium, etc.)"
+        },
+        {
+          "name": "social_personality",
+          "type": "VARCHAR(50)",
+          "description": "Social personality type"
+        },
+        {
+          "name": "fomo_tendency",
+          "type": "DECIMAL(3,2)",
+          "description": "FOMO tendency score (0-1)"
+        },
+        {
+          "name": "discovery_tendency",
+          "type": "DECIMAL(3,2)",
+          "description": "Discovery tendency score (0-1)"
+        },
+        {
+          "name": "group_influence",
+          "type": "DECIMAL(3,2)",
+          "description": "Group influence susceptibility (0-1)"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(255)",
+          "description": "Email address for contact"
+        },
+        {
+          "name": "instagram_handle",
+          "type": "VARCHAR(100)",
+          "description": "Instagram handle if shared"
+        },
+        {
+          "name": "newsletter_consent",
+          "type": "BOOLEAN DEFAULT FALSE",
+          "description": "Consent to newsletter"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When response was recorded"
+        }
+      ]
+    },
+    "user_archetypes": {
+      "description": "35 computed user types",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique archetype instance"
+        },
+        {
+          "name": "response_id",
+          "type": "VARCHAR(100) NOT NULL REFERENCES survey_responses_canonical(response_id)",
+          "description": "Link to survey response"
+        },
+        {
+          "name": "archetype_name",
+          "type": "VARCHAR(100) NOT NULL",
+          "description": "Name of archetype (e.g., Party Seeker, Calm Pairs)"
+        },
+        {
+          "name": "confidence_score",
+          "type": "DECIMAL(3,2)",
+          "description": "Confidence in archetype assignment (0-1)"
+        },
+        {
+          "name": "primary_traits",
+          "type": "TEXT",
+          "description": "Primary behavioral traits (JSON array)"
+        },
+        {
+          "name": "secondary_traits",
+          "type": "TEXT",
+          "description": "Secondary behavioral traits (JSON array)"
+        },
+        {
+          "name": "computed_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "When archetype was computed"
+        }
+      ]
+    },
+    "demographic_segments": {
+      "description": "Canonical demographic categories (NEW - Phase 1 Marketing)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique segment identifier"
+        },
+        {
+          "name": "segment_id",
+          "type": "VARCHAR(100) UNIQUE NOT NULL",
+          "description": "Segment code (e.g., col_1, office_lunch_1)"
+        },
+        {
+          "name": "segment_name",
+          "type": "VARCHAR(255) NOT NULL",
+          "description": "Human-readable name"
+        },
+        {
+          "name": "segment_description",
+          "type": "TEXT",
+          "description": "Detailed description of segment"
+        },
+        {
+          "name": "age_range",
+          "type": "VARCHAR(50)",
+          "description": "Age range characteristic"
+        },
+        {
+          "name": "company_size_range",
+          "type": "VARCHAR(50)",
+          "description": "Typical group size"
+        },
+        {
+          "name": "when",
+          "type": "VARCHAR(100)",
+          "description": "When they visit (weekends, lunch, etc.)"
+        },
+        {
+          "name": "area",
+          "type": "VARCHAR(255)",
+          "description": "Geographic area"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+          "description": "Record creation time"
+        }
+      ]
+    },
+    "demographic_archetype_mapping": {
+      "description": "Prevalence of archetypes in demographic segments (NEW - Phase 1 Marketing)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique mapping identifier"
+        },
+        {
+          "name": "segment_id",
+          "type": "VARCHAR(100) NOT NULL REFERENCES demographic_segments(segment_id)",
+          "description": "Demographic segment"
+        },
+        {
+          "name": "archetype_name",
+          "type": "VARCHAR(100) NOT NULL",
+          "description": "Archetype name"
+        },
+        {
+          "name": "prevalence_percentage",
+          "type": "DECIMAL(5,2) NOT NULL",
+          "description": "Percentage of segment with this archetype"
+        },
+        {
+          "name": "population_count",
+          "type": "INTEGER",
+          "description": "Number of responses in this segment-archetype pair"
+        },
+        {
+          "name": "confidence_score",
+          "type": "DECIMAL(3,2)",
+          "description": "Confidence in prevalence estimate (0-1)"
+        }
+      ]
+    },
+    "demographic_archetype_interventions": {
+      "description": "Recommended interventions for segment-archetype pairs (NEW - Phase 1 Marketing)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique intervention identifier"
+        },
+        {
+          "name": "segment_id",
+          "type": "VARCHAR(100) NOT NULL REFERENCES demographic_segments(segment_id)",
+          "description": "Demographic segment"
+        },
+        {
+          "name": "archetype_name",
+          "type": "VARCHAR(100) NOT NULL",
+          "description": "Archetype name"
+        },
+        {
+          "name": "intervention_type",
+          "type": "VARCHAR(100) NOT NULL",
+          "description": "Intervention category"
+        },
+        {
+          "name": "description",
+          "type": "TEXT NOT NULL",
+          "description": "Detailed description of intervention"
+        },
+        {
+          "name": "expected_roi",
+          "type": "VARCHAR(100)",
+          "description": "Expected ROI multiplier"
+        }
+      ]
+    },
+    "demographic_behavioral_alignment": {
+      "description": "Which primitives matter most per demographic segment (NEW - Phase 1 Marketing)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "SERIAL PRIMARY KEY",
+          "description": "Unique alignment record"
+        },
+        {
+          "name": "segment_id",
+          "type": "VARCHAR(100) NOT NULL REFERENCES demographic_segments(segment_id)",
+          "description": "Demographic segment"
+        },
+        {
+          "name": "archetype_name",
+          "type": "VARCHAR(100) NOT NULL",
+          "description": "Archetype name"
+        },
+        {
+          "name": "primary_primitives",
+          "type": "TEXT NOT NULL",
+          "description": "Most important primitives (JSON array)"
+        },
+        {
+          "name": "secondary_primitives",
+          "type": "TEXT",
+          "description": "Secondary important primitives (JSON array)"
+        },
+        {
+          "name": "critical_fitness_dimension",
+          "type": "VARCHAR(100)",
+          "description": "Most critical fitness dimension for this group"
+        }
+      ]
+    }
+  },
+  "indexes": [
+    "CREATE INDEX idx_venues_area ON venues(area);",
+    "CREATE INDEX idx_venues_category ON venues(category);",
+    "CREATE INDEX idx_primitives_scores_venue ON primitives_scores(venue_id);",
+    "CREATE INDEX idx_primitives_scores_source ON primitives_scores(source);",
+    "CREATE INDEX idx_pattern_venues_pattern ON pattern_venues(pattern_id);",
+    "CREATE INDEX idx_survey_responses_city ON survey_responses_canonical(city);",
+    "CREATE INDEX idx_user_archetypes_archetype ON user_archetypes(archetype_name);",
+    "CREATE INDEX idx_demographic_segments_area ON demographic_segments(area);"
+  ]
+}

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea Color Tokens</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#5a5975",
+                        "on-surface-variant": "#cec6b7",
+                        "primary-fixed-dim": "#d8c596",
+                        "surface-container-high": "#2a2a2d",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "outline-variant": "#4b463b",
+                        "secondary": "#d2bbff",
+                        "on-secondary-container": "#c9aeff",
+                        "primary": "#fff0cc",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "surface-container-highest": "#353438",
+                        "on-tertiary-fixed": "#1a1931",
+                        "inverse-on-surface": "#303033",
+                        "tertiary-fixed": "#e2dfff",
+                        "error-container": "#93000a",
+                        "on-surface": "#e4e1e6",
+                        "surface-container": "#1f1f22",
+                        "on-primary-fixed-variant": "#524621",
+                        "inverse-surface": "#e4e1e6",
+                        "surface-dim": "#131316",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "surface": "#131316",
+                        "surface-container-lowest": "#0e0e11",
+                        "on-primary-container": "#685a34",
+                        "secondary-fixed": "#eaddff",
+                        "surface-bright": "#39393c",
+                        "on-secondary-fixed": "#25005a",
+                        "surface-tint": "#d8c596",
+                        "tertiary-fixed-dim": "#c6c3e4",
+                        "tertiary": "#f2efff",
+                        "surface-variant": "#353438",
+                        "tertiary-container": "#d4d1f2",
+                        "primary-fixed": "#f5e1b0",
+                        "secondary-container": "#6001d1",
+                        "primary-container": "#e6d3a3",
+                        "error": "#ffb4ab",
+                        "on-background": "#e4e1e6",
+                        "on-primary": "#3a2f0d",
+                        "background": "#131316",
+                        "surface-container-low": "#1b1b1e",
+                        "on-tertiary-fixed-variant": "#45445f",
+                        "inverse-primary": "#6b5d37",
+                        "outline": "#979083",
+                        "on-secondary": "#3f008e",
+                        "on-tertiary": "#2f2e47",
+                        "on-primary-fixed": "#241a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin": "24px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "xl": "40px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["JetBrains Mono"],
+                        "label-sm": ["JetBrains Mono"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "display-lg": ["JetBrains Mono"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "data-mono": ["14px", { "lineHeight": "1", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #F5F5F5;
+        }
+        .color-card {
+            border: 1px solid #27272A;
+            background-color: #18181B;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-margin h-16 z-50 sticky">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined cursor-pointer active:opacity-80 text-primary hover:bg-surface-container-high transition-colors p-sm rounded-lg" data-icon="grid_view">grid_view</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Polynovea Intelligence System</h1>
+</div>
+<div>
+<span class="material-symbols-outlined cursor-pointer active:opacity-80 text-primary hover:bg-surface-container-high transition-colors p-sm rounded-lg" data-icon="settings">settings</span>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- NavigationDrawer -->
+<aside class="hidden md:flex flex-col bg-surface-container-low dark:bg-surface-container-low docked left-0 h-[calc(100vh-64px)] w-[240px] border-r border-outline-variant flat no shadows sticky top-16 p-md gap-sm shrink-0">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-md font-bold uppercase tracking-wider text-[10px]">Design Architecture</h2>
+<nav class="flex flex-col gap-xs">
+<a class="flex items-center gap-sm px-sm py-xs rounded-DEFAULT bg-secondary-container text-on-secondary-container font-bold hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="palette" style="font-variation-settings: 'FILL' 1;">palette</span>
+<span class="font-label-md text-label-md">Color Tokens</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="text_fields">text_fields</span>
+<span class="font-label-md text-label-md">Typography</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="widgets">widgets</span>
+<span class="font-label-md text-label-md">Component Library</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[18px]" data-icon="terminal">terminal</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 p-margin w-full max-w-[1600px] mx-auto overflow-x-hidden">
+<div class="mb-lg border-b border-[#27272A] pb-sm">
+<h2 class="font-headline-lg text-headline-lg text-[#F5F5F5]">Color Tokens Reference</h2>
+<p class="font-body-sm text-body-sm text-[#A1A1AA] mt-xs">Systematic grid of core color swatches for the Polynovea environment.</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-md">
+<!-- Swatch: bg-base -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#0A0A0A] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">bg-base</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#0A0A0A</span>
+</div>
+</div>
+<!-- Swatch: bg-elevated -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#121212] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">bg-elevated</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#121212</span>
+</div>
+</div>
+<!-- Swatch: surface -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#18181B] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">surface</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#18181B</span>
+</div>
+</div>
+<!-- Swatch: border -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#27272A] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">border</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#27272A</span>
+</div>
+</div>
+<!-- Swatch: text-primary -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#F5F5F5] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">text-primary</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#F5F5F5</span>
+</div>
+</div>
+<!-- Swatch: text-secondary -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#A1A1AA] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">text-secondary</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#A1A1AA</span>
+</div>
+</div>
+<!-- Swatch: text-disabled -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#71717A] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">text-disabled</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#71717A</span>
+</div>
+</div>
+<!-- Swatch: accent-gold -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#E6D3A3] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">accent-gold</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#E6D3A3</span>
+</div>
+</div>
+<!-- Swatch: accent-gold-muted -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#9A8F6A] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">accent-gold-muted</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#9A8F6A</span>
+</div>
+</div>
+<!-- Swatch: accent-violet -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#7C3AED] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">accent-violet</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#7C3AED</span>
+</div>
+</div>
+<!-- Swatch: signal-positive -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#10B981] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">signal-positive</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#10B981</span>
+</div>
+</div>
+<!-- Swatch: signal-warning -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200">
+<div class="h-24 w-full bg-[#F59E0B] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs">
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">signal-warning</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#F59E0B</span>
+</div>
+</div>
+<!-- Swatch: signal-risk -->
+<div class="color-card rounded-lg overflow-hidden flex flex-col group hover:border-[#E6D3A3] transition-colors duration-200 border-t-2 !border-t-[#EF4444]">
+<div class="h-24 w-full bg-[#EF4444] border-b border-[#27272A]"></div>
+<div class="p-sm flex flex-col gap-xs relative">
+<div class="absolute top-sm right-sm w-2 h-2 rounded-full bg-[#7C3AED]"></div>
+<span class="font-label-sm text-label-sm text-[#F5F5F5]">signal-risk</span>
+<span class="font-data-mono text-data-mono text-[#A1A1AA]">#EF4444</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,485 @@
+{
+  "version": "1.0",
+  "description": "54 Behavioral Primitives - Core Registry for Venue Analysis",
+  "last_updated": "2026-05-14",
+  "total_primitives": 54,
+  "primitives": {
+    "food_quality": {
+      "id": "food_quality",
+      "name": "Food Quality",
+      "category": "culinary",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Quality of food preparation, ingredient freshness, taste",
+      "extraction_keywords": ["fresh", "delicious", "taste", "flavor", "quality", "authentic"]
+    },
+    "food_authenticity": {
+      "id": "food_authenticity",
+      "name": "Food Authenticity",
+      "category": "culinary",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Authenticity of cuisine and traditional preparation",
+      "extraction_keywords": ["authentic", "traditional", "genuine", "real", "original"]
+    },
+    "food_variety": {
+      "id": "food_variety",
+      "name": "Food Variety",
+      "category": "culinary",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Range and diversity of menu options",
+      "extraction_keywords": ["variety", "options", "menu", "diverse", "choice"]
+    },
+    "portion_size": {
+      "id": "portion_size",
+      "name": "Portion Size",
+      "category": "culinary",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Adequacy and generosity of portions",
+      "extraction_keywords": ["portion", "serving", "generous", "plenty", "generous"]
+    },
+    "value_for_money": {
+      "id": "value_for_money",
+      "name": "Value for Money",
+      "category": "pricing",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Price-to-quality ratio perception",
+      "extraction_keywords": ["value", "worth", "expensive", "cheap", "reasonably"]
+    },
+    "pricing_premium": {
+      "id": "pricing_premium",
+      "name": "Pricing Premium",
+      "category": "pricing",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Perceived premium nature of pricing",
+      "extraction_keywords": ["expensive", "premium", "costly", "high-end", "upscale"]
+    },
+    "service_speed": {
+      "id": "service_speed",
+      "name": "Service Speed",
+      "category": "service",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Efficiency and speed of service delivery",
+      "extraction_keywords": ["fast", "quick", "slow", "wait", "speedy", "prompt"]
+    },
+    "service_attentiveness": {
+      "id": "service_attentiveness",
+      "name": "Service Attentiveness",
+      "category": "service",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Staff attentiveness and responsiveness",
+      "extraction_keywords": ["attentive", "responsive", "careful", "helpful", "considerate"]
+    },
+    "staff_warmth": {
+      "id": "staff_warmth",
+      "name": "Staff Warmth",
+      "category": "service",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Friendliness and warmth of staff interaction",
+      "extraction_keywords": ["friendly", "warm", "welcoming", "hospitable", "nice"]
+    },
+    "staff_knowledgeable": {
+      "id": "staff_knowledgeable",
+      "name": "Staff Knowledgeable",
+      "category": "service",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Knowledge of menu and offerings",
+      "extraction_keywords": ["knowledgeable", "expert", "informed", "educated", "knows"]
+    },
+    "ambience_comfortable": {
+      "id": "ambience_comfortable",
+      "name": "Ambience Comfortable",
+      "category": "ambience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Overall comfort of the physical space",
+      "extraction_keywords": ["comfortable", "cozy", "relaxed", "ease", "cushy"]
+    },
+    "ambience_intimate": {
+      "id": "ambience_intimate",
+      "name": "Ambience Intimate",
+      "category": "ambience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Intimacy and privacy of space",
+      "extraction_keywords": ["intimate", "private", "cozy", "romantic", "quiet"]
+    },
+    "ambience_energy": {
+      "id": "ambience_energy",
+      "name": "Ambience Energy",
+      "category": "ambience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Energetic and lively atmosphere",
+      "extraction_keywords": ["lively", "vibrant", "energetic", "buzzing", "alive"]
+    },
+    "music_quality": {
+      "id": "music_quality",
+      "name": "Music Quality",
+      "category": "ambience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Quality and appropriateness of music",
+      "extraction_keywords": ["music", "song", "playlist", "beats", "audio"]
+    },
+    "cleanliness": {
+      "id": "cleanliness",
+      "name": "Cleanliness",
+      "category": "hygiene",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Cleanliness of venue and facilities",
+      "extraction_keywords": ["clean", "dirty", "hygiene", "spotless", "neat"]
+    },
+    "seating_comfort": {
+      "id": "seating_comfort",
+      "name": "Seating Comfort",
+      "category": "facilities",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Comfort of seating arrangements",
+      "extraction_keywords": ["seating", "chair", "table", "comfortable", "ergonomic"]
+    },
+    "seating_spacing": {
+      "id": "seating_spacing",
+      "name": "Seating Spacing",
+      "category": "facilities",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Spacing between tables and privacy",
+      "extraction_keywords": ["space", "spacing", "crowded", "elbow", "cramped"]
+    },
+    "parking_availability": {
+      "id": "parking_availability",
+      "name": "Parking Availability",
+      "category": "facilities",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Ease of parking availability",
+      "extraction_keywords": ["parking", "space", "available", "convenient", "easy"]
+    },
+    "location_accessibility": {
+      "id": "location_accessibility",
+      "name": "Location Accessibility",
+      "category": "location",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Ease of accessing the location",
+      "extraction_keywords": ["location", "accessible", "convenient", "easy access", "near"]
+    },
+    "location_visibility": {
+      "id": "location_visibility",
+      "name": "Location Visibility",
+      "category": "location",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Visibility and prominence of location",
+      "extraction_keywords": ["visible", "prominent", "hidden", "easy to find", "noticeable"]
+    },
+    "social_energy": {
+      "id": "social_energy",
+      "name": "Social Energy",
+      "category": "social",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Energy of social interactions and group dynamics",
+      "extraction_keywords": ["social", "energy", "fun", "group", "lively", "interactive"]
+    },
+    "group_friendly": {
+      "id": "group_friendly",
+      "name": "Group Friendly",
+      "category": "social",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for group gatherings",
+      "extraction_keywords": ["group", "friends", "party", "gathering", "gang"]
+    },
+    "couple_friendly": {
+      "id": "couple_friendly",
+      "name": "Couple Friendly",
+      "category": "social",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for couple dining",
+      "extraction_keywords": ["couple", "date", "romantic", "intimate", "two"]
+    },
+    "family_friendly": {
+      "id": "family_friendly",
+      "name": "Family Friendly",
+      "category": "social",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for family dining",
+      "extraction_keywords": ["family", "kids", "children", "family-friendly", "safe"]
+    },
+    "kids_welcome": {
+      "id": "kids_welcome",
+      "name": "Kids Welcome",
+      "category": "social",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Welcoming attitude toward children",
+      "extraction_keywords": ["kids", "children", "toddler", "welcoming", "tolerant"]
+    },
+    "repeat_visits": {
+      "id": "repeat_visits",
+      "name": "Repeat Visits",
+      "category": "behavioral",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Frequency of customer repeat visits",
+      "extraction_keywords": ["again", "repeat", "came back", "frequent", "regular"]
+    },
+    "loyalty": {
+      "id": "loyalty",
+      "name": "Loyalty",
+      "category": "behavioral",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Customer loyalty and brand affinity",
+      "extraction_keywords": ["loyal", "favorite", "best", "always", "preferred"]
+    },
+    "dwell_time": {
+      "id": "dwell_time",
+      "name": "Dwell Time",
+      "category": "behavioral",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Length of customer visit duration",
+      "extraction_keywords": ["spent hours", "lingered", "stayed", "long", "duration"]
+    },
+    "sharing_moments": {
+      "id": "sharing_moments",
+      "name": "Sharing Moments",
+      "category": "behavioral",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Social sharing and moment capture worthiness",
+      "extraction_keywords": ["photo", "instagram", "share", "pictures", "capture"]
+    },
+    "experience_memorable": {
+      "id": "experience_memorable",
+      "name": "Experience Memorable",
+      "category": "experience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Memorability of the overall experience",
+      "extraction_keywords": ["memorable", "remember", "unforgettable", "remarkable", "special"]
+    },
+    "experience_unique": {
+      "id": "experience_unique",
+      "name": "Experience Unique",
+      "category": "experience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Uniqueness and distinctiveness of experience",
+      "extraction_keywords": ["unique", "different", "special", "one-of-a-kind", "novel"]
+    },
+    "experience_immersive": {
+      "id": "experience_immersive",
+      "name": "Experience Immersive",
+      "category": "experience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Immersive and engaging experience",
+      "extraction_keywords": ["immersive", "engaging", "involved", "absorbed", "engaged"]
+    },
+    "pride": {
+      "id": "pride",
+      "name": "Pride",
+      "category": "emotional",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Pride in recommending or visiting",
+      "extraction_keywords": ["proud", "boast", "recommend", "tell friends", "elite"]
+    },
+    "discovery": {
+      "id": "discovery",
+      "name": "Discovery",
+      "category": "emotional",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Sense of discovery and new findings",
+      "extraction_keywords": ["discovered", "found", "new", "hidden gem", "stumbled"]
+    },
+    "excitement": {
+      "id": "excitement",
+      "name": "Excitement",
+      "category": "emotional",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Level of excitement and anticipation",
+      "extraction_keywords": ["excited", "thrilled", "wow", "amazing", "awesome"]
+    },
+    "fomo": {
+      "id": "fomo",
+      "name": "FOMO",
+      "category": "emotional",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Fear of missing out tendency",
+      "extraction_keywords": ["everyone", "trending", "popular", "hype", "crowded"]
+    },
+    "trust": {
+      "id": "trust",
+      "name": "Trust",
+      "category": "emotional",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Trust and reliability perception",
+      "extraction_keywords": ["trust", "reliable", "consistent", "dependable", "honest"]
+    },
+    "expectation_met": {
+      "id": "expectation_met",
+      "name": "Expectation Met",
+      "category": "satisfaction",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Meeting or exceeding customer expectations",
+      "extraction_keywords": ["expected", "surprised", "delivered", "met", "exceeded"]
+    },
+    "overall_satisfaction": {
+      "id": "overall_satisfaction",
+      "name": "Overall Satisfaction",
+      "category": "satisfaction",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Overall satisfaction with experience",
+      "extraction_keywords": ["satisfied", "happy", "pleased", "content", "rating"]
+    },
+    "would_recommend": {
+      "id": "would_recommend",
+      "name": "Would Recommend",
+      "category": "satisfaction",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Likelihood of recommending to others",
+      "extraction_keywords": ["recommend", "tell", "suggest", "friend", "family"]
+    },
+    "special_occasions": {
+      "id": "special_occasions",
+      "name": "Special Occasions",
+      "category": "use_case",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for special occasion dining",
+      "extraction_keywords": ["celebration", "anniversary", "birthday", "special", "occasion"]
+    },
+    "business_lunch": {
+      "id": "business_lunch",
+      "name": "Business Lunch",
+      "category": "use_case",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for business dining",
+      "extraction_keywords": ["business", "meeting", "client", "professional", "work"]
+    },
+    "casual_dining": {
+      "id": "casual_dining",
+      "name": "Casual Dining",
+      "category": "use_case",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for casual dining",
+      "extraction_keywords": ["casual", "relaxed", "informal", "laid-back", "chill"]
+    },
+    "quick_bite": {
+      "id": "quick_bite",
+      "name": "Quick Bite",
+      "category": "use_case",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for quick meals",
+      "extraction_keywords": ["quick", "fast", "bite", "snack", "rush"]
+    },
+    "late_night": {
+      "id": "late_night",
+      "name": "Late Night",
+      "category": "use_case",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Availability and suitability for late-night service",
+      "extraction_keywords": ["late", "night", "open", "hours", "midnight"]
+    },
+    "breakfast": {
+      "id": "breakfast",
+      "name": "Breakfast",
+      "category": "use_case",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Suitability for breakfast service",
+      "extraction_keywords": ["breakfast", "morning", "eggs", "brunch", "coffee"]
+    },
+    "outdoor_seating": {
+      "id": "outdoor_seating",
+      "name": "Outdoor Seating",
+      "category": "facilities",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Quality and availability of outdoor seating",
+      "extraction_keywords": ["outdoor", "terrace", "patio", "garden", "balcony"]
+    },
+    "view_appeal": {
+      "id": "view_appeal",
+      "name": "View Appeal",
+      "category": "facilities",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Appeal of views from the venue",
+      "extraction_keywords": ["view", "scenic", "beautiful", "vista", "outlook"]
+    },
+    "decor": {
+      "id": "decor",
+      "name": "Decor",
+      "category": "ambience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Quality and aesthetic of decor",
+      "extraction_keywords": ["decor", "design", "aesthetic", "beautiful", "decorated"]
+    },
+    "innovation": {
+      "id": "innovation",
+      "name": "Innovation",
+      "category": "experience",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Innovative approach to food or service",
+      "extraction_keywords": ["innovative", "new", "creative", "different", "forward"]
+    },
+    "deals_promotions": {
+      "id": "deals_promotions",
+      "name": "Deals Promotions",
+      "category": "pricing",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Availability and appeal of deals/promotions",
+      "extraction_keywords": ["deal", "promo", "offer", "discount", "special"]
+    },
+    "delivery_quality": {
+      "id": "delivery_quality",
+      "name": "Delivery Quality",
+      "category": "service",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Quality of delivery service (if applicable)",
+      "extraction_keywords": ["delivery", "order", "shipped", "arrived", "packaging"]
+    },
+    "queue_management": {
+      "id": "queue_management",
+      "name": "Queue Management",
+      "category": "service",
+      "data_type": "score",
+      "range": [0, 1],
+      "description": "Efficiency of queue and waiting management",
+      "extraction_keywords": ["queue", "wait", "line", "crowd", "busy"]
+    }
+  }
+}

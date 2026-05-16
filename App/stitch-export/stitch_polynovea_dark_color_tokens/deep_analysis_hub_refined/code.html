@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bombay Tiffin Co. - Deep Analysis Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e11",
+                        "secondary": "#d2bbff",
+                        "on-background": "#e4e1e6",
+                        "on-surface": "#e4e1e6",
+                        "surface-variant": "#353438",
+                        "surface": "#131316",
+                        "tertiary-container": "#d4d1f2",
+                        "surface-bright": "#39393c",
+                        "on-primary-container": "#685a34",
+                        "on-tertiary-container": "#5a5975",
+                        "on-secondary": "#3f008e",
+                        "on-secondary-fixed": "#25005a",
+                        "surface-dim": "#131316",
+                        "on-surface-variant": "#cec6b7",
+                        "primary-fixed-dim": "#d8c596",
+                        "tertiary-fixed": "#e2dfff",
+                        "outline-variant": "#4b463b",
+                        "outline": "#979083",
+                        "inverse-on-surface": "#303033",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "secondary-fixed": "#eaddff",
+                        "on-tertiary-fixed": "#1a1931",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "on-primary": "#3a2f0d",
+                        "on-primary-fixed": "#241a00",
+                        "surface-container-highest": "#353438",
+                        "primary": "#fff0cc",
+                        "inverse-surface": "#e4e1e6",
+                        "on-tertiary": "#2f2e47",
+                        "surface-container-low": "#1b1b1e",
+                        "tertiary-fixed-dim": "#c6c3e4",
+                        "primary-fixed": "#f5e1b0",
+                        "background": "#131316",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#2a2a2d",
+                        "on-tertiary-fixed-variant": "#45445f",
+                        "on-secondary-container": "#c9aeff",
+                        "tertiary": "#f2efff",
+                        "surface-container": "#1f1f22",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#524621",
+                        "surface-tint": "#d8c596",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#e6d3a3",
+                        "secondary-container": "#6001d1",
+                        "error": "#ffb4ab",
+                        "inverse-primary": "#6b5d37"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "40px",
+                        "md": "16px",
+                        "margin": "24px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["JetBrains Mono"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-md": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "1", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .font-clash { font-family: 'Clash Display', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation (Generated from JSON guidance) -->
+<header class="bg-surface border-b border-outline-variant w-full px-margin h-16 flex justify-between items-center z-50 sticky top-0">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[24px]">monitoring</span>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">VENUE_INTEL_SYSTEM</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Bombay Tiffin Co. | Andheri West, Mumbai</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex bg-surface-container-lowest border border-outline-variant rounded p-[2px]">
+<button class="px-3 py-1 font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors rounded-sm">Client View</button>
+<button class="px-3 py-1 bg-surface-variant text-on-surface font-label-sm text-label-sm rounded-sm border border-outline-variant shadow-sm">Deep Analysis</button>
+</div>
+<button class="font-label-md text-label-md text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded transition-colors flex items-center gap-xs border border-primary/20">
+<span class="material-symbols-outlined text-[16px]">tune</span> ANALYSIS_MODE
+            </button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Side Navigation (NavigationDrawer from JSON) -->
+<nav class="hidden lg:flex flex-col h-full py-lg gap-sm fixed left-0 top-16 w-[240px] border-r border-outline-variant bg-surface-container-low z-40 h-[calc(100vh-64px)] overflow-y-auto">
+<div class="flex flex-col gap-xs px-sm"><a class="flex items-center gap-sm px-sm py-2 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-2 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+<span class="font-label-md text-label-md">Competitors</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-2 rounded text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">auto_fix_high</span>
+<span class="font-label-md text-label-md">Transform</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-2 rounded bg-[#7C3AED] text-white border-r-2 border-primary" href="#">
+<span class="material-symbols-outlined text-[20px]">campaign</span>
+<span class="font-label-md text-label-md">Marketing</span>
+</a></div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-[240px] flex flex-col h-[calc(100vh-64px)] overflow-y-auto">
+<!-- Secondary Tab Navigation -->
+<div class="border-b border-outline-variant bg-surface sticky top-0 z-30 px-margin">
+<div class="flex items-center gap-lg">
+<button class="py-3 font-label-md text-label-md text-primary border-b-2 border-primary">Intelligence</button>
+<button class="py-3 font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Risk</button>
+<button class="py-3 font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Primitives</button>
+<button class="py-3 font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Benchmarks</button>
+<button class="py-3 font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Trends</button>
+</div>
+</div>
+<!-- Dashboard Grid -->
+<div class="p-margin grid grid-cols-1 lg:grid-cols-12 gap-margin">
+<!-- Left Column (Personalised Recommendations) -->
+<div class="lg:col-span-7 flex flex-col gap-margin">
+<div class="bg-surface border border-outline-variant rounded-lg p-md relative overflow-hidden">
+<div class="absolute top-0 right-0 p-sm">
+<div class="w-2 h-2 rounded-full bg-[#7C3AED] shadow-[0_0_8px_#7C3AED]"></div>
+</div>
+<div class="flex items-center justify-between mb-md border-b border-outline-variant pb-sm">
+<h2 class="font-headline-md text-[20px] font-semibold text-on-surface uppercase tracking-tight flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+                                Personalised Recommendations (F3)
+                            </h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Row 1: Critical -->
+<div class="border-l-2 border-l-[#EF4444] bg-surface-container-lowest border border-outline-variant rounded p-sm flex items-start gap-md hover:bg-[#121212] transition-colors">
+<div class="bg-[#EF4444]/10 text-[#EF4444] font-label-sm text-[10px] px-2 py-0.5 rounded border border-[#EF4444]/20 uppercase whitespace-nowrap mt-1">Critical</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-[16px] font-semibold text-on-surface mb-1">Optimize Dinner Menu Pricing</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Current pricing for premium thalis shows a 15% elasticity gap compared to immediate neighborhood competitors.</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="font-data-mono text-data-mono">+₹45k/mo Impact</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+<span class="font-data-mono text-[12px]">Immediate Action</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2: Critical -->
+<div class="border-l-2 border-l-[#EF4444] bg-surface-container-lowest border border-outline-variant rounded p-sm flex items-start gap-md hover:bg-[#121212] transition-colors">
+<div class="bg-[#EF4444]/10 text-[#EF4444] font-label-sm text-[10px] px-2 py-0.5 rounded border border-[#EF4444]/20 uppercase whitespace-nowrap mt-1">Critical</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-[16px] font-semibold text-on-surface mb-1">Staffing Deficit During Peak</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Wait times exceeding 25 mins on Friday/Saturday 8PM-10PM slot causing estimated 8% table abandonment.</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-xs text-[#EF4444]">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+<span class="font-data-mono text-data-mono">High Risk</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 3: High -->
+<div class="border-l-2 border-l-[#F59E0B] bg-surface-container-lowest border border-outline-variant rounded p-sm flex items-start gap-md hover:bg-[#121212] transition-colors">
+<div class="bg-[#F59E0B]/10 text-[#F59E0B] font-label-sm text-[10px] px-2 py-0.5 rounded border border-[#F59E0B]/20 uppercase whitespace-nowrap mt-1">High</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-[16px] font-semibold text-on-surface mb-1">Leverage 'Habit Former' Segment</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Introduce a subscription model for weekday lunch tiffins to lock in the 28% regular customer base.</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined text-[14px]">group_add</span>
+<span class="font-data-mono text-data-mono">+20% Retention</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 4: High -->
+<div class="border-l-2 border-l-[#F59E0B] bg-surface-container-lowest border border-outline-variant rounded p-sm flex items-start gap-md hover:bg-[#121212] transition-colors">
+<div class="bg-[#F59E0B]/10 text-[#F59E0B] font-label-sm text-[10px] px-2 py-0.5 rounded border border-[#F59E0B]/20 uppercase whitespace-nowrap mt-1">High</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-[16px] font-semibold text-on-surface mb-1">Local Delivery Radius Expansion</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Signal density high in Juhu area with unmet demand for authentic homestyle meals.</p>
+<div class="flex gap-4">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">map</span>
+<span class="font-data-mono text-[12px]">Requires Logistics Revamp</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 5: Medium -->
+<div class="border-l-2 border-l-[#7C3AED] bg-surface-container-lowest border border-outline-variant rounded p-sm flex items-start gap-md hover:bg-[#121212] transition-colors">
+<div class="bg-[#7C3AED]/10 text-[#7C3AED] font-label-sm text-[10px] px-2 py-0.5 rounded border border-[#7C3AED]/20 uppercase whitespace-nowrap mt-1">Medium</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-[16px] font-semibold text-on-surface mb-1">Ambiance Tweak: Lighting</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Review mode indicates current lighting during evening service slightly deters the 'Calm Pairs' demographic.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column -->
+<div class="lg:col-span-5 flex flex-col gap-margin">
+<!-- Top Card: Archetype Breakdown -->
+<div class="bg-surface border border-outline-variant rounded-lg p-md relative">
+<div class="absolute top-0 right-0 p-sm">
+<div class="w-2 h-2 rounded-full bg-[#7C3AED] shadow-[0_0_8px_#7C3AED]"></div>
+</div>
+<h2 class="font-headline-md text-[18px] font-semibold text-on-surface uppercase tracking-tight mb-md border-b border-outline-variant pb-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">pie_chart</span>
+                            Archetype Breakdown (F5)
+                        </h2>
+<div class="flex flex-col gap-3">
+<div>
+<div class="flex justify-between items-end mb-1">
+<div>
+<span class="font-label-md text-[13px] text-on-surface uppercase">Trusted Regular</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant ml-2">Loyal weekday diners · 26–35 · office crowd</span>
+</div>
+<span class="font-data-mono text-data-mono text-primary">38%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden border border-outline-variant">
+<div class="bg-[#7C3AED] h-full" style="width: 38%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<div>
+<span class="font-label-md text-[13px] text-on-surface uppercase">Habit Former</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant ml-2">Routine-driven · return on schedule</span>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface">28%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden border border-outline-variant">
+<div class="bg-primary-container h-full" style="width: 28%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<div>
+<span class="font-label-md text-[13px] text-on-surface uppercase">Calm Pairs</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant ml-2">Couples · weekend &amp; occasion dining</span>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface">18%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden border border-outline-variant">
+<div class="bg-primary-container/70 h-full" style="width: 18%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<div>
+<span class="font-label-md text-[13px] text-on-surface uppercase">Discovery Explorer</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant ml-2">First-time visitors · curiosity-driven</span>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface-variant">10%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden border border-outline-variant">
+<div class="bg-outline-variant h-full" style="width: 10%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-1">
+<div>
+<span class="font-label-md text-[13px] text-on-surface uppercase">Premium Prioritizer</span>
+<span class="font-body-sm text-[11px] text-on-surface-variant ml-2">High spend · status-conscious</span>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface-variant">6%</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden border border-outline-variant">
+<div class="bg-outline-variant h-full" style="width: 6%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Card: Pricing Power -->
+<div class="bg-surface border border-outline-variant rounded-lg p-md">
+<h2 class="font-headline-md text-[18px] font-semibold text-on-surface uppercase tracking-tight mb-md border-b border-outline-variant pb-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">payments</span>
+                            Pricing Power (F8)
+                        </h2>
+<div class="grid grid-cols-2 gap-sm mb-md">
+<div class="bg-surface-container-lowest p-sm rounded border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase mb-1">Monetization Potential</span>
+<span class="font-data-mono text-[24px] text-primary">0.71</span>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded border border-outline-variant flex flex-col items-center justify-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase mb-1">Pricing Headroom</span>
+<span class="font-label-md text-[18px] text-[#F59E0B] uppercase">MED</span>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-sm">
+<h3 class="font-label-sm text-[11px] text-on-surface-variant uppercase mb-sm">Revenue Levers</h3>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center bg-[#121212] px-2 py-1 rounded border border-outline-variant">
+<span class="font-body-sm text-[13px] text-on-surface">Upsell potential</span>
+<span class="font-label-sm text-[11px] text-primary bg-primary/10 px-2 py-0.5 rounded uppercase">Strong</span>
+</div>
+<div class="flex justify-between items-center bg-[#121212] px-2 py-1 rounded border border-outline-variant">
+<span class="font-body-sm text-[13px] text-on-surface">Premium pricing window</span>
+<span class="font-label-sm text-[11px] text-[#F59E0B] bg-[#F59E0B]/10 px-2 py-0.5 rounded uppercase">Moderate</span>
+</div>
+<div class="flex justify-between items-center bg-[#121212] px-2 py-1 rounded border border-outline-variant">
+<span class="font-body-sm text-[13px] text-on-surface">Group spend capture</span>
+<span class="font-label-sm text-[11px] text-on-surface-variant bg-surface-variant px-2 py-0.5 rounded uppercase border border-outline-variant">Weak</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation (Generated from JSON guidance - Mobile Only) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 pb-safe bg-surface border-t border-outline-variant">
+<a class="flex flex-col items-center text-primary font-bold" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center text-on-surface-variant opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">sensors</span>
+<span class="font-label-sm text-label-sm">Signals</span>
+</a>
+<a class="flex flex-col items-center text-on-surface-variant opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">inventory_2</span>
+<span class="font-label-sm text-label-sm">Vault</span>
+</a>
+<a class="flex flex-col items-center text-on-surface-variant opacity-70 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-[24px]">account_circle</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

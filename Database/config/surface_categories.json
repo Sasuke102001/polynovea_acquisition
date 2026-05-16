@@ -1,0 +1,132 @@
+{
+  "version": "1.0",
+  "description": "7 Venue Types - Surface Categories with Fitness Weights",
+  "last_updated": "2026-05-14",
+  "total_categories": 7,
+  "fitness_dimensions": [
+    "office_lunch",
+    "repeat_habit",
+    "social_dwell",
+    "group_energy",
+    "destination_visit"
+  ],
+  "categories": {
+    "casual_dining": {
+      "id": "casual_dining",
+      "name": "Casual Dining",
+      "parent_category": "dining",
+      "description": "Relaxed, informal dining establishments with moderate pricing",
+      "example_cuisines": ["Indian", "Asian", "Continental", "Multi-cuisine"],
+      "typical_visit_duration": "45-90 minutes",
+      "party_size": "1-8 people",
+      "fitness_weights": {
+        "office_lunch": 0.65,
+        "repeat_habit": 0.72,
+        "social_dwell": 0.68,
+        "group_energy": 0.55,
+        "destination_visit": 0.45
+      }
+    },
+    "premium_dining": {
+      "id": "premium_dining",
+      "name": "Premium Dining",
+      "parent_category": "dining",
+      "description": "High-end, refined dining with premium pricing and service",
+      "example_cuisines": ["Fine Dining", "Gourmet", "Multi-cuisine Fine Dining"],
+      "typical_visit_duration": "120-180 minutes",
+      "party_size": "2-6 people",
+      "fitness_weights": {
+        "office_lunch": 0.45,
+        "repeat_habit": 0.38,
+        "social_dwell": 0.85,
+        "group_energy": 0.42,
+        "destination_visit": 0.92
+      }
+    },
+    "quick_service": {
+      "id": "quick_service",
+      "name": "Quick Service",
+      "parent_category": "dining",
+      "description": "Fast-casual and quick-service restaurants with quick turnaround",
+      "example_cuisines": ["Fast Casual", "QSR", "Cafe", "Bakery"],
+      "typical_visit_duration": "15-30 minutes",
+      "party_size": "1-4 people",
+      "fitness_weights": {
+        "office_lunch": 0.88,
+        "repeat_habit": 0.82,
+        "social_dwell": 0.35,
+        "group_energy": 0.28,
+        "destination_visit": 0.25
+      }
+    },
+    "cafe": {
+      "id": "cafe",
+      "name": "Cafe",
+      "parent_category": "beverage_focused",
+      "description": "Cafes, coffee shops, and beverage-focused establishments",
+      "example_cuisines": ["Coffee", "Beverages", "Light snacks", "Pastries"],
+      "typical_visit_duration": "20-60 minutes",
+      "party_size": "1-4 people",
+      "fitness_weights": {
+        "office_lunch": 0.62,
+        "repeat_habit": 0.78,
+        "social_dwell": 0.65,
+        "group_energy": 0.38,
+        "destination_visit": 0.35
+      }
+    },
+    "bar_lounge": {
+      "id": "bar_lounge",
+      "name": "Bar & Lounge",
+      "parent_category": "beverage_focused",
+      "description": "Bars, lounges, and alcohol-serving establishments",
+      "example_cuisines": ["Alcohol", "Cocktails", "Spirits", "Light Bites"],
+      "typical_visit_duration": "90-180 minutes",
+      "party_size": "2-10 people",
+      "fitness_weights": {
+        "office_lunch": 0.22,
+        "repeat_habit": 0.55,
+        "social_dwell": 0.82,
+        "group_energy": 0.85,
+        "destination_visit": 0.65
+      }
+    },
+    "buffet": {
+      "id": "buffet",
+      "name": "Buffet",
+      "parent_category": "dining",
+      "description": "All-you-can-eat buffet and spread-based service",
+      "example_cuisines": ["Indian Buffet", "International Buffet", "Multi-cuisine"],
+      "typical_visit_duration": "60-120 minutes",
+      "party_size": "2-10 people",
+      "fitness_weights": {
+        "office_lunch": 0.48,
+        "repeat_habit": 0.62,
+        "social_dwell": 0.72,
+        "group_energy": 0.68,
+        "destination_visit": 0.42
+      }
+    },
+    "specialty": {
+      "id": "specialty",
+      "name": "Specialty/Themed",
+      "parent_category": "dining",
+      "description": "Specialty cuisines, themed restaurants, and niche establishments",
+      "example_cuisines": ["Regional", "Fusion", "Ethnic", "Experience-based"],
+      "typical_visit_duration": "75-150 minutes",
+      "party_size": "1-8 people",
+      "fitness_weights": {
+        "office_lunch": 0.35,
+        "repeat_habit": 0.45,
+        "social_dwell": 0.78,
+        "group_energy": 0.65,
+        "destination_visit": 0.88
+      }
+    }
+  },
+  "category_rules": {
+    "assignment_logic": "Assign venue to category based on dominant operational characteristics",
+    "multi_category_handling": "Primary category by revenue/foot traffic; secondary tags optional",
+    "update_frequency": "Quarterly or when venue operations change significantly"
+  }
+}

@@ -1,0 +1,48 @@
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.production
+.env.development
+# Allow example/guide files
+!.env.example
+!.env.setup-guide
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# ── Node / Next.js ────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Claude Code local settings ───────────────────────────────────────────────
+.claude/
+
+# ── Large raw pipeline data (not needed for deployment) ───────────────────────
+Database/data/
+
+# ── Misc ─────────────────────────────────────────────────────────────────────
+*.log
+*.csv
+session_retrospective.json

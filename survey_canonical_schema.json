@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "created_date": "2026-05-14",
+  "description": "Canonical survey schema that normalizes all form versions (v1, v2, new) into a single standardized structure",
+  "sections": {
+    "metadata": {
+      "submission_id": "string (unique identifier)",
+      "respondent_id": "string (from form system)",
+      "submitted_at": "timestamp (ISO 8601)",
+      "form_version": "enum: v1 | v2 | new",
+      "form_version_name": "string (descriptive)"
+    },
+    "demographics": {
+      "age_group": "enum: 18-21 | 22-25 | 26-30 | 30+ | unknown",
+      "city_area": "string (normalized location)",
+      "visit_frequency": "enum: under_monthly | 1-2_monthly | 3-5_monthly | 6+_monthly | unknown",
+      "visit_timing": "enum: weekdays | weekends | both | unknown",
+      "typical_duration": "enum: 1-2_hours | 2-3_hours | 3+_hours | unknown",
+      "typical_company": "enum: alone | partner | 2-4_people | 5+_people | work_team | unknown"
+    },
+    "identity_and_social_style": {
+      "social_experiences": "array of strings (up to 3 from: live_music, clubs, lounges, rooftops, underground, creative_spaces, community_events, food_hospitality)",
+      "decision_factors": "array of strings (up to 3 from: music, crowd_vibe, friends_going, atmosphere, exclusivity, comfort, pricing, networking, discovery, familiarity)",
+      "social_personality": "enum: high_energy_seeker | intimate_preference | discovery_explorer | trusted_places_preference | mood_dependent | unknown",
+      "energy_preference": "enum: high_energy_exciting | balanced_energy | mostly_calm_comfortable | unknown",
+      "place_preference": "enum: new_places_often | mix_both | familiar_trusted_places | unknown"
+    },
+    "discovery_and_attention": {
+      "discovery_channels": "array of strings (up to 3 from: instagram, friends, whatsapp_groups, influencers, djs_artists, google_maps, event_platforms, walking_past)",
+      "attention_grabbers": "array of strings (up to 3 from: crowd_energy, music_lineup, interior_aesthetic, friend_reposts, exclusivity, limited_tickets, celebrity_presence, unique_concept)",
+      "crowd_reaction": "enum: makes_more_interested | depends_on_crowd | neutral | makes_avoid | unknown"
+    },
+    "fomo_and_decision_triggers": {
+      "fomo_tendency": "enum: often | sometimes | rarely | never | unknown",
+      "quick_decision_triggers": "array of strings (up to 3 from: friends_going, limited_spots, great_lineup, spontaneous_mood, exclusive_access, trending_online)",
+      "choice_overload_behavior": "enum: decide_quickly | compare_carefully | ask_friends | go_familiar | lose_interest | unknown"
+    },
+    "group_dynamics": {
+      "group_role": "enum: organizer | recommender | follower | spontaneous_one | depends_on_situation | unknown",
+      "recommendation_frequency": "enum: very_often | sometimes | rarely | never | unknown",
+      "group_influence": "enum: frequently_skip | sometimes_skip | rarely_skip | never_skip | unknown"
+    },
+    "environment_and_habits": {
+      "atmosphere_preference": "enum: high_energy_social | intimate_cozy | premium_exclusive | creative_artistic | calm_conversation_focused | unknown",
+      "revisit_vs_explore": "enum: mostly_same_places | mix_both | mostly_new_places | unknown",
+      "music_importance": "enum: not_important | somewhat_important | very_important | unknown",
+      "music_preferences": "object: {volume: bool, familiar_songs: bool, energy: bool, live_performance: bool, background_vibe: bool, ability_to_talk: bool, crowd_mood: bool}"
+    },
+    "purpose_and_spend": {
+      "primary_purpose": "enum: food_drink | work_chill | entertainment | socializing | celebration | unknown",
+      "typical_spend": "enum: under_1000 | 1000_3000 | 3000_5000 | 5000_plus | unknown",
+      "spend_drivers": "array of strings (factors that make them spend more)"
+    },
+    "preferences_and_ratings": {
+      "quality_of_experience_importance": "integer: 1-5 (from form v2)",
+      "comfort_importance": "integer: 1-5",
+      "service_importance": "integer: 1-5",
+      "pricing_importance": "integer: 1-5",
+      "crowd_importance": "integer: 1-5",
+      "music_importance": "integer: 1-5",
+      "convenience_importance": "integer: 1-5",
+      "safety_importance": "integer: 1-5",
+      "review_influence": "enum: very_little | somewhat | a_lot | unknown"
+    },
+    "specific_venues_and_behaviors": {
+      "favorite_places": "array of strings (names of places they visit often)",
+      "why_favorite": "string (text explaining why)",
+      "what_frustrates": "string (text explaining frustrations)",
+      "what_makes_avoid": "string (text explaining avoidance triggers)",
+      "what_makes_leave_early": "string (text)",
+      "what_makes_stay_longer": "string (text)",
+      "what_drives_return": "string (text - retention drivers)",
+      "recommendation_criteria": "string (text - what makes a place recommendable)"
+    },
+    "community_and_access": {
+      "access_interests": "array of strings (from: early_access, secret_events, artist_showcases, venue_recs, community_meetups, networking, music_discovery, creative_collabs)",
+      "community_seeking": "boolean (whether they're interested in community features)"
+    },
+    "contact_and_consent": {
+      "name": "string (optional)",
+      "email": "string (email address)",
+      "instagram_handle": "string (optional)",
+      "whatsapp_number": "string (optional)",
+      "newsletter_consent": "boolean"
+    },
+    "derived_fields": {
+      "archetype": "string (computed from social_personality + energy_preference + place_preference, e.g., 'Calm Pairs', 'Party Group', 'Discovery Explorer')",
+      "acquisition_readiness": "enum: high_community_interest | moderate_interest | low_interest",
+      "retention_drivers": "array of strings (key factors that make them stay/return)"
+    }
+  },
+  "form_version_mappings": {
+    "v1_research_form": {
+      "form_name": "Research Form - Sheet1.csv",
+      "response_count": 9,
+      "mappings": {
+        "age_group": "age_group",
+        "city": "city_area",
+        "frequency": "visit_frequency",
+        "when": "visit_timing",
+        "duration": "typical_duration",
+        "company": "typical_company",
+        "reason": "primary_purpose",
+        "spend": "typical_spend",
+        "spend_more": "spend_drivers",
+        "choose_place": "decision_factors",
+        "crowd_impact": "review_influence (infer from context)",
+        "music_matters": "music_importance",
+        "energy_pref": "energy_preference",
+        "music_stay": "music_preferences",
+        "leave_or_stay": "what_makes_leave_early / what_makes_stay_longer",
+        "frustrations": "what_frustrates",
+        "email": "email"
+      }
+    },
+    "v2_detailed_form": {
+      "form_name": "Help us design better experiences_This takes 60–90 seconds. _Submissions_2026-05-12.csv",
+      "response_count": 36,
+      "mappings": {
+        "Age Group": "age_group",
+        "City / Area": "city_area",
+        "How often do you go out in a month?": "visit_frequency",
+        "When do you usually go out?": "visit_timing",
+        "Typical time you stay when you go out": "typical_duration",
+        "Who do you usually go with?": "typical_company",
+        "Primary purpose when you go out": "primary_purpose",
+        "Typical total spend per outing": "typical_spend",
+        "What makes you spend more?": "spend_drivers",
+        "What makes you choose a place?": "decision_factors",
+        "Quality of experience": "quality_of_experience_importance",
+        "Comfort / environment": "comfort_importance",
+        "Service": "service_importance",
+        "Pricing fairness": "pricing_importance",
+        "People / crowd": "crowd_importance",
+        "Music / entertainment": "music_importance",
+        "Convenience": "convenience_importance",
+        "Safety / ease": "safety_importance",
+        "Which feels more like you?": "place_preference",
+        "How much do reviews / recommendations affect your decision?": "review_influence",
+        "How much does the crowd at a place affect your decision?": "crowd_reaction (infer)",
+        "What frustrates you the most when you're out?": "what_frustrates",
+        "What makes you avoid a place even if it looks good online?": "what_makes_avoid",
+        "Name 3-4 places you go to often": "favorite_places",
+        "Why do you go there?": "why_favorite",
+        "What do they do badly?": "what_frustrates",
+        "What makes you leave early?": "what_makes_leave_early",
+        "What makes you stay longer?": "what_makes_stay_longer",
+        "What would make you come back again?": "what_drives_return",
+        "What makes a place feel worth recommending to someone else?": "recommendation_criteria",
+        "When music is part of the experience, what matters most to you?": "music_preferences",
+        "Email ID": "email",
+        "Would you like to join our Newsletter?": "newsletter_consent"
+      }
+    },
+    "new_form": {
+      "form_name": "polynovea_behavioral_intelligence_form.md",
+      "response_count": 0,
+      "mappings": {
+        "What kind of social experiences do you enjoy most?": "social_experiences",
+        "What matters MOST when choosing where to go?": "decision_factors",
+        "Which best describes you socially?": "social_personality",
+        "How do you usually discover events or venues?": "discovery_channels",
+        "What immediately grabs your attention about a venue/event?": "attention_grabbers",
+        "If you see a place is packed/crowded, your reaction is usually": "crowd_reaction",
+        "Have you ever gone somewhere mainly because you didn't want to miss out?": "fomo_tendency",
+        "What most strongly pushes you to make plans quickly?": "quick_decision_triggers",
+        "When there are too many venue options, you usually": "choice_overload_behavior",
+        "In your group, you're usually": "group_role",
+        "How often do friends ask you for recommendations?": "recommendation_frequency",
+        "Have you ever skipped somewhere because your group wasn't interested?": "group_influence",
+        "What type of atmosphere keeps you somewhere longer?": "atmosphere_preference",
+        "Do you usually revisit the same places or explore new ones?": "revisit_vs_explore",
+        "What would you like access to?": "access_interests",
+        "Name": "name",
+        "Instagram Handle": "instagram_handle",
+        "Email Address": "email",
+        "WhatsApp Number": "whatsapp_number",
+        "I agree to receive updates": "newsletter_consent"
+      }
+    }
+  },
+  "notes": {
+    "archetype_computation": "Use combination of: social_personality (identity), energy_preference (activation level), discovery_channels (how they find), group_role (social position), place_preference (exploration), and music_preferences to compute user archetype",
+    "acquisition_signals": "High acquisition readiness when: high_fomo_tendency + active_discovery + access_interests + community_seeking",
+    "retention_signals": "Retention drivers extracted from: what_makes_stay_longer + what_drives_return + why_favorite + music_preferences",
+    "data_quality": "v1 has partial data (missing detailed preferences), v2 is comprehensive, new form is acquisition-focused"
+  }
+}

@@ -1,0 +1,290 @@
+"""
+routers/chat.py
+AI chat endpoint for venue intelligence across Marketing, Competitors, Transform, and Deep/Risk tabs.
+Integrates with Nvidia/Kimi API for streaming responses.
+Logs all conversations to Supabase for training data collection.
+"""
+
+import asyncio
+import json
+import os
+from typing import AsyncGenerator
+
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+
+from database import get_pool
+from models import ChatRequest, ChatMessage
+from prompts import get_system_prompt
+from routers.utils import SEGMENT_LABELS
+from supabase import create_client
+
+router = APIRouter()
+
+# Supabase client (lazy initialization)
+_supabase_client = None
+
+def get_supabase_client():
+    """Lazy-load Supabase client to ensure .env is loaded."""
+    global _supabase_client
+    if _supabase_client is None:
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_ANON_KEY")
+        if not supabase_url or not supabase_key:
+            raise RuntimeError("SUPABASE_URL and SUPABASE_ANON_KEY must be set in .env")
+        _supabase_client = create_client(supabase_url, supabase_key)
+    return _supabase_client
+
+# Nvidia API config — single model for all tabs
+NVIDIA_API_BASE        = "https://integrate.api.nvidia.com/v1"
+NVIDIA_API_KEY_CREATIVE = os.getenv("NVIDIA_API_KEY_CREATIVE")
+NVIDIA_MODEL_CREATIVE   = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
+
+
+async def fetch_venue_context(venue_id: int, tab: str) -> dict:
+    """Fetch relevant venue context from RDS based on tab."""
+    pool = get_pool()
+
+    async with pool.acquire() as conn:
+        venue = await conn.fetchrow(
+            "SELECT id, name, city, area, types FROM venues WHERE id = $1",
+            venue_id,
+        )
+        if not venue:
+            raise HTTPException(status_code=404, detail="Venue not found")
+
+        fitness = await conn.fetchrow(
+            "SELECT * FROM venue_fitness_dimensions WHERE venue_id = $1",
+            venue_id,
+        )
+
+        # Correct columns: segment_id, alignment_score, segment_rank
+        segments = await conn.fetch(
+            """
+            SELECT segment_id, alignment_score, segment_rank
+            FROM venue_demographic_scores
+            WHERE venue_id = $1
+            ORDER BY segment_rank
+            LIMIT 5
+            """,
+            venue_id,
+        )
+
+        # Archetypes keyed by segment_id, not venue_id
+        top_seg_ids = [r["segment_id"] for r in segments[:3]]
+        archetypes = await conn.fetch(
+            """
+            SELECT DISTINCT ON (segment_id) segment_id, archetype_name
+            FROM demographic_archetype_mapping
+            WHERE segment_id = ANY($1::text[])
+            ORDER BY segment_id, prevalence_percentage DESC
+            """,
+            top_seg_ids,
+        ) if top_seg_ids else []
+
+        # Competitors from venue_similarity (joined to venues)
+        competitors = await conn.fetch(
+            """
+            SELECT v.id, v.name, v.area, v.city, vs.similarity_score
+            FROM venue_similarity vs
+            JOIN venues v ON v.id = vs.similar_venue_id
+            WHERE vs.venue_id = $1
+            ORDER BY vs.rank
+            LIMIT 5
+            """,
+            venue_id,
+        )
+
+        # Risk signals — table may not exist yet; fail gracefully
+        risk_signals = []
+        if tab == "deep_risk":
+            try:
+                risk_signals = await conn.fetch(
+                    """
+                    SELECT signal_name, signal_impact, confidence_level
+                    FROM intervention_triggers
+                    WHERE venue_id = $1 AND is_active = true
+                    ORDER BY signal_impact DESC
+                    LIMIT 8
+                    """,
+                    venue_id,
+                )
+            except Exception:
+                risk_signals = []
+
+    context = {
+        "venue_id": venue_id,
+        "venue_name": venue["name"],
+        "venue_type": venue["types"][0] if venue["types"] else "Restaurant",
+        "city": venue["city"],
+        "area": venue["area"],
+        "top_segments": [
+            {
+                "segment_id": seg["segment_id"],
+                "name": SEGMENT_LABELS.get(seg["segment_id"], {}).get("label", seg["segment_id"]),
+                "fitness_score": round(float(seg["alignment_score"] or 0.0), 3),
+            }
+            for seg in segments
+        ],
+        "top_archetypes": [
+            {"segment_id": arc["segment_id"], "archetype": arc["archetype_name"]}
+            for arc in archetypes
+        ],
+        "top_fitness_dims": [],
+        "top_competitors": [
+            {
+                "id": comp["id"],
+                "name": comp["name"],
+                "area": comp["area"],
+                "similarity_score": round(float(comp["similarity_score"] or 0.0), 3),
+            }
+            for comp in competitors
+        ],
+    }
+
+    if fitness:
+        dims = [
+            ("Office Lunch",        fitness.get("fitness_for_office_lunch",      0.0)),
+            ("Repeat Habit",        fitness.get("fitness_for_repeat_habit",       0.0)),
+            ("Social Dwell",        fitness.get("fitness_for_social_dwell",       0.0)),
+            ("Group Energy",        fitness.get("fitness_for_group_energy",       0.0)),
+            ("Destination Visit",   fitness.get("fitness_for_destination_visit",  0.0)),
+            ("Operational Quality", fitness.get("operational_quality",            0.0)),
+            ("Retention Strength",  fitness.get("retention_strength",             0.0)),
+        ]
+        context["top_fitness_dims"] = [
+            {"label": label, "score": round(float(score or 0.0), 3)}
+            for label, score in dims
+            if score and float(score) > 0
+        ][:4]
+
+    if tab == "deep_risk":
+        context["risk_signals"] = [
+            {
+                "name": sig["signal_name"],
+                "impact": float(sig["signal_impact"] or 0.0),
+                "confidence": sig["confidence_level"],
+            }
+            for sig in risk_signals
+        ]
+
+    return context
+
+
+async def stream_from_nvidia(
+    system_prompt: str, user_question: str, tab: str
+) -> AsyncGenerator[str, None]:
+    """
+    Stream response from Nvidia API using the creative model for all tabs.
+    Temperature varies by tab type — higher for content/creative, lower for analytical.
+    """
+    try:
+        from openai import AsyncOpenAI
+
+        api_key = NVIDIA_API_KEY_CREATIVE
+        model   = NVIDIA_MODEL_CREATIVE
+
+        # Creative tabs: higher temperature for engaging copy
+        # Analytical tabs: lower temperature for accuracy
+        creative_tabs = {"marketing", "overview", "audience"}
+        temperature = 0.8 if tab in creative_tabs else 0.4
+
+        if not api_key:
+            yield "[Error: NVIDIA_API_KEY_CREATIVE is not configured]"
+            return
+
+        client = AsyncOpenAI(
+            api_key=api_key,
+            base_url=NVIDIA_API_BASE,
+        )
+
+        max_tokens = {
+            "marketing":   4096,
+            "overview":    3000,
+            "audience":    3000,
+            "competitors": 3000,
+            "transform":   3000,
+            "deep_risk":   3000,
+        }.get(tab, 2000)
+
+        stream = await client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_question},
+            ],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            stream=True,
+        )
+
+        async for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content
+
+    except Exception as e:
+        yield f"\n\n[Error: {str(e)}]"
+
+
+async def log_chat_to_supabase(
+    venue_id: int, tab: str, question: str, context_snapshot: dict, response: str
+) -> None:
+    """Async logging of chat to Supabase (fire-and-forget after response)."""
+    try:
+        supabase = get_supabase_client()
+        supabase.table("venue_chat_logs").insert({
+            "venue_id": str(venue_id),
+            "tab": tab,
+            "question": question,
+            "context_snapshot": context_snapshot,
+            "response": response,
+            "model_version": "kimi-v1",
+        }).execute()
+    except Exception as e:
+        # Log error but don't fail the request
+        print(f"Supabase logging failed: {e}")
+
+
+@router.post("/{venue_id}/chat")
+async def chat_with_venue(venue_id: int, request: ChatRequest):
+    """
+    Stream AI chat response for a venue, guardrailed by tab.
+    """
+    # Validate tab
+    valid_tabs = ["marketing", "competitors", "transform", "deep_risk", "overview", "audience"]
+    if request.tab not in valid_tabs:
+        raise HTTPException(status_code=400, detail=f"Invalid tab. Must be one of: {valid_tabs}")
+
+    # Fetch venue context
+    try:
+        context = await fetch_venue_context(venue_id, request.tab)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching venue context: {str(e)}")
+
+    # Build system prompt (guardrailed per tab)
+    try:
+        system_prompt = get_system_prompt(request.tab, context)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error building prompt: {str(e)}")
+
+    # Collect full response for logging
+    full_response = ""
+
+    async def response_generator():
+        nonlocal full_response
+        try:
+            async for chunk in stream_from_nvidia(system_prompt, request.question, request.tab):
+                full_response += chunk
+                yield chunk
+        except Exception as e:
+            yield f"\n\n[Error: {str(e)}]"
+            full_response += f"\n\n[Error: {str(e)}]"
+        finally:
+            # Log to Supabase asynchronously after streaming completes
+            asyncio.create_task(
+                log_chat_to_supabase(venue_id, request.tab, request.question, context, full_response)
+            )
+
+    return StreamingResponse(response_generator(), media_type="text/event-stream")

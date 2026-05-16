@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Venue Hub: Marketing Tab</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#e2dfff",
+                      "on-primary-fixed": "#241a00",
+                      "on-tertiary-fixed": "#1a1931",
+                      "on-tertiary": "#2f2e47",
+                      "surface-container": "#1f1f22",
+                      "on-surface": "#e4e1e6",
+                      "tertiary": "#f2efff",
+                      "secondary": "#d2bbff",
+                      "on-tertiary-fixed-variant": "#45445f",
+                      "surface": "#131316",
+                      "surface-bright": "#39393c",
+                      "background": "#131316",
+                      "on-error-container": "#ffdad6",
+                      "primary-fixed-dim": "#d8c596",
+                      "on-surface-variant": "#cec6b7",
+                      "on-secondary": "#3f008e",
+                      "inverse-on-surface": "#303033",
+                      "error": "#ffb4ab",
+                      "surface-container-lowest": "#0e0e11",
+                      "on-secondary-fixed": "#25005a",
+                      "surface-dim": "#131316",
+                      "primary": "#fff0cc",
+                      "secondary-fixed": "#eaddff",
+                      "surface-container-highest": "#353438",
+                      "primary-fixed": "#f5e1b0",
+                      "secondary-fixed-dim": "#d2bbff",
+                      "secondary-container": "#6001d1",
+                      "on-primary-container": "#685a34",
+                      "on-background": "#e4e1e6",
+                      "surface-variant": "#353438",
+                      "surface-container-low": "#1b1b1e",
+                      "outline-variant": "#4b463b",
+                      "on-primary-fixed-variant": "#524621",
+                      "tertiary-fixed-dim": "#c6c3e4",
+                      "tertiary-container": "#d4d1f2",
+                      "on-secondary-container": "#c9aeff",
+                      "on-primary": "#3a2f0d",
+                      "inverse-primary": "#6b5d37",
+                      "on-error": "#690005",
+                      "surface-container-high": "#2a2a2d",
+                      "on-tertiary-container": "#5a5975",
+                      "primary-container": "#e6d3a3",
+                      "outline": "#979083",
+                      "on-secondary-fixed-variant": "#5a00c6",
+                      "inverse-surface": "#e4e1e6",
+                      "error-container": "#93000a",
+                      "surface-tint": "#d8c596"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "base": "4px",
+                      "margin": "24px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-md": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A; /* Level 0 Base */
+            color: #e4e1e6;
+        }
+        .card-surface {
+            background-color: #18181B; /* Level 2 Surface */
+            border: 1px solid #27272A;
+        }
+        .card-surface-dark {
+            background-color: #1A1A24;
+            border: 1px solid #27272A;
+        }
+        .accent-border-gold {
+            border-top: 2px solid #E6D3A3;
+        }
+        .text-gold {
+            color: #E6D3A3;
+        }
+        .bg-gold {
+            background-color: #E6D3A3;
+            color: #0A0A0A;
+        }
+        .border-gold {
+            border-color: #E6D3A3;
+        }
+        .border-violet {
+            border-color: #7C3AED;
+        }
+        .text-violet {
+            color: #7C3AED;
+        }
+        .bg-violet-dim {
+            background-color: rgba(124, 58, 237, 0.1);
+        }
+        /* Custom progress bar styles */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #27272A;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            gap: 2px;
+        }
+        .progress-segment {
+            flex: 1;
+            background-color: transparent;
+        }
+        .progress-segment.filled {
+            background-color: #E6D3A3;
+        }
+        .progress-segment.filled-violet {
+            background-color: #7C3AED;
+        }
+        .progress-segment.filled-gray {
+            background-color: #4b463b;
+        }
+        
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col font-body-md text-body-md">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary docked full-width top-0 border-b border-outline-variant dark:border-outline-variant flat no shadows flex justify-between items-center w-full px-margin h-16 z-50 fixed">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary tracking-tighter uppercase">VENUE_INTELLIGENCE_v4.0</span>
+</div>
+<!-- Top Nav (Desktop) -->
+<nav class="hidden md:flex gap-lg items-center">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-sm py-xs text-label-md font-label-md" href="#">Overview</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-sm py-xs text-label-md font-label-md" href="#">Competitors</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-sm py-xs text-label-md font-label-md" href="#">Transform</a>
+<a class="text-primary dark:text-primary border-b-2 border-primary hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-sm py-xs text-label-md font-label-md opacity-80 transition-opacity" href="#">Marketing</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="bg-primary-container text-on-primary-container border border-primary-container hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors px-md py-xs rounded text-label-md font-label-md flex items-center gap-xs">
+<span>DEEP ANALYSIS</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 pt-16">
+<!-- NavigationDrawer (Desktop) -->
+<aside class="bg-surface-container dark:bg-surface-container border-r border-outline-variant dark:border-outline-variant flat no shadows fixed left-0 top-16 h-[calc(100vh-64px)] z-40 py-lg px-md w-60 hidden md:block">
+<div class="mb-lg">
+<span class="text-label-md font-label-md text-primary dark:text-primary uppercase tracking-widest opacity-80">ANALYTICS_SUITE</span>
+</div>
+<nav class="flex flex-col gap-sm">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant flex items-center gap-sm p-sm rounded text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant flex items-center gap-sm p-sm rounded text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">compare_arrows</span>
+<span>Competitors</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant flex items-center gap-sm p-sm rounded text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Traffic</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant flex items-center gap-sm p-sm rounded text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span>Revenue</span>
+</a>
+<a class="bg-secondary-container dark:bg-secondary-container text-on-secondary-container dark:text-on-secondary-container rounded-lg hover:bg-surface-variant dark:hover:bg-surface-variant flex items-center gap-sm p-sm text-label-md font-label-md scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span>Marketing</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full md:ml-60 p-margin pb-24 md:pb-margin overflow-y-auto">
+<!-- Section 1: Customer Segments -->
+<section class="mb-lg">
+<div class="card-surface-dark p-md rounded-lg flex flex-col gap-md">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+<span class="text-label-md font-label-md">Based on your venue's profile, you attract:</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Segment 1 -->
+<div class="card-surface p-sm rounded border border-gold accent-border-gold flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="text-body-md font-body-md font-semibold text-on-surface">Office Workers</span>
+<span class="text-data-mono font-data-mono text-gold">42%</span>
+</div>
+<!-- Step 8 Progress -->
+<div class="progress-bar-container">
+<div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div>
+<div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div>
+<div class="progress-segment"></div><div class="progress-segment"></div>
+</div>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-violet-dim text-violet border border-violet border-opacity-30 px-xs py-[2px] rounded text-label-sm font-label-sm uppercase tracking-wider">Trusted Regular</span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+                                Weekday lunch
+                            </div>
+</div>
+<!-- Segment 2 -->
+<div class="card-surface p-sm rounded border border-violet flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="text-body-md font-body-md font-semibold text-on-surface">Families</span>
+<span class="text-data-mono font-data-mono text-violet">31%</span>
+</div>
+<!-- Step 8 Progress (Violet) -->
+<div class="progress-bar-container">
+<div class="progress-segment filled-violet"></div><div class="progress-segment filled-violet"></div><div class="progress-segment filled-violet"></div><div class="progress-segment filled-violet"></div>
+<div class="progress-segment filled-violet"></div><div class="progress-segment filled-violet"></div><div class="progress-segment filled-violet"></div><div class="progress-segment filled-violet"></div>
+<div class="progress-segment"></div><div class="progress-segment"></div>
+</div>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-violet-dim text-violet border border-violet border-opacity-30 px-xs py-[2px] rounded text-label-sm font-label-sm uppercase tracking-wider">Habit Former</span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">nightlight</span>
+                                Weekend evening
+                            </div>
+</div>
+<!-- Segment 3 -->
+<div class="card-surface p-sm rounded flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="text-body-md font-body-md font-semibold text-on-surface">Couples</span>
+<span class="text-data-mono font-data-mono text-on-surface-variant">18%</span>
+</div>
+<!-- Step 8 Progress (Gray) -->
+<div class="progress-bar-container">
+<div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div>
+<div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div>
+<div class="progress-segment"></div><div class="progress-segment"></div>
+</div>
+<div class="flex items-center gap-sm mt-xs">
+<span class="bg-violet-dim text-violet border border-violet border-opacity-30 px-xs py-[2px] rounded text-label-sm font-label-sm uppercase tracking-wider">Calm Pairs</span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mt-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">dark_mode</span>
+                                Late evening
+                            </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Recommended Approaches -->
+<section class="flex flex-col gap-sm">
+<!-- Card 1: Expanded -->
+<div class="card-surface rounded-lg p-md flex flex-col gap-md accent-border-gold relative overflow-hidden">
+<!-- High Risk/Value Accent Stripe -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-gold"></div>
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-sm pl-sm">
+<div class="flex items-center gap-sm">
+<div class="bg-gold text-on-primary-fixed w-6 h-6 flex items-center justify-center rounded text-data-mono font-data-mono font-bold">01</div>
+<h3 class="text-body-md font-body-md font-semibold tracking-wide">Habit Formation</h3>
+</div>
+<div class="flex items-center gap-xs bg-[#1A1A10] border border-gold border-opacity-30 px-sm py-xs rounded">
+<span class="text-label-sm font-label-sm text-gold uppercase tracking-wider">Repeat Habit</span>
+<span class="material-symbols-outlined text-[14px] text-gold">arrow_upward</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg pl-sm">
+<!-- Left Col: Channels -->
+<div class="flex flex-col gap-sm">
+<span class="text-label-md font-label-md text-on-surface-variant mb-xs">Channel Viability</span>
+<!-- WhatsApp -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<span class="text-data-mono font-data-mono text-on-surface">WhatsApp</span>
+<span class="text-data-mono font-data-mono text-gold">ROI: +25–40%</span>
+</div>
+<div class="progress-bar-container h-1">
+<div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment filled"></div><div class="progress-segment"></div><div class="progress-segment"></div>
+</div>
+</div>
+<!-- Email -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<span class="text-data-mono font-data-mono text-on-surface">Email</span>
+<span class="text-data-mono font-data-mono text-on-surface-variant">ROI: +15–25%</span>
+</div>
+<div class="progress-bar-container h-1">
+<div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment"></div><div class="progress-segment"></div><div class="progress-segment"></div><div class="progress-segment"></div>
+</div>
+</div>
+<!-- Zomato -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<span class="text-data-mono font-data-mono text-on-surface">Zomato</span>
+<span class="text-data-mono font-data-mono text-on-surface-variant">ROI: +10–20%</span>
+</div>
+<div class="progress-bar-container h-1">
+<div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment filled-gray"></div><div class="progress-segment"></div><div class="progress-segment"></div><div class="progress-segment"></div><div class="progress-segment"></div><div class="progress-segment"></div>
+</div>
+</div>
+</div>
+<!-- Right Col: Execution -->
+<div class="flex flex-col gap-sm">
+<span class="text-label-md font-label-md text-on-surface-variant mb-xs">Execution Template</span>
+<div class="bg-[#0F0F14] border-l-2 border-gold p-sm rounded-r flex flex-col gap-sm relative group">
+<p class="text-label-sm font-label-sm font-mono text-on-surface opacity-90 leading-relaxed">
+                                    "Hey [Name], it's Thursday — your usual table is waiting. Quick walk from BKC. See you at 1pm?"
+                                </p>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors text-label-sm font-label-sm flex items-center gap-xs self-start mt-xs">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+                                    Copy Template
+                                </button>
+</div>
+<div class="flex flex-wrap gap-xs mt-auto pt-sm border-t border-outline-variant">
+<span class="text-label-sm font-label-sm text-on-surface-variant mr-xs self-center">Targets:</span>
+<span class="bg-surface-container-high px-xs py-[2px] rounded text-label-sm font-label-sm text-on-surface uppercase border border-outline-variant">Office Workers</span>
+<span class="bg-surface-container-high px-xs py-[2px] rounded text-label-sm font-label-sm text-on-surface uppercase border border-outline-variant">Families</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Collapsed -->
+<div class="card-surface rounded-lg p-sm flex items-center justify-between cursor-pointer hover:bg-[#1A1A1D] transition-colors group">
+<div class="flex items-center gap-sm">
+<div class="bg-surface-container-high text-on-surface-variant w-6 h-6 flex items-center justify-center rounded text-data-mono font-data-mono font-bold group-hover:bg-gold group-hover:text-on-primary-fixed transition-colors">02</div>
+<h3 class="text-body-md font-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Social Proof</h3>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center gap-xs bg-surface-container px-sm py-xs rounded opacity-60">
+<span class="text-label-sm font-label-sm text-gold uppercase tracking-wider">Social Dwell</span>
+<span class="material-symbols-outlined text-[14px] text-gold">arrow_upward</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-gold transition-colors">expand_more</span>
+</div>
+</div>
+<!-- Card 3: Collapsed -->
+<div class="card-surface rounded-lg p-sm flex items-center justify-between cursor-pointer hover:bg-[#1A1A1D] transition-colors group">
+<div class="flex items-center gap-sm">
+<div class="bg-surface-container-high text-on-surface-variant w-6 h-6 flex items-center justify-center rounded text-data-mono font-data-mono font-bold group-hover:bg-gold group-hover:text-on-primary-fixed transition-colors">03</div>
+<h3 class="text-body-md font-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Identity Signaling</h3>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center gap-xs bg-surface-container px-sm py-xs rounded opacity-60">
+<span class="text-label-sm font-label-sm text-gold uppercase tracking-wider">Destination Visit</span>
+<span class="material-symbols-outlined text-[14px] text-gold">arrow_upward</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-gold transition-colors">expand_more</span>
+</div>
+</div>
+</section>
+<!-- Footer Note -->
+<div class="mt-lg text-center pb-lg">
+<p class="text-label-sm font-label-sm text-on-surface-variant opacity-60 max-w-2xl mx-auto">
+                    Recommendations derived from your venue's fitness profile and India-specific behavioural research. Validate with field measurements.
+                </p>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile) -->
+<nav class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline-variant flat no shadows fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-14 bg-background dark:bg-background md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:text-primary dark:hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-label-sm font-label-sm mt-xs">Snapshot</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:text-primary dark:hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="text-label-sm font-label-sm mt-xs">Compare</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:text-primary dark:hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-label-sm font-label-sm mt-xs">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:text-primary dark:hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="text-label-sm font-label-sm mt-xs">Logs</span>
+</a>
+<!-- Mapping Marketing to Alerts intent for Mobile nav layout given limited slots, or keeping original JSON nav. Sticking to JSON nav options as requested by strict rules -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:text-primary dark:hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">emergency_home</span>
+<span class="text-label-sm font-label-sm mt-xs">Alerts</span>
+</a>
+</nav>
+</body></html>

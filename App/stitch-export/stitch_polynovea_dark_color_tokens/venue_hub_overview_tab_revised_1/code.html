@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Venue Intelligence - Bombay Tiffin Co.</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Style Guidance -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#4b463b",
+                        "surface-container-low": "#1b1b1e",
+                        "on-primary-container": "#685a34",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed": "#eaddff",
+                        "surface-container": "#1f1f22",
+                        "on-secondary-fixed": "#25005a",
+                        "on-secondary-container": "#c9aeff",
+                        "surface-variant": "#353438",
+                        "primary-container": "#e6d3a3",
+                        "tertiary-fixed-dim": "#c6c3e4",
+                        "outline": "#979083",
+                        "on-tertiary-fixed": "#1a1931",
+                        "inverse-surface": "#e4e1e6",
+                        "tertiary-fixed": "#e2dfff",
+                        "on-primary-fixed": "#241a00",
+                        "surface-bright": "#39393c",
+                        "surface-container-high": "#2a2a2d",
+                        "on-surface": "#e4e1e6",
+                        "on-primary-fixed-variant": "#524621",
+                        "surface-container-lowest": "#0e0e11",
+                        "secondary": "#d2bbff",
+                        "surface-dim": "#131316",
+                        "surface": "#131316",
+                        "primary": "#fff0cc",
+                        "inverse-on-surface": "#303033",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#d8c596",
+                        "on-tertiary-container": "#5a5975",
+                        "on-tertiary": "#2f2e47",
+                        "background": "#131316",
+                        "on-surface-variant": "#cec6b7",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "error-container": "#93000a",
+                        "on-error": "#690005",
+                        "surface-container-highest": "#353438",
+                        "primary-fixed": "#f5e1b0",
+                        "on-primary": "#3a2f0d",
+                        "on-tertiary-fixed-variant": "#45445f",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "secondary-container": "#6001d1",
+                        "on-background": "#e4e1e6",
+                        "on-secondary": "#3f008e",
+                        "tertiary": "#f2efff",
+                        "tertiary-container": "#d4d1f2",
+                        "inverse-primary": "#6b5d37",
+                        "surface-tint": "#d8c596"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "md": "16px",
+                        "margin": "24px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "xl": "40px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["JetBrains Mono"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-lg": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "1", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "1", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col md:flex-row antialiased">
+<!-- JSON NavigationDrawer (Desktop Shell) -->
+<nav class="hidden md:flex flex-col bg-surface-container border-r border-outline-variant h-screen w-60 fixed left-0 top-0 z-40 py-lg px-md">
+<div class="mb-xl px-sm">
+<h2 class="text-label-md font-label-md text-primary tracking-tighter">ANALYTICS_SUITE</h2>
+</div>
+<ul class="flex flex-col gap-xs"><li><a class="flex items-center gap-md px-sm py-sm bg-secondary-container text-on-secondary-container rounded-lg opacity-80 scale-[0.98]" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="text-label-md font-label-md">Overview</span></a></li><li><a class="flex items-center gap-md px-sm py-sm text-on-surface-variant hover:bg-surface-variant transition-colors rounded-lg" href="#"><span class="material-symbols-outlined text-[20px]">compare_arrows</span><span class="text-label-md font-label-md">Competitors</span></a></li><li><a class="flex items-center gap-md px-sm py-sm text-on-surface-variant hover:bg-surface-variant transition-colors rounded-lg" href="#"><span class="material-symbols-outlined text-[20px]">auto_fix_high</span><span class="text-label-md font-label-md">Transform</span></a></li><li><a class="flex items-center gap-md px-sm py-sm text-on-surface-variant hover:bg-surface-variant transition-colors rounded-lg" href="#"><span class="material-symbols-outlined text-[20px]">campaign</span><span class="text-label-md font-label-md">Marketing</span></a></li></ul>
+</nav>
+<!-- Main Application Canvas -->
+<main class="flex-1 md:ml-60 flex flex-col min-h-screen pb-20 md:pb-0">
+<!-- JSON TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin h-16 bg-surface border-b border-outline-variant sticky top-0 z-30">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[24px]">analytics</span>
+<h1 class="text-headline-md font-headline-md font-bold text-primary tracking-tighter">VENUE_INTELLIGENCE_v4.0</h1>
+</div>
+<button class="text-label-md font-label-md text-primary hover:bg-surface-container-highest transition-colors px-sm py-xs border border-outline-variant rounded">
+                DEEP ANALYSIS
+            </button>
+</header>
+<!-- Page Content Canvas -->
+<div class="p-margin flex flex-col gap-lg max-w-[1400px] w-full mx-auto">
+<!-- Context Header & Mode Toggle -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md border-b border-outline-variant pb-md">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-primary-container">Bombay Tiffin Co.</h2>
+<div class="flex items-center gap-xs mt-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+<span class="text-body-sm font-body-sm">Mumbai, Bandra Kurla Complex</span>
+</div>
+</div>
+<!-- View Toggle Component -->
+<div class="flex bg-surface-container border border-outline-variant rounded p-xs">
+<button class="px-md py-xs bg-surface border border-outline-variant rounded text-label-sm font-label-sm text-on-surface">Client View</button>
+<button class="px-md py-xs text-on-surface-variant text-label-sm font-label-sm hover:text-on-surface transition-colors">Deep Analysis</button>
+</div>
+</div>
+<!-- Bento Grid: Main Analytics -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-md">
+<!-- Col 1: Fitness Profile (Radar representation) -->
+<div class="lg:col-span-4 bg-surface border border-outline-variant rounded flex flex-col p-md">
+<div class="flex justify-between items-center mb-md pb-xs border-b border-outline-variant">
+<h3 class="text-label-md font-label-md text-on-surface tracking-wide uppercase">Fitness Profile</h3>
+<span class="material-symbols-outlined text-outline text-[18px]">radar</span>
+</div>
+<div class="flex-1 flex items-center justify-center relative min-h-[240px]">
+<!-- Structural SVG Radar Chart Mockup -->
+<svg class="w-full max-w-[220px] h-auto" viewbox="0 0 200 200">
+<!-- Background Grid -->
+<polygon fill="none" points="100,20 176,75 147,165 53,165 24,75" stroke="#27272A" stroke-width="1"></polygon>
+<polygon fill="none" points="100,40 157,81 135,148 65,148 43,81" stroke="#27272A" stroke-width="1"></polygon>
+<polygon fill="none" points="100,60 138,87 123,132 77,132 62,87" stroke="#27272A" stroke-width="1"></polygon>
+<!-- Axes -->
+<line stroke="#27272A" stroke-width="1" x1="100" x2="100" y1="100" y2="20"></line>
+<line stroke="#27272A" stroke-width="1" x1="100" x2="176" y1="100" y2="75"></line>
+<line stroke="#27272A" stroke-width="1" x1="100" x2="147" y1="100" y2="165"></line>
+<line stroke="#27272A" stroke-width="1" x1="100" x2="53" y1="100" y2="165"></line>
+<line stroke="#27272A" stroke-width="1" x1="100" x2="24" y1="100" y2="75"></line>
+<!-- Data Polygon (Approximated based on values) -->
+<!-- Values: Office(0.78), Repeat(0.82), Social(0.45), Group(0.21), Dest(0.67) -->
+<polygon fill="rgba(230, 211, 163, 0.15)" points="100,38 162,81 121,128 91,113 50,84" stroke="#E6D3A3" stroke-width="1.5"></polygon>
+<!-- Data Points -->
+<circle cx="100" cy="38" fill="#E6D3A3" r="3"></circle>
+<circle cx="162" cy="81" fill="#E6D3A3" r="3"></circle>
+<circle cx="121" cy="128" fill="#E6D3A3" r="3"></circle>
+<circle cx="91" cy="113" fill="#E6D3A3" r="3"></circle>
+<circle cx="50" cy="84" fill="#E6D3A3" r="3"></circle>
+</svg>
+<!-- Labels overlay -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 text-[10px] font-data-mono text-on-surface-variant text-center">
+                            Office Lunch<br/><span class="text-primary-container">0.78</span>
+</div>
+<div class="absolute top-[35%] right-0 translate-x-4 text-[10px] font-data-mono text-on-surface-variant text-right">
+                            Repeat Habit<br/><span class="text-primary-container">0.82</span>
+</div>
+<div class="absolute bottom-2 right-4 text-[10px] font-data-mono text-on-surface-variant text-right">
+                            Social<br/><span class="text-primary-container">0.45</span>
+</div>
+<div class="absolute bottom-2 left-4 text-[10px] font-data-mono text-on-surface-variant text-left">
+                            Group<br/><span class="text-primary-container">0.21</span>
+</div>
+<div class="absolute top-[35%] left-0 -translate-x-2 text-[10px] font-data-mono text-on-surface-variant text-left">
+                            Destination<br/><span class="text-primary-container">0.67</span>
+</div>
+</div>
+</div>
+<!-- Col 2: Your Customers -->
+<div class="lg:col-span-4 bg-surface border border-outline-variant rounded flex flex-col p-md">
+<div class="flex justify-between items-center mb-md pb-xs border-b border-outline-variant">
+<h3 class="text-label-md font-label-md text-on-surface tracking-wide uppercase">Your Customers</h3>
+<span class="material-symbols-outlined text-secondary text-[18px]">group_add</span>
+</div>
+<div class="flex flex-col gap-sm mb-md">
+<div class="flex justify-between items-end border-b border-surface-variant pb-xs">
+<div>
+<span class="text-label-sm font-label-sm text-outline">Primary Segment</span>
+<div class="text-body-md font-body-md text-on-surface">Office Workers</div>
+</div>
+<span class="text-data-mono font-data-mono text-secondary">42%</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-variant pb-xs">
+<div>
+<span class="text-label-sm font-label-sm text-outline">Secondary Segment</span>
+<div class="text-body-md font-body-md text-on-surface">Couples</div>
+</div>
+<span class="text-data-mono font-data-mono text-secondary">18%</span>
+</div>
+</div>
+<div class="mt-auto">
+<span class="text-label-sm font-label-sm text-outline mb-sm block">Archetype Distribution</span>
+<div class="flex flex-col gap-xs">
+<!-- Bar 1 -->
+<div>
+<div class="flex justify-between text-[11px] font-data-mono mb-1 text-on-surface-variant">
+<span>Trusted Regular</span><span>38%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded overflow-hidden">
+<div class="h-full bg-secondary" style="width: 38%"></div>
+</div>
+</div>
+<!-- Bar 2 -->
+<div>
+<div class="flex justify-between text-[11px] font-data-mono mb-1 text-on-surface-variant">
+<span>Habit Former</span><span>28%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded overflow-hidden">
+<div class="h-full bg-secondary opacity-70" style="width: 28%"></div>
+</div>
+</div>
+<!-- Bar 3 -->
+<div>
+<div class="flex justify-between text-[11px] font-data-mono mb-1 text-on-surface-variant">
+<span>Calm Pairs</span><span>18%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded overflow-hidden">
+<div class="h-full bg-secondary opacity-40" style="width: 18%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Col 3: Venue Health -->
+<div class="lg:col-span-4 bg-surface border border-outline-variant rounded flex flex-col p-md relative overflow-hidden">
+<!-- Subtle AI badge -->
+<div class="absolute top-md right-md flex items-center justify-center w-6 h-6 rounded-full bg-secondary-container bg-opacity-20 border border-secondary-container">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></div>
+</div>
+<div class="mb-md pb-xs border-b border-outline-variant">
+<h3 class="text-label-md font-label-md text-on-surface tracking-wide uppercase">Venue Health</h3>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center py-sm">
+<!-- Score Ring -->
+<div class="relative w-32 h-32 flex items-center justify-center mb-md">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="#27272A" stroke-width="4"></circle>
+<circle class="transition-all duration-1000" cx="50" cy="50" fill="none" r="45" stroke="#E6D3A3" stroke-dasharray="282.7" stroke-dashoffset="73.5" stroke-width="4"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-display-lg font-display-lg text-primary-container leading-none">74</span>
+<span class="text-label-sm font-label-sm text-outline">/100</span>
+</div>
+</div>
+<div class="w-full grid grid-cols-2 gap-sm text-center border-t border-surface-variant pt-sm">
+<div class="flex flex-col">
+<span class="text-[10px] font-data-mono text-outline mb-1">Operational Q.</span>
+<span class="text-body-md font-data-mono text-on-surface border border-outline-variant bg-surface-container-low px-2 py-1 rounded">0.78</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-data-mono text-outline mb-1">Retention Str.</span>
+<span class="text-body-md font-data-mono text-secondary border border-outline-variant bg-surface-container-low px-2 py-1 rounded">0.71</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Strengths & Gaps -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-md mt-sm">
+<!-- Panel 1: Working For You -->
+<div class="bg-surface border-t-2 border-outline-variant border-x border-b border-x-surface-variant border-b-surface-variant rounded flex flex-col p-md">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<span class="material-symbols-outlined text-outline text-[18px]">trending_up</span>
+<h3 class="text-label-md font-label-md text-on-surface tracking-wide uppercase">Working For You</h3>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="bg-surface-container-low border border-surface-variant p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-container text-[18px] mt-0.5">check_circle</span>
+<div>
+<h4 class="text-label-sm font-label-sm text-on-surface">Peak Hour Conversion</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Lunch rush demonstrates 14% higher throughput than neighborhood baseline.</p>
+</div>
+</div>
+<div class="bg-surface-container-low border border-surface-variant p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-container text-[18px] mt-0.5">check_circle</span>
+<div>
+<h4 class="text-label-sm font-label-sm text-on-surface">Menu Affinity</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Strong cross-attachment between primary mains and secondary beverages.</p>
+</div>
+</div>
+<div class="bg-surface-container-low border border-surface-variant p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary-container text-[18px] mt-0.5">check_circle</span>
+<div>
+<h4 class="text-label-sm font-label-sm text-on-surface">Regulars Core</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">High visit frequency among the top 10% of identified unique profiles.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel 2: Gaps To Close -->
+<div class="bg-surface border-t-2 border-error border-x border-b border-x-surface-variant border-b-surface-variant rounded flex flex-col p-md">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<span class="material-symbols-outlined text-outline text-[18px]">warning</span>
+<h3 class="text-label-md font-label-md text-on-surface tracking-wide uppercase">Gaps To Close</h3>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="bg-surface-container-low border border-surface-variant p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-error text-[18px] mt-0.5">trending_down</span>
+<div>
+<h4 class="text-label-sm font-label-sm text-on-surface">Evening Dwell Drop</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Post-6PM traffic declines sharply compared to localized competitor sets.</p>
+</div>
+</div>
+<div class="bg-surface-container-low border border-surface-variant p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-error text-[18px] mt-0.5">trending_down</span>
+<div>
+<h4 class="text-label-sm font-label-sm text-on-surface">Weekend Retention</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Low crossover of weekday 'Office Workers' segment into weekend 'Destination' visits.</p>
+</div>
+</div>
+<div class="bg-surface-container-low border border-surface-variant p-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-error text-[18px] mt-0.5">trending_down</span>
+<div>
+<h4 class="text-label-sm font-label-sm text-on-surface">Group Capacity</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">Spatial analytics indicate friction for groups of 4+, capping revenue potential.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- JSON BottomNavBar (Mobile Shell) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-14 bg-background border-t border-outline-variant">
+<a class="flex flex-col items-center justify-center text-primary font-bold translate-y-[-2px] duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]">monitoring</span>
+<span class="text-label-sm font-label-sm mt-1">Snapshot</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">query_stats</span>
+<span class="text-label-sm font-label-sm mt-1">Compare</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">map</span>
+<span class="text-label-sm font-label-sm mt-1">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">terminal</span>
+<span class="text-label-sm font-label-sm mt-1">Logs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[24px]">emergency_home</span>
+<span class="text-label-sm font-label-sm mt-1">Alerts</span>
+</a>
+</nav>
+</body></html>

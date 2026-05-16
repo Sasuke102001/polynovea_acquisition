@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Venue Intelligence - Marketing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#2f2e47",
+                    "error": "#ffb4ab",
+                    "primary-fixed-dim": "#d8c596",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary": "#3f008e",
+                    "surface-tint": "#d8c596",
+                    "on-tertiary-fixed-variant": "#45445f",
+                    "on-primary": "#3a2f0d",
+                    "on-background": "#e4e1e6",
+                    "tertiary": "#f2efff",
+                    "on-surface-variant": "#cec6b7",
+                    "on-tertiary-fixed": "#1a1931",
+                    "on-secondary-fixed": "#25005a",
+                    "primary": "#fff0cc",
+                    "secondary-container": "#6001d1",
+                    "surface-container-low": "#1b1b1e",
+                    "surface-container": "#1f1f22",
+                    "surface-variant": "#353438",
+                    "on-tertiary-container": "#5a5975",
+                    "on-secondary-fixed-variant": "#5a00c6",
+                    "primary-fixed": "#f5e1b0",
+                    "surface-container-lowest": "#0e0e11",
+                    "tertiary-fixed": "#e2dfff",
+                    "primary-container": "#e6d3a3",
+                    "inverse-on-surface": "#303033",
+                    "outline": "#979083",
+                    "secondary": "#d2bbff",
+                    "on-primary-fixed": "#241a00",
+                    "error-container": "#93000a",
+                    "surface-bright": "#39393c",
+                    "surface": "#131316",
+                    "on-secondary-container": "#c9aeff",
+                    "tertiary-fixed-dim": "#c6c3e4",
+                    "surface-dim": "#131316",
+                    "secondary-fixed-dim": "#d2bbff",
+                    "on-surface": "#e4e1e6",
+                    "secondary-fixed": "#eaddff",
+                    "inverse-surface": "#e4e1e6",
+                    "surface-container-high": "#2a2a2d",
+                    "on-error": "#690005",
+                    "inverse-primary": "#6b5d37",
+                    "on-primary-container": "#685a34",
+                    "on-primary-fixed-variant": "#524621",
+                    "background": "#131316",
+                    "tertiary-container": "#d4d1f2",
+                    "surface-container-highest": "#353438",
+                    "outline-variant": "#4b463b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "xl": "40px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "md": "16px",
+                    "margin": "24px",
+                    "lg": "24px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "display-lg": ["JetBrains Mono"],
+                    "label-sm": ["JetBrains Mono"],
+                    "label-md": ["JetBrains Mono"],
+                    "data-mono": ["JetBrains Mono"],
+                    "headline-md": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "data-mono": ["14px", {"lineHeight": "1", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #131316;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #353438;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4b463b;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin h-16 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant docked full-width top-0 z-50 fixed">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary">analytics</span>
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary tracking-tighter uppercase">VENUE_INTELLIGENCE_v4.0</span>
+</div>
+<div class="hidden md:flex flex-1 justify-center gap-lg">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-md py-sm rounded">
+<span class="text-label-md font-label-md">Overview</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-md py-sm rounded">
+<span class="text-label-md font-label-md">Competitors</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-md py-sm rounded">
+<span class="text-label-md font-label-md">Transform</span>
+</button>
+<button class="text-primary dark:text-primary border-b-2 border-primary hover:bg-surface-container-highest dark:hover:bg-surface-container-highest transition-colors px-md py-sm opacity-80 transition-opacity">
+<span class="text-label-md font-label-md">Marketing</span>
+</button>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center bg-surface-container-high rounded-full p-xs border border-outline-variant">
+<button class="px-sm py-xs text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors">Client View</button>
+<button class="px-sm py-xs text-label-sm font-label-sm bg-primary-container text-on-primary-container rounded-full">Deep Analysis</button>
+</div>
+<button class="text-label-md font-label-md text-primary dark:text-primary border border-primary px-md py-sm rounded hover:bg-surface-container-highest transition-colors uppercase">
+                DEEP ANALYSIS
+            </button>
+</div>
+</header>
+<!-- Main Layout -->
+<div class="flex h-screen pt-16">
+<!-- NavigationDrawer -->
+<nav class="hidden md:block fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 py-lg px-md bg-surface-container dark:bg-surface-container border-r border-outline-variant dark:border-outline-variant w-60">
+<h2 class="text-label-md font-label-md text-primary dark:text-primary mb-md uppercase tracking-wider px-sm">ANALYTICS_SUITE</h2>
+<ul class="flex flex-col gap-xs">
+<li>
+<button class="w-full flex items-center gap-sm px-sm py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant rounded transition-colors text-left text-label-md font-label-md">
+<span class="material-symbols-outlined">dashboard</span>
+                        Overview
+                    </button>
+</li>
+<li>
+<button class="w-full flex items-center gap-sm px-sm py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant rounded transition-colors text-left text-label-md font-label-md">
+<span class="material-symbols-outlined">compare_arrows</span>
+                        Competitors
+                    </button>
+</li>
+<li>
+<button class="w-full flex items-center gap-sm px-sm py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant dark:hover:bg-surface-variant rounded transition-colors text-left text-label-md font-label-md">
+<span class="material-symbols-outlined">auto_graph</span>
+                        Transform
+                    </button>
+</li>
+<li>
+<button class="w-full flex items-center gap-sm px-sm py-sm bg-secondary-container dark:bg-secondary-container text-on-secondary-container dark:text-on-secondary-container rounded-lg hover:bg-surface-variant dark:hover:bg-surface-variant transition-colors text-left text-label-md font-label-md scale-[0.98] duration-150">
+<span class="material-symbols-outlined">campaign</span>
+                        Marketing
+                    </button>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-60 overflow-y-auto custom-scrollbar p-margin lg:px-xl pb-24 bg-background">
+<div class="max-w-[1400px] mx-auto space-y-lg">
+<!-- Section 1: Customer Segments -->
+<section class="bg-surface border border-outline-variant rounded-lg p-md md:p-lg flex flex-col gap-md">
+<h3 class="text-body-md font-body-md text-on-surface-variant">Based on your venue's profile, you attract:</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-sm">
+<!-- Segment 1 -->
+<div class="bg-surface-container-low border-t-2 border-primary-container border-x border-b border-outline-variant p-sm flex flex-col gap-sm rounded">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-headline-md font-headline-md text-on-surface">Office Workers</h4>
+<div class="text-display-lg font-display-lg text-primary-container mt-xs">42%</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container text-label-sm font-label-sm px-sm py-xs rounded-full uppercase tracking-wider">Trusted Regular</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant text-label-md font-label-md mt-auto pt-sm border-t border-outline-variant">
+<span class="material-symbols-outlined text-base">schedule</span>
+                                Weekday lunch
+                            </div>
+</div>
+<!-- Segment 2 -->
+<div class="bg-surface-container-low border-t-2 border-secondary-container border-x border-b border-outline-variant p-sm flex flex-col gap-sm rounded">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-headline-md font-headline-md text-on-surface">Families</h4>
+<div class="text-display-lg font-display-lg text-secondary-container mt-xs">31%</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container text-label-sm font-label-sm px-sm py-xs rounded-full uppercase tracking-wider">Habit Former</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant text-label-md font-label-md mt-auto pt-sm border-t border-outline-variant">
+<span class="material-symbols-outlined text-base">schedule</span>
+                                Weekend afternoon
+                            </div>
+</div>
+<!-- Segment 3 -->
+<div class="bg-surface-container-low border border-outline-variant p-sm flex flex-col gap-sm rounded">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="text-headline-md font-headline-md text-on-surface">Couples</h4>
+<div class="text-display-lg font-display-lg text-on-surface-variant mt-xs">18%</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container text-label-sm font-label-sm px-sm py-xs rounded-full uppercase tracking-wider">Calm Pairs</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant text-label-md font-label-md mt-auto pt-sm border-t border-outline-variant">
+<span class="material-symbols-outlined text-base">schedule</span>
+                                Friday–Saturday evening
+                            </div>
+</div>
+</div>
+</section>
+<!-- Section 2: Acquisition -->
+<section class="flex flex-col gap-md">
+<div class="flex items-center gap-sm">
+<span class="bg-[#10B981]/20 text-[#10B981] text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-[#10B981]/30">NEW CUSTOMERS</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">ACQUISITION: Reach New Customers</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-md">
+<!-- Card A -->
+<div class="bg-surface border border-outline-variant rounded p-md flex flex-col gap-md relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-label-sm font-label-sm px-sm py-xs rounded-bl uppercase font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">stars</span> #1 RECOMMENDED
+                            </div>
+<div class="pr-xl">
+<h3 class="text-headline-lg font-headline-lg text-on-surface">Instagram Reels</h3>
+<div class="flex items-center gap-xs mt-sm text-body-sm font-body-sm text-primary-container">
+<span class="material-symbols-outlined text-sm">psychology</span>
+                                    Mechanism: Environmental Expectation
+                                </div>
+</div>
+<div class="grid grid-cols-2 gap-sm border-y border-outline-variant py-sm">
+<div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Relevance Score</div>
+<div class="flex items-center gap-sm">
+<div class="text-data-mono font-data-mono text-on-surface text-lg">8/10</div>
+<div class="flex-1 h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[80%]"></div>
+</div>
+</div>
+</div>
+<div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Expected ROI</div>
+<div class="text-data-mono font-data-mono text-[#10B981] text-lg">+15–25%</div>
+</div>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant italic">
+                                "73% of diners check venue photos before booking..."
+                            </div>
+<div class="mt-auto pt-sm">
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Target Segments:</div>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 text-label-sm font-label-sm px-sm py-xs rounded">Couples</span>
+<span class="bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 text-label-sm font-label-sm px-sm py-xs rounded">College Kids</span>
+</div>
+</div>
+</div>
+<!-- Card B -->
+<div class="bg-surface border border-outline-variant rounded p-md flex flex-col gap-md relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-label-sm font-label-sm px-sm py-xs rounded-bl uppercase font-bold flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">stars</span> #2 RECOMMENDED
+                            </div>
+<div class="pr-xl">
+<h3 class="text-headline-lg font-headline-lg text-on-surface">Zomato / Swiggy</h3>
+<div class="flex items-center gap-xs mt-sm text-body-sm font-body-sm text-primary-container">
+<span class="material-symbols-outlined text-sm">thumb_up</span>
+                                    Mechanism: Social Proof
+                                </div>
+</div>
+<div class="grid grid-cols-2 gap-sm border-y border-outline-variant py-sm">
+<div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Relevance Score</div>
+<div class="flex items-center gap-sm">
+<div class="text-data-mono font-data-mono text-on-surface text-lg">9/10</div>
+<div class="flex-1 h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[90%]"></div>
+</div>
+</div>
+</div>
+<div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Expected ROI</div>
+<div class="text-data-mono font-data-mono text-[#10B981] text-lg">+25–60%</div>
+</div>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant italic">
+                                "Platform placement drives the highest single-channel uplift..."
+                            </div>
+<div class="mt-auto pt-sm">
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Target Segments:</div>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 text-label-sm font-label-sm px-sm py-xs rounded">Families</span>
+<span class="bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 text-label-sm font-label-sm px-sm py-xs rounded">Office Workers</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Not Recommended -->
+<div class="bg-error-container/10 border-l-2 border-error border-y border-r border-outline-variant rounded-r p-sm flex flex-col gap-xs mt-sm">
+<div class="flex items-start gap-sm text-on-surface-variant text-body-sm font-body-sm">
+<span class="material-symbols-outlined text-error text-base mt-xs">close</span>
+<div>
+<span class="font-bold text-on-surface">YouTube Shorts:</span> "Short-form video works for high-energy nightlife..."
+                            </div>
+</div>
+<div class="flex items-start gap-sm text-on-surface-variant text-body-sm font-body-sm">
+<span class="material-symbols-outlined text-error text-base mt-xs">close</span>
+<div>
+<span class="font-bold text-on-surface">Facebook Ads:</span> "35+ demographic mismatch..."
+                            </div>
+</div>
+</div>
+</section>
+<!-- Section 3: Retention -->
+<section class="flex flex-col gap-md">
+<div class="flex items-center gap-sm">
+<span class="bg-[#7C3AED]/20 text-[#7C3AED] text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-[#7C3AED]/30">EXISTING CUSTOMERS</span>
+<h2 class="text-headline-md font-headline-md text-on-surface">RETENTION: Keep Existing Customers Coming Back</h2>
+</div>
+<div class="flex flex-col gap-sm">
+<!-- Active Retention Card -->
+<div class="bg-surface border border-outline-variant rounded p-md flex flex-col gap-md relative">
+<div class="absolute top-0 right-0 bg-primary-container text-on-primary-container text-label-sm font-label-sm px-sm py-xs rounded-bl uppercase font-bold flex items-center gap-xs">
+                                PRIMARY
+                            </div>
+<div class="flex justify-between items-start pr-xl">
+<div>
+<h3 class="text-headline-lg font-headline-lg text-on-surface">WhatsApp Broadcast</h3>
+<div class="flex items-center gap-xs mt-xs text-body-sm font-body-sm text-primary-container">
+<span class="material-symbols-outlined text-sm">cycle</span>
+                                        Mechanism: Habit Formation
+                                    </div>
+</div>
+<div class="text-right">
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Expected ROI</div>
+<div class="text-data-mono font-data-mono text-[#10B981] text-lg">+30–40%</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md items-start">
+<div class="flex flex-col gap-sm">
+<div class="text-body-sm font-body-sm text-on-surface-variant italic">
+                                        "85–95% open rate in India..."
+                                    </div>
+<div>
+<div class="text-label-sm font-label-sm text-on-surface-variant mb-xs">Target Segments:</div>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-secondary-container/20 text-on-secondary-container border border-secondary-container/30 text-label-sm font-label-sm px-sm py-xs rounded">Office Workers</span>
+<span class="bg-secondary-container/20 text-on-secondary-container border border-secondary-container/30 text-label-sm font-label-sm px-sm py-xs rounded">Families</span>
+</div>
+</div>
+</div>
+<!-- Sample Message -->
+<div class="bg-surface-container-lowest border-l-2 border-primary-container border-y border-r border-outline-variant rounded-r p-sm flex flex-col gap-sm">
+<div class="text-data-mono font-data-mono text-body-sm text-on-surface-variant leading-relaxed">
+                                        "Hey [Name], it's Thursday — your usual table is waiting..."
+                                    </div>
+<button class="self-start text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm flex items-center gap-xs transition-colors">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                                        [ Copy Template ]
+                                    </button>
+</div>
+</div>
+</div>
+<!-- Collapsed Retention Cards -->
+<div class="bg-surface border border-outline-variant rounded p-sm flex justify-between items-center cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-md">
+<h4 class="text-body-lg font-body-lg text-on-surface font-bold">Email</h4>
+<span class="text-data-mono font-data-mono text-[#10B981] text-body-sm">ROI: +15–25%</span>
+</div>
+<button class="text-on-surface-variant text-label-sm font-label-sm flex items-center gap-xs">
+                                [ Expand <span class="material-symbols-outlined text-sm">expand_more</span> ]
+                            </button>
+</div>
+<div class="bg-surface border border-outline-variant rounded p-sm flex justify-between items-center cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-md">
+<h4 class="text-body-lg font-body-lg text-on-surface font-bold">SMS</h4>
+<span class="text-data-mono font-data-mono text-[#10B981] text-body-sm">ROI: +10–15%</span>
+</div>
+<button class="text-on-surface-variant text-label-sm font-label-sm flex items-center gap-xs">
+                                [ Expand <span class="material-symbols-outlined text-sm">expand_more</span> ]
+                            </button>
+</div>
+</div>
+</section>
+<footer class="pt-lg border-t border-outline-variant text-center">
+<p class="text-[11px] font-body-sm text-on-surface-variant/60 max-w-2xl mx-auto">
+                        Recommendations derived from your venue's fitness profile and India-specific behavioural research (Phase 1). Validate with field measurements.
+                    </p>
+</footer>
+</div>
+</main>
+</div>
+</body></html>

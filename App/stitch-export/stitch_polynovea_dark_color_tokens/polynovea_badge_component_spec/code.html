@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Component Specification: System Badges</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#0e0e11",
+                      "on-error-container": "#ffdad6",
+                      "outline": "#979083",
+                      "surface-container-highest": "#353438",
+                      "surface-container-high": "#2a2a2d",
+                      "surface-container": "#1f1f22",
+                      "inverse-surface": "#e4e1e6",
+                      "primary-fixed": "#f5e1b0",
+                      "on-primary": "#3a2f0d",
+                      "inverse-primary": "#6b5d37",
+                      "surface-dim": "#131316",
+                      "surface-container-low": "#1b1b1e",
+                      "on-surface": "#e4e1e6",
+                      "on-secondary-container": "#c9aeff",
+                      "primary": "#fff0cc",
+                      "surface": "#131316",
+                      "on-primary-container": "#685a34",
+                      "error": "#ffb4ab",
+                      "on-primary-fixed": "#241a00",
+                      "background": "#131316",
+                      "tertiary-container": "#d4d1f2",
+                      "surface-variant": "#353438",
+                      "primary-fixed-dim": "#d8c596",
+                      "on-secondary-fixed-variant": "#5a00c6",
+                      "on-primary-fixed-variant": "#524621",
+                      "secondary": "#d2bbff",
+                      "primary-container": "#e6d3a3",
+                      "on-surface-variant": "#cec6b7",
+                      "on-tertiary-fixed": "#1a1931",
+                      "on-tertiary": "#2f2e47",
+                      "surface-bright": "#39393c",
+                      "on-background": "#e4e1e6",
+                      "tertiary-fixed-dim": "#c6c3e4",
+                      "tertiary-fixed": "#e2dfff",
+                      "on-tertiary-fixed-variant": "#45445f",
+                      "on-secondary": "#3f008e",
+                      "on-tertiary-container": "#5a5975",
+                      "tertiary": "#f2efff",
+                      "inverse-on-surface": "#303033",
+                      "secondary-fixed-dim": "#d2bbff",
+                      "on-secondary-fixed": "#25005a",
+                      "secondary-fixed": "#eaddff",
+                      "error-container": "#93000a",
+                      "surface-tint": "#d8c596",
+                      "outline-variant": "#4b463b",
+                      "on-error": "#690005",
+                      "secondary-container": "#6001d1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "md": "16px",
+                      "base": "4px",
+                      "margin": "24px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "xl": "40px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "display-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "label-md": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "JetBrains Mono"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e4e1e6;
+        }
+        .badge-base {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 9999px; /* full rounded */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        
+        /* Custom Variants matching user prompt exactly */
+        .badge-gold {
+            background-color: rgba(230, 211, 163, 0.15);
+            color: #E6D3A3;
+            border: 1px solid rgba(230, 211, 163, 0.4);
+        }
+        .badge-violet {
+            background-color: rgba(124, 58, 237, 0.15);
+            color: #7C3AED;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+        }
+        .badge-green {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10B981;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .badge-amber {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #F59E0B;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .badge-red {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #EF4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface border-b border-outline-variant flex justify-between items-center w-full px-margin h-16 docked full-width top-0 z-50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary dark:text-primary cursor-pointer active:opacity-80">grid_view</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary tracking-tight">Polynovea Intelligence System</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary dark:text-primary cursor-pointer active:opacity-80">settings</span>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- NavigationDrawer -->
+<nav class="bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant fixed left-0 top-16 h-[calc(100vh-64px)] w-[240px] flex flex-col p-md gap-sm hidden md:flex z-40">
+<div class="mb-lg px-sm">
+<span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">Design Architecture</span>
+</div>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">palette</span>
+                Color Tokens
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">text_fields</span>
+                Typography
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded bg-secondary-container text-on-secondary-container font-bold hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">widgets</span>
+                Component Library
+            </a>
+<a class="flex items-center gap-sm px-sm py-sm rounded text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">terminal</span>
+                System Logs
+            </a>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 md:ml-[240px] p-margin lg:p-xl flex flex-col gap-lg">
+<!-- Page Header -->
+<div class="mb-md">
+<h1 class="font-headline-lg text-headline-lg text-primary-container mb-xs">Component Specification: System Badges</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                    Technical specifications for intelligence badges used across the platform to denote entity status, system confidence, and risk levels.
+                </p>
+</div>
+<!-- Specs Card -->
+<div class="bg-[#18181B] border border-[#27272A] rounded-lg p-lg flex flex-col gap-lg shadow-sm">
+<div class="border-b border-[#27272A] pb-md flex justify-between items-start">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-xs">Badge Variants</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Displayed on #18181B Level 2 Surface for contrast evaluation.</p>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-xs">TECHNICAL SPECS</p>
+<p class="font-body-sm text-body-sm text-on-surface" style="font-family: 'Inter', sans-serif; font-size: 11px; text-transform: uppercase;">Inter 11px / Full Round / 15% BG Alpha / 40% Border</p>
+</div>
+</div>
+<!-- Badge Display Row -->
+<div class="flex flex-wrap items-center gap-md py-lg justify-center bg-[#18181B] rounded border border-[#27272A] border-dashed">
+<span class="badge-base badge-gold">High Confidence</span>
+<span class="badge-base badge-violet">Intelligence</span>
+<span class="badge-base badge-green">Strong Signal</span>
+<span class="badge-base badge-amber">Gap Detected</span>
+<span class="badge-base badge-red">High Risk</span>
+</div>
+<!-- Spec Details Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-md mt-md">
+<!-- Detail 1 -->
+<div class="bg-[#121212] border border-[#27272A] p-sm rounded flex flex-col gap-xs">
+<div class="flex items-center gap-xs mb-xs">
+<div class="w-3 h-3 rounded-full" style="background-color: #E6D3A3;"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Gold / Signal</span>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>BG:</span> <span>rgba(230,211,163,0.15)</span></div>
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>Text:</span> <span>#E6D3A3</span></div>
+<div class="flex justify-between"><span>Border:</span> <span>rgba(230,211,163,0.4)</span></div>
+</div>
+</div>
+<!-- Detail 2 -->
+<div class="bg-[#121212] border border-[#27272A] p-sm rounded flex flex-col gap-xs">
+<div class="flex items-center gap-xs mb-xs">
+<div class="w-3 h-3 rounded-full" style="background-color: #7C3AED;"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Violet / AI</span>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>BG:</span> <span>rgba(124,58,237,0.15)</span></div>
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>Text:</span> <span>#7C3AED</span></div>
+<div class="flex justify-between"><span>Border:</span> <span>rgba(124,58,237,0.4)</span></div>
+</div>
+</div>
+<!-- Detail 3 -->
+<div class="bg-[#121212] border border-[#27272A] p-sm rounded flex flex-col gap-xs">
+<div class="flex items-center gap-xs mb-xs">
+<div class="w-3 h-3 rounded-full" style="background-color: #10B981;"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Green / Success</span>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>BG:</span> <span>rgba(16,185,129,0.15)</span></div>
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>Text:</span> <span>#10B981</span></div>
+<div class="flex justify-between"><span>Border:</span> <span>rgba(16,185,129,0.4)</span></div>
+</div>
+</div>
+<!-- Detail 4 -->
+<div class="bg-[#121212] border border-[#27272A] p-sm rounded flex flex-col gap-xs">
+<div class="flex items-center gap-xs mb-xs">
+<div class="w-3 h-3 rounded-full" style="background-color: #F59E0B;"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Amber / Warning</span>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>BG:</span> <span>rgba(245,158,11,0.15)</span></div>
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>Text:</span> <span>#F59E0B</span></div>
+<div class="flex justify-between"><span>Border:</span> <span>rgba(245,158,11,0.4)</span></div>
+</div>
+</div>
+<!-- Detail 5 -->
+<div class="bg-[#121212] border border-[#27272A] p-sm rounded flex flex-col gap-xs">
+<div class="flex items-center gap-xs mb-xs">
+<div class="w-3 h-3 rounded-full" style="background-color: #EF4444;"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Red / Danger</span>
+</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>BG:</span> <span>rgba(239,68,68,0.15)</span></div>
+<div class="flex justify-between border-b border-[#27272A] pb-xs mb-xs"><span>Text:</span> <span>#EF4444</span></div>
+<div class="flex justify-between"><span>Border:</span> <span>rgba(239,68,68,0.4)</span></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

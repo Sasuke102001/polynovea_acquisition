@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea Intelligence System - Progress Bar Spec</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#241a00",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#353438",
+                        "on-secondary-fixed": "#25005a",
+                        "background": "#131316",
+                        "primary-fixed-dim": "#d8c596",
+                        "on-error": "#690005",
+                        "on-tertiary": "#2f2e47",
+                        "on-secondary": "#3f008e",
+                        "on-background": "#e4e1e6",
+                        "surface-variant": "#353438",
+                        "on-surface": "#e4e1e6",
+                        "on-primary-fixed-variant": "#524621",
+                        "tertiary-fixed-dim": "#c6c3e4",
+                        "surface-container": "#1f1f22",
+                        "outline-variant": "#4b463b",
+                        "on-primary-container": "#685a34",
+                        "surface-container-low": "#1b1b1e",
+                        "tertiary": "#f2efff",
+                        "surface-dim": "#131316",
+                        "surface-bright": "#39393c",
+                        "tertiary-fixed": "#e2dfff",
+                        "secondary-fixed": "#eaddff",
+                        "secondary": "#d2bbff",
+                        "surface-container-lowest": "#0e0e11",
+                        "primary": "#fff0cc",
+                        "surface-tint": "#d8c596",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "inverse-surface": "#e4e1e6",
+                        "surface-container-high": "#2a2a2d",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "on-primary": "#3a2f0d",
+                        "on-surface-variant": "#cec6b7",
+                        "on-tertiary-fixed": "#1a1931",
+                        "primary-fixed": "#f5e1b0",
+                        "primary-container": "#e6d3a3",
+                        "outline": "#979083",
+                        "inverse-primary": "#6b5d37",
+                        "on-tertiary-container": "#5a5975",
+                        "surface": "#131316",
+                        "tertiary-container": "#d4d1f2",
+                        "on-tertiary-fixed-variant": "#45445f",
+                        "on-secondary-container": "#c9aeff",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#303033",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#6001d1",
+                        "accent-red": "#EF4444",
+                        "accent-amber": "#F59E0B",
+                        "accent-green": "#10B981",
+                        "border-color": "#27272A",
+                        "text-muted": "#A1A1AA",
+                        "text-bright": "#F5F5F5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "lg": "24px",
+                        "margin": "24px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["JetBrains Mono"],
+                        "headline-lg": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "data-mono": ["14px", {"lineHeight": "1", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #131316; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface antialiased flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center w-full px-margin h-16 shrink-0 z-50 sticky">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80 transition-colors hover:bg-surface-container-high rounded p-xs" data-icon="grid_view">grid_view</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Polynovea Intelligence System</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary cursor-pointer active:opacity-80 transition-colors hover:bg-surface-container-high rounded p-xs" data-icon="settings">settings</span>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- NavigationDrawer -->
+<aside class="hidden md:flex flex-col bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant flat no shadows docked left-0 h-screen w-[240px] shrink-0 overflow-y-auto">
+<div class="p-md border-b border-outline-variant shrink-0">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">Design Architecture</span>
+</div>
+<nav class="flex flex-col p-md gap-sm flex-1">
+<a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined font-label-md text-label-md" data-icon="palette">palette</span>
+<span class="font-label-md text-label-md">Color Tokens</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined font-label-md text-label-md" data-icon="text_fields">text_fields</span>
+<span class="font-label-md text-label-md">Typography</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded bg-secondary-container text-on-secondary-container font-bold hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined font-label-md text-label-md" data-icon="widgets">widgets</span>
+<span class="font-label-md text-label-md">Component Library</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined font-label-md text-label-md" data-icon="terminal">terminal</span>
+<span class="font-label-md text-label-md">System Logs</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-margin md:p-lg lg:p-xl bg-surface-dim">
+<div class="max-w-4xl mx-auto space-y-lg">
+<!-- Page Header -->
+<div class="border-b border-border-color pb-md">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-xs">System Progress Bar Spec</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Dynamic horizontal indicators for tracking fitness dimensions, completion rates, and system scores.
+                    </p>
+</div>
+<!-- Bento Grid Layout for Specs -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-md">
+<!-- Preview Card -->
+<div class="md:col-span-8 bg-[#18181B] border border-border-color rounded-lg overflow-hidden flex flex-col">
+<div class="px-md py-sm border-b border-border-color bg-surface-container-low flex justify-between items-center shrink-0">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Component Preview</span>
+<span class="w-2 h-2 rounded-full bg-[#7C3AED] shadow-[0_0_8px_#7C3AED]"></span>
+</div>
+<div class="p-lg flex-1 flex flex-col justify-center gap-lg bg-surface">
+<!-- Progress Bar 1 -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-end mb-1">
+<span class="font-body-sm text-[13px] font-medium text-text-muted font-[Inter]">Low Fitness</span>
+<span class="font-body-sm text-[13px] font-medium text-text-bright font-[Inter]">25%</span>
+</div>
+<div class="h-2 w-full bg-border-color rounded-[4px] overflow-hidden">
+<div class="h-full bg-accent-red rounded-[4px] transition-all duration-250 ease-out w-[25%]"></div>
+</div>
+</div>
+<!-- Progress Bar 2 -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-end mb-1">
+<span class="font-body-sm text-[13px] font-medium text-text-muted font-[Inter]">Medium Fitness</span>
+<span class="font-body-sm text-[13px] font-medium text-text-bright font-[Inter]">55%</span>
+</div>
+<div class="h-2 w-full bg-border-color rounded-[4px] overflow-hidden">
+<div class="h-full bg-accent-amber rounded-[4px] transition-all duration-250 ease-out w-[55%]"></div>
+</div>
+</div>
+<!-- Progress Bar 3 -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-end mb-1">
+<span class="font-body-sm text-[13px] font-medium text-text-muted font-[Inter]">High Fitness</span>
+<span class="font-body-sm text-[13px] font-medium text-text-bright font-[Inter]">85%</span>
+</div>
+<div class="h-2 w-full bg-border-color rounded-[4px] overflow-hidden">
+<div class="h-full bg-accent-green rounded-[4px] transition-all duration-250 ease-out w-[85%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Structure & Specs Card -->
+<div class="md:col-span-4 bg-[#18181B] border border-border-color rounded-lg overflow-hidden flex flex-col border-t-2 border-t-primary-container">
+<div class="px-md py-sm border-b border-border-color bg-surface-container-low shrink-0">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Structure &amp; Specs</span>
+</div>
+<div class="p-md flex-1 overflow-y-auto">
+<ul class="space-y-sm">
+<li class="flex flex-col border-b border-border-color pb-sm last:border-0 last:pb-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant mb-1">Track Container</span>
+<div class="flex items-center gap-sm font-data-mono text-data-mono text-on-surface">
+<div class="w-3 h-3 rounded bg-[#27272A] border border-outline"></div>
+<span>Bg: #27272A | H: 8px | R: 4px</span>
+</div>
+</li>
+<li class="flex flex-col border-b border-border-color pb-sm last:border-0 last:pb-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant mb-1">Labels</span>
+<div class="flex items-center gap-sm font-data-mono text-data-mono text-on-surface">
+<span class="text-text-muted font-body-sm">Aa</span>
+<span>Inter 13px Med | #A1A1AA</span>
+</div>
+</li>
+<li class="flex flex-col border-b border-border-color pb-sm last:border-0 last:pb-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant mb-1">Values</span>
+<div class="flex items-center gap-sm font-data-mono text-data-mono text-on-surface">
+<span class="text-text-bright font-body-sm">Aa</span>
+<span>Inter 13px Med | #F5F5F5</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Technical Rules Card -->
+<div class="md:col-span-12 bg-[#18181B] border border-border-color rounded-lg overflow-hidden flex flex-col">
+<div class="px-md py-sm border-b border-border-color bg-surface-container-low shrink-0 flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="code">code</span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Technical Logic</span>
+</div>
+<div class="p-0 overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-color bg-surface-container-lowest">
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant font-medium">State</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant font-medium">Range</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant font-medium">Color Token</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant font-medium">Hex Value</th>
+</tr>
+</thead>
+<tbody class="font-data-mono text-data-mono">
+<tr class="border-b border-border-color hover:bg-[#121212] transition-colors group">
+<td class="py-sm px-md text-on-surface">Low</td>
+<td class="py-sm px-md text-on-surface-variant">0 - 0.33</td>
+<td class="py-sm px-md text-accent-red">Accent Red</td>
+<td class="py-sm px-md text-on-surface-variant group-hover:text-primary-container transition-colors">#EF4444</td>
+</tr>
+<tr class="border-b border-border-color hover:bg-[#121212] transition-colors group">
+<td class="py-sm px-md text-on-surface">Med</td>
+<td class="py-sm px-md text-on-surface-variant">0.33 - 0.66</td>
+<td class="py-sm px-md text-accent-amber">Accent Amber</td>
+<td class="py-sm px-md text-on-surface-variant group-hover:text-primary-container transition-colors">#F59E0B</td>
+</tr>
+<tr class="border-b border-border-color hover:bg-[#121212] transition-colors group">
+<td class="py-sm px-md text-on-surface">High</td>
+<td class="py-sm px-md text-on-surface-variant">0.66 - 1.0</td>
+<td class="py-sm px-md text-accent-green">Accent Green</td>
+<td class="py-sm px-md text-on-surface-variant group-hover:text-primary-container transition-colors">#10B981</td>
+</tr>
+<tr class="hover:bg-[#121212] transition-colors group">
+<td class="py-sm px-md text-on-surface" colspan="2">Animation Timing</td>
+<td class="py-sm px-md text-on-surface-variant" colspan="2">250ms ease-out on value change</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
