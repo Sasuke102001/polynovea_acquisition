@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getOverview, type FitnessDimension } from "@/lib/api";
 import ScoreRing from "@/components/ScoreRing";
-import ChatDrawer from "@/components/ChatDrawer";
 
 // ─── Radar SVG (server component — pure math, no client JS needed) ────────────
 
@@ -450,7 +449,6 @@ export default async function OverviewPage({
           </div>
         </div>
       </div>
-      <ChatDrawer venueId={parseInt(id)} tab="overview" />
     </div>
   );
 }

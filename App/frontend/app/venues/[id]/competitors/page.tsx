@@ -10,7 +10,6 @@ import {
   type SimilarVenueCard,
   type ClientVenueCard,
 } from "@/lib/api";
-import ChatDrawer from "@/components/ChatDrawer";
 
 const LIMIT = 3;
 
@@ -314,7 +313,6 @@ export default function CompetitorsPage({
           </div>
         </>
       )}
-      <ChatDrawer venueId={parseInt(id)} tab="competitors" />
     </div>
   );
 }

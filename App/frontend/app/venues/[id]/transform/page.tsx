@@ -8,7 +8,6 @@ import {
   type DeltaBar,
   type SimilarVenueCard,
 } from "@/lib/api";
-import ChatDrawer from "@/components/ChatDrawer";
 
 const LIMIT = 40;
 
@@ -484,7 +483,6 @@ export default function TransformPage({
           )}
         </div>
       )}
-      <ChatDrawer venueId={parseInt(id)} tab="transform" />
     </div>
   );
 }

@@ -22,7 +22,6 @@ import {
   type TrendSignal,
   type RisingPattern,
 } from "@/lib/api";
-import ChatDrawer from "@/components/ChatDrawer";
 
 // ─── Priority tier helpers ────────────────────────────────────────────────────
 
@@ -1128,7 +1127,6 @@ export default function DeepAnalysisPage({
           <ComingSoon tab={DEEP_TABS.find((t) => t.id === activeTab)?.label ?? activeTab} />
         )}
       </main>
-      <ChatDrawer venueId={parseInt(id)} tab="deep_risk" />
     </div>
   );
 }

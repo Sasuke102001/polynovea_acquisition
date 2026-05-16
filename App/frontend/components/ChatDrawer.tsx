@@ -147,12 +147,12 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
   const messagesEndRef                  = useRef<HTMLDivElement>(null);
   const inputRef                        = useRef<HTMLInputElement>(null);
 
-  // Persist messages to localStorage whenever they change
-  useEffect(() => {
+  // Save to localStorage — called only on user send and response complete, not on every chunk
+  const persistMessages = (msgs: Message[]) => {
     try {
-      localStorage.setItem(STORAGE_KEY(venueId), JSON.stringify(messages));
+      localStorage.setItem(STORAGE_KEY(venueId), JSON.stringify(msgs));
     } catch { /* storage full — silently ignore */ }
-  }, [messages, venueId]);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -179,7 +179,9 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
     setInput("");
     setError(null);
 
-    setMessages((prev) => [...prev, { role: "user", content: userQuestion }]);
+    const withUserMsg = (prev: Message[]) => [...prev, { role: "user" as const, content: userQuestion }];
+    setMessages(withUserMsg);
+    persistMessages(withUserMsg(messages));
     setIsLoading(true);
 
     let currentResponse = "";
@@ -216,6 +218,11 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
       onComplete: () => {
         setIsDeliberating(false);
         setIsLoading(false);
+        // Save to localStorage once — after full response, not on every chunk
+        setMessages((prev) => {
+          persistMessages(prev);
+          return prev;
+        });
       },
     }, mode);
   };

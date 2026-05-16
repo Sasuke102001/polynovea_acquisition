@@ -4,7 +4,6 @@ import {
   type ChannelCard,
   type MarketingSegmentCard,
 } from "@/lib/api";
-import ChatDrawer from "@/components/ChatDrawer";
 import WhatsAppGenerator from "@/components/WhatsAppGenerator";
 import AIChannelCard from "@/components/AIChannelCard";
 
@@ -453,7 +452,6 @@ export default async function MarketingPage({
           </footer>
         </div>
       </main>
-      <ChatDrawer venueId={parseInt(id)} tab="marketing" />
     </div>
   );
 }

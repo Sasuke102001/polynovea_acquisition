@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getAudience, type AudienceSegmentProfile, type AudienceAggregate } from "@/lib/api";
-import ChatDrawer from "@/components/ChatDrawer";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -464,7 +463,6 @@ export default async function AudiencePage({
         </div>
       </div>
 
-      <ChatDrawer venueId={parseInt(id)} tab="audience" />
     </div>
   );
 }

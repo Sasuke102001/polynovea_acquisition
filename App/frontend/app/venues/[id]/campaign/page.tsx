@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getMarketing, type ChannelCard } from "@/lib/api";
-import ChatDrawer from "@/components/ChatDrawer";
 import AIChannelCard from "@/components/AIChannelCard";
 import WhatsAppGenerator from "@/components/WhatsAppGenerator";
 
@@ -131,7 +130,6 @@ function NoTarget({ id }: { id: string }) {
           Set target in Transform
         </Link>
       </div>
-      <ChatDrawer venueId={parseInt(id)} tab="marketing" />
     </div>
   );
 }
@@ -276,7 +274,6 @@ export default async function CampaignPage({
         </div>
       </main>
 
-      <ChatDrawer venueId={parseInt(id)} tab="marketing" />
     </div>
   );
 }

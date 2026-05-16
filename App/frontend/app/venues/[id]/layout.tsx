@@ -1,5 +1,6 @@
 import Link from "next/link";
 import VenueNav from "@/components/VenueNav";
+import ChatDrawerWrapper from "@/components/ChatDrawerWrapper";
 
 export default async function VenueHubLayout({
   children,
@@ -41,6 +42,9 @@ export default async function VenueHubLayout({
         {/* Page content */}
         {children}
       </div>
+
+      {/* Chat drawer — mounted once, survives tab navigation */}
+      <ChatDrawerWrapper venueId={parseInt(id)} />
     </div>
   );
 }
