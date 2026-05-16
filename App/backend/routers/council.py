@@ -57,7 +57,7 @@ def _strip_thinking(text: str) -> str:
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
 
-async def _call(member: dict, messages: list, max_tokens: int = 300) -> str:
+async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
     """Non-streaming call to one council member. Returns the full response text."""
     api_key = os.getenv(member["key_env"])
     if not api_key:
@@ -79,20 +79,21 @@ async def _call(member: dict, messages: list, max_tokens: int = 300) -> str:
 
 _R1_INSTRUCTION = """
 
-Answer in under 120 words. Be specific and actionable.
-Format:
-POSITION: [one sentence conclusion]
-ANSWER: [your response]
-CONFIDENCE: [HIGH/MEDIUM/LOW]"""
+Answer the user's question based on the venue data above.
+Structure your response exactly as:
+
+POSITION: [one sentence — your core conclusion or recommendation]
+ANSWER: [your full response, 150–250 words, specific and actionable]
+CONFIDENCE: [HIGH / MEDIUM / LOW]"""
 
 
 async def _round1(system_prompt: str, question: str) -> dict[str, str]:
     """All 3 models answer independently, in parallel."""
     tasks = [
         _call(m, [
-            {"role": "system",    "content": system_prompt + _R1_INSTRUCTION},
-            {"role": "user",      "content": question},
-        ], max_tokens=250)
+            {"role": "system", "content": system_prompt + _R1_INSTRUCTION},
+            {"role": "user",   "content": question},
+        ], max_tokens=400)
         for m in _ALL
     ]
     results = await asyncio.gather(*tasks)
@@ -107,15 +108,21 @@ def _r2_user_message(my_name: str, my_r1: str, r1: dict[str, str]) -> str:
         for name, answer in r1.items()
         if name != my_name
     )
-    return f"""Your answer: {my_r1}
+    return f"""You gave this answer:
 
-Other experts: {others}
+YOUR ANSWER:
+{my_r1}
 
-In under 80 words:
-AGREE_ON: [what you agree with]
-DISAGREE_ON: [what you disagree with and why]
-REFINED_POSITION: [your final stance]
-CHANGE_FROM_R1: [MAJOR/MINOR/NONE]"""
+Two other independent experts answered the same question:
+
+{others}
+
+Review their reasoning. Then respond:
+
+AGREE_ON: [points you agree with from the other experts]
+DISAGREE_ON: [points you disagree with, and why]
+REFINED_POSITION: [your final stance — maintain if confident, adjust if they raised valid points]
+CHANGE_FROM_R1: [MAJOR / MINOR / NONE]"""
 
 
 async def _round2(system_prompt: str, question: str, r1: dict[str, str]) -> dict[str, str]:
@@ -126,7 +133,7 @@ async def _round2(system_prompt: str, question: str, r1: dict[str, str]) -> dict
             {"role": "user",      "content": question},
             {"role": "assistant", "content": r1[m["name"]]},
             {"role": "user",      "content": _r2_user_message(m["name"], r1[m["name"]], r1)},
-        ], max_tokens=200)
+        ], max_tokens=300)
         for m in _ALL
     ]
     results = await asyncio.gather(*tasks)

@@ -130,15 +130,29 @@ const TAB_META: Record<Tab, { label: string; subtitle: string }> = {
 
 const COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]";
 
+const STORAGE_KEY = (venueId: number) => `polynovea_chat_${venueId}`;
+
 export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
   const [isOpen, setIsOpen]             = useState(false);
-  const [messages, setMessages]         = useState<Message[]>([]);
+  const [messages, setMessages]         = useState<Message[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY(venueId));
+      return stored ? (JSON.parse(stored) as Message[]) : [];
+    } catch { return []; }
+  });
   const [input, setInput]               = useState("");
   const [isLoading, setIsLoading]       = useState(false);
   const [isDeliberating, setIsDeliberating] = useState(false);
   const [error, setError]               = useState<string | null>(null);
   const messagesEndRef                  = useRef<HTMLDivElement>(null);
   const inputRef                        = useRef<HTMLInputElement>(null);
+
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY(venueId), JSON.stringify(messages));
+    } catch { /* storage full — silently ignore */ }
+  }, [messages, venueId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -147,6 +161,12 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
   }, [isOpen]);
+
+  const handleClearChat = () => {
+    setMessages([]);
+    setError(null);
+    try { localStorage.removeItem(STORAGE_KEY(venueId)); } catch { /* ignore */ }
+  };
 
   const handleSubmit = async (
     e: React.FormEvent | React.MouseEvent,
@@ -234,12 +254,24 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
               <h3 className="text-[18px] font-bold text-on-surface">{label}</h3>
               <p className="text-[14px] text-on-surface-variant mt-[2px]">{subtitle}</p>
             </div>
-            <button
-              onClick={() => { setIsOpen(false); setMessages([]); setInput(""); setError(null); }}
-              className="text-on-surface-variant hover:text-on-surface transition-colors"
-            >
-              <span className="material-symbols-outlined">close</span>
-            </button>
+            <div className="flex items-center gap-sm">
+              {messages.length > 0 && !isLoading && (
+                <button
+                  onClick={handleClearChat}
+                  className="text-[12px] text-on-surface-variant/60 hover:text-error transition-colors flex items-center gap-[3px]"
+                  title="Clear chat history"
+                >
+                  <span className="material-symbols-outlined text-[14px]">delete_sweep</span>
+                  Clear
+                </button>
+              )}
+              <button
+                onClick={() => { setIsOpen(false); setInput(""); setError(null); }}
+                className="text-on-surface-variant hover:text-on-surface transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
