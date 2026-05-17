@@ -276,6 +276,8 @@ ARCHETYPE_DESCRIPTORS: dict[str, str] = {
     "Lifestyle Regular":    "Premium regulars · experience-driven",
     "Trend Hunter":         "Early adopters · novelty-seeking · 20–30",
     "Quiet Discoverer":     "Solo explorers · low-key · discovery-driven",
+    "Social Butterfly":     "Group-first · social-occasion-driven · WOM amplifier",
+    "Comfort Dweller":      "Familiarity-seeking · long dwell · safety-conscious",
 }
 
 def make_archetype_chip(name: str) -> ArchetypeChip:
