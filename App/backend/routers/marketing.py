@@ -12,14 +12,20 @@ Acquisition: Instagram Reels (#1) → Zomato/Swiggy (#2)
 Retention:   WhatsApp (PRIMARY) → Email → SMS
 """
 
+import os
 from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import StreamingResponse
 
 from database import get_pool
 from models import (
     MarketingResponse, MarketingSegmentCard, ChannelCard,
     NotRecommendedItem, GrowthTargetSection,
-    AdBrief, PlatformBriefRules,
+    AdBrief, PlatformBriefRules, BriefGenerateRequest,
 )
+
+_NVIDIA_API_BASE  = "https://integrate.api.nvidia.com/v1"
+_NVIDIA_KEY       = os.getenv("NVIDIA_API_KEY_CREATIVE")
+_NVIDIA_MODEL     = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
 from routers.utils import (
     SEGMENT_LABELS, SEGMENT_TOP_ARCHETYPES, make_archetype_chip,
     CHANNEL_LABELS, MECHANISM_LABELS, DIM_LABELS,
@@ -955,4 +961,175 @@ async def get_ad_brief(
         platform_rules=platform_rules,
         copy_hooks=copy_hooks,
         data_confidence="MED",
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BRIEF CONTENT GENERATOR  (streaming)
+# POST /{venue_id}/marketing/brief/generate?channel=
+# Generates 3 ready-to-use content pieces grounded in the structured brief.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_CHANNEL_CONTENT_TYPE: dict[str, str] = {
+    "whatsapp":        "WhatsApp broadcast messages",
+    "instagram_reels": "Instagram Reels scripts (hook + body + CTA)",
+    "instagram_ads":   "Meta/Instagram ad copy variations",
+    "google_ads":      "Google search ad headlines + descriptions",
+    "sms":             "SMS messages (under 160 chars each)",
+    "zomato_swiggy":   "Zomato/Swiggy listing description variants",
+}
+
+
+def _build_brief_system_prompt(
+    venue_name: str,
+    venue_area: str,
+    seg_label: str,
+    archetype_name: str,
+    archetype_key: str,
+    resolved_channel: str,
+    ch_label: str,
+    brief_data: dict,
+    platform_data: dict,
+    india_rules: list[str],
+    anti_flags: list[str],
+) -> str:
+    content_type = _CHANNEL_CONTENT_TYPE.get(resolved_channel, "content pieces")
+    donts_str    = "\n".join(f"- {d}" for d in brief_data["dont"])
+    india_str    = "\n".join(f"- {r}" for r in india_rules)
+    platform_donts = "\n".join(f"- {d}" for d in platform_data["dont"])
+    flags_str    = ("\n\nAUTO-DETECTED RISKS:\n" + "\n".join(f"- {f}" for f in anti_flags)) if anti_flags else ""
+    trust_note   = "\n\nMANDATORY: Establish trust/social proof BEFORE any scarcity or urgency." if brief_data.get("trust_first") else ""
+
+    return f"""You are an expert India F&B ad copywriter. Your job is to generate exactly 3 ready-to-use {content_type} for {venue_name} in {venue_area}.
+
+VENUE BRIEF:
+- Venue: {venue_name}, {venue_area}
+- Target segment: {seg_label}
+- Dominant archetype: {archetype_name}
+- India research verdict: {brief_data.get("india_verdict", "CONFIRMED")} — {brief_data.get("india_note", "")}
+
+CREATIVE DIRECTION:
+- Tone: {brief_data["tone"]}
+- Emotional driver: {brief_data["emotional_driver"]}
+- Hook formula: {brief_data["hook"]}
+- CTA style: {brief_data["cta"]}
+- Visual direction: {brief_data["visual"]}
+- Language: {brief_data["language_rec"]}{trust_note}
+
+{ch_label.upper()} PLATFORM RULES:
+- Format: {platform_data["format"]}
+- Hook style: {platform_data["hook_style"]}
+- CTA: {platform_data["cta"]}
+- Platform don'ts:
+{platform_donts}
+
+INDIA RULES — ALWAYS APPLY:
+{india_str}
+
+NEVER WRITE / NEVER DO:
+{donts_str}{flags_str}
+
+OUTPUT FORMAT:
+Return exactly 3 numbered {content_type}. Use "{venue_name}" as the venue name. Use [Dish] as a placeholder for specific dishes. No preamble, no explanation, no headings — just the 3 pieces numbered 1, 2, 3."""
+
+
+async def _stream_brief_content(system_prompt: str, user_message: str):
+    try:
+        from openai import AsyncOpenAI
+
+        if not _NVIDIA_KEY:
+            yield "[Error: NVIDIA_API_KEY_CREATIVE not configured]"
+            return
+
+        client = AsyncOpenAI(api_key=_NVIDIA_KEY, base_url=_NVIDIA_API_BASE)
+        stream = await client.chat.completions.create(
+            model=_NVIDIA_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_message},
+            ],
+            temperature=0.85,
+            max_tokens=1500,
+            stream=True,
+        )
+
+        async for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content
+
+    except Exception as e:
+        yield f"\n\n[Error: {str(e)}]"
+
+
+@router.post("/{venue_id}/marketing/brief/generate")
+async def generate_brief_content(
+    venue_id:  int,
+    request:   BriefGenerateRequest,
+    channel:   str = Query(default=None),
+):
+    pool = get_pool()
+
+    async with pool.acquire() as conn:
+        venue_row = await conn.fetchrow(
+            "SELECT name, area FROM venues WHERE id = $1", venue_id
+        )
+        if not venue_row:
+            raise HTTPException(status_code=404, detail="Venue not found")
+
+        seg_row = await conn.fetchrow(
+            """
+            SELECT segment_id FROM venue_demographic_scores
+            WHERE  venue_id = $1
+            ORDER  BY segment_rank
+            LIMIT  1
+            """,
+            venue_id,
+        )
+        primary_seg_id = seg_row["segment_id"] if seg_row else "office_workers"
+
+        arc_row = await conn.fetchrow(
+            """
+            SELECT archetype_name FROM demographic_archetype_mapping
+            WHERE  segment_id = $1
+            ORDER  BY prevalence_percentage DESC
+            LIMIT  1
+            """,
+            primary_seg_id,
+        )
+
+    archetype_name   = arc_row["archetype_name"] if arc_row else "Habit Former"
+    archetype_key    = _ARCHETYPE_NAME_TO_KEY.get(archetype_name, "habit_former")
+    brief_data       = _ARCHETYPE_BRIEF.get(archetype_key, _ARCHETYPE_BRIEF["habit_former"])
+    seg_meta         = SEGMENT_LABELS.get(primary_seg_id, {})
+    seg_label        = seg_meta.get("label", primary_seg_id)
+    resolved_channel = channel or _SEGMENT_DEFAULT_CHANNEL.get(primary_seg_id, "whatsapp")
+    platform_data    = _PLATFORM_BRIEF_RULES.get(resolved_channel, _PLATFORM_BRIEF_RULES["whatsapp"])
+    ch_label         = CHANNEL_LABELS.get(resolved_channel, resolved_channel)
+    india_rules      = list(_INDIA_UNIVERSAL_RULES) + _ARCHETYPE_INDIA_RULES.get(archetype_key, [])
+    anti_flags       = _detect_anti_patterns(archetype_key, resolved_channel, primary_seg_id)
+
+    system_prompt = _build_brief_system_prompt(
+        venue_name=venue_row["name"],
+        venue_area=venue_row["area"],
+        seg_label=seg_label,
+        archetype_name=archetype_name,
+        archetype_key=archetype_key,
+        resolved_channel=resolved_channel,
+        ch_label=ch_label,
+        brief_data=brief_data,
+        platform_data=platform_data,
+        india_rules=india_rules,
+        anti_flags=anti_flags,
+    )
+
+    content_type = _CHANNEL_CONTENT_TYPE.get(resolved_channel, "content pieces")
+    user_message = (
+        request.direction.strip()
+        if request.direction.strip()
+        else f"Generate 3 {content_type} for {venue_row['name']}."
+    )
+
+    return StreamingResponse(
+        _stream_brief_content(system_prompt, user_message),
+        media_type="text/plain",
     )

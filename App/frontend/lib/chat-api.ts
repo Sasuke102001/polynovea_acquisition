@@ -3,14 +3,69 @@
  * Client-side streaming wrapper for Polynovea venue intelligence AI.
  */
 
-// chat-api is only called from client components (ChatDrawer), so relative URL is correct.
-// Vercel rewrite proxies /api/* → EC2 backend, avoiding HTTPS→HTTP mixed-content block.
+// Client components only — relative URL so Vercel rewrite proxies to EC2.
 const API_BASE = "";
 
 export interface ChatStreamOptions {
   onChunk: (chunk: string) => void;
   onError?: (error: string) => void;
   onComplete?: () => void;
+}
+
+export async function streamBriefContent(
+  venueId: number,
+  channel: string,
+  direction: string,
+  options: ChatStreamOptions,
+): Promise<void> {
+  let response: Response;
+  try {
+    response = await fetch(
+      `${API_BASE}/api/venues/${venueId}/marketing/brief/generate?channel=${channel}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ direction }),
+      },
+    );
+  } catch {
+    options.onError?.("Could not reach the server. Check your connection.");
+    return;
+  }
+
+  if (!response.ok) {
+    try {
+      const err = await response.json();
+      options.onError?.(err.detail ?? `Server error ${response.status}`);
+    } catch {
+      options.onError?.(`Server error ${response.status}`);
+    }
+    return;
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    options.onError?.("No response body from server.");
+    return;
+  }
+
+  const decoder = new TextDecoder();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      if (chunk) options.onChunk(chunk);
+    }
+    const tail = decoder.decode();
+    if (tail) options.onChunk(tail);
+    options.onComplete?.();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Stream interrupted";
+    options.onError?.(msg);
+  } finally {
+    reader.releaseLock();
+  }
 }
 
 /**

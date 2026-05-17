@@ -470,6 +470,12 @@ class AdBrief(BaseModel):
     data_confidence: str          # "HIGH" | "MED" | "LOW"
 
 
+# ─── Brief Content Generator ─────────────────────────────────────────────────────
+
+class BriefGenerateRequest(BaseModel):
+    direction: str = ""   # optional user direction; empty = AI picks
+
+
 # ─── Chat ───────────────────────────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
