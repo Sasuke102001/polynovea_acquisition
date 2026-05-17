@@ -30,6 +30,7 @@ def _load(filename: str) -> str:
 # Full research documents — loaded once at startup
 _BEHAVIORAL_RESEARCH  = _load("PHASE_1_INDIA_BEHAVIORAL_RESEARCH.md")
 _MARKETING_FRAMEWORK  = _load("MARKETING_ENGINE_FRAMEWORK.md")
+_MASTER_OPERATING_DOC = _load("Polynovea_Master_Operating_Document_FINAL.md")
 
 
 # ─── Identity guardrail ───────────────────────────────────────────────────────
@@ -91,20 +92,30 @@ Working Women (24–38, weekday lunch, safe comfortable spaces):
 
 _POLYNOVEA_CONTEXT = """
 POLYNOVEA CONTEXT:
-Polynovea is a live music collective that partners with F&B venues in Mumbai/MMR
-to run live music shows — acoustic sessions, indie nights, jazz evenings, unplugged sets.
+Polynovea is a behavioral intelligence and growth systems company operating in Mumbai/MMR.
+The core foundation is AI, data, and behavioral intelligence infrastructure — not event management.
+
+Live entertainment (acoustic sessions, indie nights, jazz evenings, unplugged sets) is a
+deployment surface — a controlled, measurable environment used to generate behavioral data,
+influence audience dynamics, and produce measurable revenue outcomes for partner venues.
 
 What Polynovea executes on behalf of partner venues:
-- Books artists, manages show logistics
+- Books artists, manages show logistics (live entertainment as a behavioral lever)
 - Creates Instagram content (event posts + performance Reels; seating area only)
 - Runs Meta (Instagram + Facebook) and Google ads targeting the venue's primary audience
 - Sends WhatsApp broadcast campaigns to the venue's customer database
-- Provides this venue intelligence platform
+- Provides this venue intelligence platform (Module 2 — behavioral intelligence layer)
+
+The intelligence this platform provides (segment scoring, fitness dimensions, competitor
+analysis, channel effectiveness) is Module 2 of the Polynovea intelligence infrastructure.
+It converts behavioral signals from reviews, platform data, and venue metadata into
+operational decision intelligence — not just dashboards.
 
 What Polynovea does NOT do:
 - Menu, pricing, staffing, or operational decisions (venue's domain)
 - General social media management beyond show-related content
 - Content outside the performance zone of the venue
+- POS or financial data analysis (that is Module 3, not yet deployed)
 """
 
 
@@ -296,6 +307,15 @@ CAMPAIGN TEMPLATES (for primary segment):
 
 STRATEGIC INTERVENTIONS (ranked by fit score):
 {interventions_str}{risk_str}
+
+══════════════════════════════════════════════════════════════════
+POLYNOVEA ECOSYSTEM ARCHITECTURE & OPERATING DOCTRINE
+══════════════════════════════════════════════════════════════════
+Use this to understand what Polynovea actually is, what Module 2 is,
+how this platform fits into the larger intelligence infrastructure,
+and the founding philosophy behind the behavioral intelligence thesis.
+
+{_MASTER_OPERATING_DOC}
 
 ══════════════════════════════════════════════════════════════════
 SEGMENT PSYCHOLOGICAL INTELLIGENCE (copy triggers, timing, platform behavior)
