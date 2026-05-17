@@ -738,6 +738,9 @@ _SEGMENT_DEFAULT_CHANNEL: dict[str, str] = {
     "working_women":  "whatsapp",
 }
 
+# Channels valid for content generation (excludes platform-consulting channels like zomato_swiggy)
+_CONTENT_CHANNELS = {"whatsapp", "instagram_reels", "instagram_ads", "google_ads", "sms"}
+
 # Archetype-specific copy hooks — India-adjusted (Kimi 2026)
 _ARCHETYPE_COPY_HOOKS: dict[str, list[str]] = {
     "party_seeker": [
@@ -1102,7 +1105,14 @@ async def generate_brief_content(
     brief_data       = _ARCHETYPE_BRIEF.get(archetype_key, _ARCHETYPE_BRIEF["habit_former"])
     seg_meta         = SEGMENT_LABELS.get(primary_seg_id, {})
     seg_label        = seg_meta.get("label", primary_seg_id)
+
     resolved_channel = channel or _SEGMENT_DEFAULT_CHANNEL.get(primary_seg_id, "whatsapp")
+    if resolved_channel not in _CONTENT_CHANNELS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"'{resolved_channel}' is a platform-consulting channel — content generation not applicable.",
+        )
+
     platform_data    = _PLATFORM_BRIEF_RULES.get(resolved_channel, _PLATFORM_BRIEF_RULES["whatsapp"])
     ch_label         = CHANNEL_LABELS.get(resolved_channel, resolved_channel)
     india_rules      = list(_INDIA_UNIVERSAL_RULES) + _ARCHETYPE_INDIA_RULES.get(archetype_key, [])

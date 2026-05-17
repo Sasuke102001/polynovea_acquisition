@@ -10,7 +10,6 @@ const CHANNELS = [
   { key: "instagram_ads",   label: "Meta Ads" },
   { key: "google_ads",      label: "Google" },
   { key: "sms",             label: "SMS" },
-  { key: "zomato_swiggy",   label: "Zomato" },
 ];
 
 interface Props {
