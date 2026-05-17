@@ -357,7 +357,25 @@ export default async function MarketingPage({
             </div>
           </section>
 
-          {/* ── Section 2: Acquisition ── */}
+          {/* ── Section 2: Ad Brief Generator ── */}
+          <section className="flex flex-col gap-md">
+            <div className="flex items-center gap-sm">
+              <span className="bg-primary/20 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-primary/30">
+                AD BRIEF
+              </span>
+              <h2 className="text-headline-md font-headline-md text-primary font-bold">
+                BRIEF GENERATOR
+              </h2>
+              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+                — archetype × channel × India creative rules
+              </span>
+            </div>
+            <div className="bg-brand-surface border border-brand-border rounded-lg p-md md:p-lg">
+              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} />
+            </div>
+          </section>
+
+          {/* ── Section 3: Acquisition ── */}
           <section className="flex flex-col gap-md">
             <div className="flex items-center gap-sm">
               <span className="bg-signal-positive/20 text-signal-positive text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-signal-positive/30">
@@ -441,24 +459,6 @@ export default async function MarketingPage({
               </div>
             </section>
           )}
-
-          {/* ── Section 5: Ad Brief Generator ── */}
-          <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
-              <span className="bg-primary/20 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-primary/30">
-                AD BRIEF
-              </span>
-              <h2 className="text-headline-md font-headline-md text-primary font-bold">
-                BRIEF GENERATOR
-              </h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
-                — archetype × channel × India creative rules
-              </span>
-            </div>
-            <div className="bg-brand-surface border border-brand-border rounded-lg p-md md:p-lg">
-              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} />
-            </div>
-          </section>
 
           {/* ── Benchmark footnote ── */}
           <div className="border-t border-brand-border pt-sm">
