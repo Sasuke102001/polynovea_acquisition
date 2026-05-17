@@ -449,6 +449,7 @@ CHANNEL_LABELS: dict[str, str] = {
     "sms":                    "SMS Blast",
     "email":                  "Email Campaign",
     "instagram_organic":      "Instagram Content",
+    "instagram_reels":        "Instagram Reels",
     "instagram_ads":          "Meta & Instagram Ads",
     "google_ads":             "Google Ads",
     "instagram_consulting":   "Instagram (Advisory)",
