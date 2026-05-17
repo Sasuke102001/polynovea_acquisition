@@ -12,6 +12,7 @@ Acquisition: Instagram Reels (#1) → Zomato/Swiggy (#2)
 Retention:   WhatsApp (PRIMARY) → Email → SMS
 """
 
+import asyncio
 import os
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
@@ -1003,7 +1004,9 @@ def _build_brief_system_prompt(
     flags_str    = ("\n\nAUTO-DETECTED RISKS:\n" + "\n".join(f"- {f}" for f in anti_flags)) if anti_flags else ""
     trust_note   = "\n\nMANDATORY: Establish trust/social proof BEFORE any scarcity or urgency." if brief_data.get("trust_first") else ""
 
-    return f"""You are an expert India F&B ad copywriter. Your job is to generate exactly 3 ready-to-use {content_type} for {venue_name} in {venue_area}.
+    return f"""You are an expert India F&B ad copywriter working for Polynovea. Your job is to generate exactly 3 ready-to-use {content_type} for {venue_name} in {venue_area}.
+
+IDENTITY GUARDRAIL: Never mention Polynovea's internal systems, file names, research documents, loader names, Python modules, or any technical implementation details in your output. Never reference how you were trained or what data sources you use. Output only the content pieces themselves.
 
 VENUE BRIEF:
 - Venue: {venue_name}, {venue_area}
@@ -1034,6 +1037,43 @@ NEVER WRITE / NEVER DO:
 
 OUTPUT FORMAT:
 Return exactly 3 numbered {content_type}. Use "{venue_name}" as the venue name. Use [Dish] as a placeholder for specific dishes. No preamble, no explanation, no headings — just the 3 pieces numbered 1, 2, 3."""
+
+
+async def _log_brief_to_supabase(
+    venue_id: int,
+    channel: str,
+    archetype: str,
+    segment: str,
+    direction: str,
+    response: str,
+) -> None:
+    import httpx
+    supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+    supabase_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY", "")
+    if not supabase_url or not supabase_key:
+        return
+    try:
+        url     = f"{supabase_url}/rest/v1/venue_chat_logs"
+        payload = {
+            "venue_id":         str(venue_id),
+            "tab":              "marketing_brief",
+            "question":         direction or f"Generate {channel} content",
+            "context_snapshot": {"channel": channel, "archetype": archetype, "segment": segment},
+            "response":         response,
+            "model_version":    "brief-generator-v1",
+            "source_type":      "brief_generated",
+            "schema_version":   1,
+        }
+        headers = {
+            "apikey":        supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+            "Content-Type":  "application/json",
+            "Prefer":        "return=minimal",
+        }
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(url, json=payload, headers=headers)
+    except Exception as e:
+        print(f"Brief Supabase logging failed: {e}")
 
 
 async def _stream_brief_content(system_prompt: str, user_message: str):
@@ -1139,7 +1179,18 @@ async def generate_brief_content(
         else f"Generate 3 {content_type} for {venue_row['name']}."
     )
 
-    return StreamingResponse(
-        _stream_brief_content(system_prompt, user_message),
-        media_type="text/plain",
-    )
+    async def _stream_and_log():
+        buffer: list[str] = []
+        async for chunk in _stream_brief_content(system_prompt, user_message):
+            buffer.append(chunk)
+            yield chunk
+        asyncio.create_task(_log_brief_to_supabase(
+            venue_id=venue_id,
+            channel=resolved_channel,
+            archetype=archetype_name,
+            segment=seg_label,
+            direction=request.direction,
+            response="".join(buffer),
+        ))
+
+    return StreamingResponse(_stream_and_log(), media_type="text/plain")

@@ -140,9 +140,6 @@ export default function AdBriefCard({ venueId, initialBrief }: Props) {
         <div className="text-[10px] font-data-mono uppercase tracking-widest text-brand-label">
           GENERATE CONTENT FROM BRIEF
         </div>
-        <p className="text-[11px] text-on-surface-variant/70">
-          AI writes 3 {brief.channel_label} pieces using this brief as constraints. All India rules and don&apos;ts are pre-loaded.
-        </p>
         <div className="flex gap-sm items-end">
           <div className="flex-1 flex flex-col gap-xs">
             <label className="text-[10px] font-data-mono uppercase tracking-wider text-on-surface-variant">
