@@ -17,20 +17,25 @@ import pathlib
 
 _BACKEND_DIR  = pathlib.Path(__file__).parent            # App/backend/
 _PROJECT_ROOT = _BACKEND_DIR.parent.parent               # project root
+_RESEARCH_DIR = _PROJECT_ROOT / "research"               # research/
 
 
 def _load(filename: str) -> str:
-    path = _PROJECT_ROOT / filename
+    path = _RESEARCH_DIR / filename
     try:
         return path.read_text(encoding="utf-8")
     except Exception:
-        return f"[{filename} not found — place file at project root]"
+        return f"[{filename} not found — place file in research/ folder]"
 
 
 # Full research documents — loaded once at startup
-_BEHAVIORAL_RESEARCH  = _load("PHASE_1_INDIA_BEHAVIORAL_RESEARCH.md")
-_MARKETING_FRAMEWORK  = _load("MARKETING_ENGINE_FRAMEWORK.md")
-_MASTER_OPERATING_DOC = _load("Polynovea_Master_Operating_Document_FINAL.md")
+_BEHAVIORAL_RESEARCH    = _load("behavioral_acquisition_mechanisms_hospitality.md")
+_CHANNEL_EFFECTIVENESS  = _load("Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md")
+_SEGMENTATION_MARKETING = _load("Behavioral Segmentation and Targeted Marketing for Hospitality Venues.md")
+_VALIDATION_REPORT      = _load("Indian_FB_Consumer_Segmentation_Validation_Report.md")
+_BEHAVIORAL_INTEL       = _load("behavioral_intelligence_module.md")
+_MARKETING_RESEARCH     = _load("marketing_channel_strategy_research.md")
+_MASTER_OPERATING_DOC   = _load("Polynovea_Master_Operating_Document_FINAL.md")
 
 
 # ─── Identity guardrail ───────────────────────────────────────────────────────
@@ -337,20 +342,36 @@ SEGMENT PSYCHOLOGICAL INTELLIGENCE (copy triggers, timing, platform behavior)
 {_SEGMENT_RESEARCH}
 
 ══════════════════════════════════════════════════════════════════
-RESEARCH FOUNDATION — INDIA F&B BEHAVIORAL RESEARCH
+RESEARCH — BEHAVIORAL ACQUISITION MECHANISMS (academic backbone)
 ══════════════════════════════════════════════════════════════════
-Use this as your evidence base when explaining WHY something works,
-citing channel benchmarks, or discussing behavioral mechanisms.
-
 {_BEHAVIORAL_RESEARCH}
 
 ══════════════════════════════════════════════════════════════════
-RESEARCH FOUNDATION — POLYNOVEA MARKETING ENGINE FRAMEWORK
+RESEARCH — CHANNEL EFFECTIVENESS IN HOSPITALITY MARKETING
 ══════════════════════════════════════════════════════════════════
-Use this for campaign architecture, execution model, channel priority
-logic, and scenario-based recommendations.
+{_CHANNEL_EFFECTIVENESS}
 
-{_MARKETING_FRAMEWORK}
+══════════════════════════════════════════════════════════════════
+RESEARCH — BEHAVIORAL SEGMENTATION & TARGETED MARKETING
+══════════════════════════════════════════════════════════════════
+{_SEGMENTATION_MARKETING}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — INDIA F&B SEGMENTATION VALIDATION REPORT
+══════════════════════════════════════════════════════════════════
+Use this to flag corrected claims: SMS open rate ~20% (not 98%),
+Reels 2x engagement + 10-50x reach (not 6.5x), archetype caveat.
+{_VALIDATION_REPORT}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — SEGMENT & ARCHETYPE BEHAVIORAL INTELLIGENCE MODULE
+══════════════════════════════════════════════════════════════════
+{_BEHAVIORAL_INTEL}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — MARKETING CHANNEL STRATEGY
+══════════════════════════════════════════════════════════════════
+{_MARKETING_RESEARCH}
 
 {_POLYNOVEA_CONTEXT}
 
