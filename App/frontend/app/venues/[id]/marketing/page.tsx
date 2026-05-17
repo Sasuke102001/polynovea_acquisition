@@ -1,11 +1,13 @@
 import Link from "next/link";
 import {
   getMarketing,
+  getAdBrief,
   type ChannelCard,
   type MarketingSegmentCard,
 } from "@/lib/api";
 import WhatsAppGenerator from "@/components/WhatsAppGenerator";
 import AIChannelCard from "@/components/AIChannelCard";
+import AdBriefCard from "@/components/AdBriefCard";
 
 // Channels rendered as AI suggestion cards (content is AI-generated, not static)
 const AI_CHANNELS = new Set(["instagram_organic", "instagram_ads", "google_ads", "instagram_consulting", "zomato_swiggy"]);
@@ -294,8 +296,12 @@ export default async function MarketingPage({
   const { id } = await params;
 
   let data;
+  let brief;
   try {
-    data = await getMarketing(id);
+    [data, brief] = await Promise.all([
+      getMarketing(id),
+      getAdBrief(id),
+    ]);
   } catch {
     return (
       <div className="p-margin text-error font-body-sm">
@@ -435,6 +441,24 @@ export default async function MarketingPage({
               </div>
             </section>
           )}
+
+          {/* ── Section 5: Ad Brief Generator ── */}
+          <section className="flex flex-col gap-md">
+            <div className="flex items-center gap-sm">
+              <span className="bg-primary/20 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-primary/30">
+                AD BRIEF
+              </span>
+              <h2 className="text-headline-md font-headline-md text-primary font-bold">
+                BRIEF GENERATOR
+              </h2>
+              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+                — archetype × channel × India creative rules
+              </span>
+            </div>
+            <div className="bg-brand-surface border border-brand-border rounded-lg p-md md:p-lg">
+              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} />
+            </div>
+          </section>
 
           {/* ── Benchmark footnote ── */}
           <div className="border-t border-brand-border pt-sm">

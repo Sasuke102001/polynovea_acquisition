@@ -9,6 +9,7 @@ import {
   getBenchmarks,
   getTrends,
   type IntelligenceResponse,
+  type ArchetypeIntervention,
   type RiskResponse,
   type PrimitivesResponse,
   type BenchmarksResponse,
@@ -145,6 +146,41 @@ function ArchetypeSection({ archetypes }: { archetypes: ArchetypeBar[] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ─── Archetype interventions section ─────────────────────────────────────────
+
+function ArchetypeInterventionsSection({ interventions }: { interventions: ArchetypeIntervention[] }) {
+  const grouped = interventions.reduce<Record<string, ArchetypeIntervention[]>>((acc, item) => {
+    if (!acc[item.archetype_name]) acc[item.archetype_name] = [];
+    acc[item.archetype_name].push(item);
+    return acc;
+  }, {});
+
+  return (
+    <div className="flex flex-col gap-md">
+      {Object.entries(grouped).map(([archetype, items]) => (
+        <div key={archetype} className="bg-[#18181B] border border-[#27272A] rounded-lg p-md flex flex-col gap-sm">
+          <div className="flex items-center gap-sm">
+            <span className="w-2 h-2 rounded-full bg-[#7C3AED] flex-shrink-0" />
+            <span className="text-body-md font-body-md font-semibold text-on-surface">{archetype}</span>
+          </div>
+          <div className="flex flex-col gap-xs pl-[20px]">
+            {items.map((item, i) => (
+              <div key={i} className="flex flex-col gap-[2px]">
+                <div className="text-body-sm font-body-sm text-on-surface-variant">{item.description}</div>
+                {item.expected_roi && (
+                  <div className="text-[10px] font-data-mono text-signal-positive uppercase tracking-wider">
+                    Expected ROI: {item.expected_roi}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -1090,6 +1126,20 @@ export default function DeepAnalysisPage({
                 </div>
                 <PricingPowerSection pricing={intelligenceData.pricing_power} />
               </section>
+
+              {intelligenceData.archetype_interventions.length > 0 && (
+                <section className="flex flex-col gap-md">
+                  <div className="flex items-center gap-sm">
+                    <span className="bg-primary/10 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase border border-primary/20 tracking-wider">
+                      F9 · ARCHETYPE TARGETING
+                    </span>
+                    <h3 className="text-headline-md font-headline-md text-on-surface font-bold">
+                      Archetype-Level Actions
+                    </h3>
+                  </div>
+                  <ArchetypeInterventionsSection interventions={intelligenceData.archetype_interventions} />
+                </section>
+              )}
             </div>
 
             <footer className="pt-lg border-t border-[#27272A] text-center pb-md">

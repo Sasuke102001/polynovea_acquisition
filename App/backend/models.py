@@ -285,10 +285,18 @@ class PricingPower(BaseModel):
     revenue_levers: list[dict[str, Any]]   # [{label, status, sub}]
 
 
+class ArchetypeIntervention(BaseModel):
+    archetype_name: str
+    intervention_type: str
+    description: str
+    expected_roi: str | None
+
+
 class IntelligenceResponse(BaseModel):
     recommendations: list[RecommendationRow]
     archetype_distribution: list[ArchetypeBar]
     pricing_power: PricingPower
+    archetype_interventions: list[ArchetypeIntervention]
 
 
 # ─── Screen 6 — Deep Analysis: Benchmarks Tab ──────────────────────────────
@@ -338,9 +346,22 @@ class TrendsResponse(BaseModel):
 # ─── Audience Tab ─────────────────────────────────────────────────────────────
 
 class AudiencePlatformRow(BaseModel):
-    platform: str        # "instagram", "zomato", etc.
-    usage_type: str      # "discovery" | "validation" | "booking" | "post_visit_review" | "wom"
-    strength: str        # "primary" | "secondary" | "minimal"
+    platform: str
+    usage_type: str
+    strength: str
+
+
+class OccasionMultiplier(BaseModel):
+    occasion_label: str
+    multiplier_min: float
+    multiplier_max: float
+    notes: str | None
+
+
+class SpendTrigger(BaseModel):
+    archetype_name: str
+    trigger_text: str
+    staff_script: str | None
 
 
 class AudienceSegmentProfile(BaseModel):
@@ -383,6 +404,8 @@ class AudienceSegmentProfile(BaseModel):
     # Related
     top_archetypes: list[ArchetypeChip]
     platforms: list[AudiencePlatformRow]
+    occasion_multipliers: list[OccasionMultiplier]
+    spend_triggers: list[SpendTrigger]
 
 
 class AudienceAggregate(BaseModel):
@@ -402,6 +425,49 @@ class AudienceResponse(BaseModel):
     venue_area: str
     segment_profiles: list[AudienceSegmentProfile]
     aggregate: AudienceAggregate
+
+
+# ─── Ad Brief Generator ──────────────────────────────────────────────────────────
+
+class PlatformBriefRules(BaseModel):
+    format: str
+    hook_style: str
+    cta: str
+    dont: list[str]
+
+
+class AdBrief(BaseModel):
+    venue_name: str
+    venue_area: str
+    target_segment: str           # "Office Workers"
+    target_archetype: str         # "Habit Former"
+    channel: str                  # "whatsapp"
+    channel_label: str            # "WhatsApp Broadcast"
+
+    # Creative brief
+    tone: str
+    emotional_driver: str         # "habit_formation + reciprocity"
+    hook: str                     # hook formula description
+    cta: str
+    visual_direction: str
+
+    # India-specific layer
+    india_rules: list[str]        # critical India rules for this archetype + channel
+    trust_first: bool             # mandate trust signals before scarcity/urgency
+    language_rec: str             # "Hinglish" | "Regional" | "English-ok"
+    occasion_anchor: str | None   # festival/cultural calendar suggestion
+
+    # Anti-patterns
+    dont_say: list[str]
+    anti_pattern_flags: list[str]
+
+    # Platform rules
+    platform_rules: PlatformBriefRules
+
+    # Ready-to-use copy starters
+    copy_hooks: list[str]
+
+    data_confidence: str          # "HIGH" | "MED" | "LOW"
 
 
 # ─── Chat ───────────────────────────────────────────────────────────────────────

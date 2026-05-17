@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAudience, type AudienceSegmentProfile, type AudienceAggregate } from "@/lib/api";
+import { getAudience, type AudienceSegmentProfile, type AudienceAggregate, type OccasionMultiplier, type SpendTrigger } from "@/lib/api";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -101,7 +101,9 @@ function SegmentCard({ seg }: { seg: AudienceSegmentProfile }) {
       : "—";
   const wom =
     seg.wom_multiplier_min != null
-      ? `${seg.wom_multiplier_min}x`
+      ? seg.wom_multiplier_max && seg.wom_multiplier_max !== seg.wom_multiplier_min
+        ? `${seg.wom_multiplier_min}–${seg.wom_multiplier_max}×`
+        : `${seg.wom_multiplier_min}×`
       : "—";
   const repeat =
     seg.repeat_tendency_pct_min && seg.repeat_tendency_pct_max
@@ -224,24 +226,58 @@ function SegmentCard({ seg }: { seg: AudienceSegmentProfile }) {
         </div>
       </div>
 
-      {/* Archetypes */}
+      {/* Occasion multipliers */}
+      {seg.occasion_multipliers.length > 0 && (
+        <div className="flex flex-col gap-xs">
+          <div className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">
+            Spend by Occasion
+          </div>
+          <div className="flex flex-col gap-[3px]">
+            {seg.occasion_multipliers.map((o) => (
+              <div key={o.occasion_label} className="flex items-center justify-between text-body-sm font-body-sm">
+                <span className="text-on-surface-variant">{o.occasion_label}</span>
+                <span className="font-data-mono text-primary">
+                  {o.multiplier_min === o.multiplier_max
+                    ? `${o.multiplier_min}×`
+                    : `${o.multiplier_min}–${o.multiplier_max}×`}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Archetypes + staff scripts */}
       {seg.top_archetypes.length > 0 && (
         <div className="flex flex-col gap-xs">
           <div className="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">
             Primary Archetypes
           </div>
-          <div className="flex flex-col gap-xs">
-            {seg.top_archetypes.map((a) => (
-              <div key={a.name} className="flex items-center gap-sm">
-                <span className="w-2 h-2 rounded-full bg-[#7C3AED] flex-shrink-0" />
-                <div>
-                  <span className="text-body-sm font-body-sm text-on-surface">{a.name}</span>
-                  <span className="text-label-sm font-label-sm text-on-surface-variant ml-xs">
-                    · {a.demographic_label}
-                  </span>
+          <div className="flex flex-col gap-sm">
+            {seg.top_archetypes.map((a) => {
+              const trigger = seg.spend_triggers.find((t) => t.archetype_name === a.name);
+              return (
+                <div key={a.name} className="flex flex-col gap-[3px]">
+                  <div className="flex items-center gap-sm">
+                    <span className="w-2 h-2 rounded-full bg-[#7C3AED] flex-shrink-0" />
+                    <div>
+                      <span className="text-body-sm font-body-sm text-on-surface">{a.name}</span>
+                      <span className="text-label-sm font-label-sm text-on-surface-variant ml-xs">
+                        · {a.demographic_label}
+                      </span>
+                    </div>
+                  </div>
+                  {trigger?.staff_script && (
+                    <div className="ml-[20px] bg-surface-variant/40 border border-outline-variant rounded px-sm py-xs">
+                      <span className="text-[10px] font-data-mono text-primary/70 uppercase tracking-wider mr-xs">Say:</span>
+                      <span className="text-[11px] font-body-sm text-on-surface-variant italic">
+                        "{trigger.staff_script}"
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

@@ -13,7 +13,7 @@ from fastapi import APIRouter, HTTPException, Path
 from typing import Any
 
 from database import get_pool
-from models import IntelligenceResponse, RecommendationRow, ArchetypeBar, PricingPower
+from models import IntelligenceResponse, RecommendationRow, ArchetypeBar, PricingPower, ArchetypeIntervention
 from routers.utils import (
     make_archetype_chip, intervention_title,
     SEGMENT_TOP_ARCHETYPES,
@@ -173,6 +173,18 @@ async def get_intelligence(venue_id: int = Path(...)):
             primary_seg,
         )
 
+        # Archetype-level interventions for primary segment
+        archetype_intervention_rows = await conn.fetch(
+            """
+            SELECT segment_id, archetype_name, intervention_type, description, expected_roi
+            FROM   demographic_archetype_interventions
+            WHERE  segment_id = $1
+            ORDER  BY archetype_name, expected_roi DESC NULLS LAST
+            LIMIT  12
+            """,
+            primary_seg,
+        )
+
         # Fitness scores for pricing power
         fd = await conn.fetchrow(
             """
@@ -225,8 +237,19 @@ async def get_intelligence(venue_id: int = Path(...)):
         revenue_levers=_revenue_levers(fd_dict),
     )
 
+    archetype_interventions: list[ArchetypeIntervention] = [
+        ArchetypeIntervention(
+            archetype_name=r["archetype_name"],
+            intervention_type=r["intervention_type"],
+            description=r["description"],
+            expected_roi=r["expected_roi"],
+        )
+        for r in archetype_intervention_rows
+    ]
+
     return IntelligenceResponse(
         recommendations=recommendations,
         archetype_distribution=archetype_dist,
         pricing_power=pricing_power,
+        archetype_interventions=archetype_interventions,
     )

@@ -387,10 +387,18 @@ export interface PricingPower {
   revenue_levers: RevenueLever[];
 }
 
+export interface ArchetypeIntervention {
+  archetype_name: string;
+  intervention_type: string;
+  description: string;
+  expected_roi: string | null;
+}
+
 export interface IntelligenceResponse {
   recommendations: RecommendationRow[];
   archetype_distribution: ArchetypeBar[];
   pricing_power: PricingPower;
+  archetype_interventions: ArchetypeIntervention[];
 }
 
 export async function getIntelligence(venueId: string | number): Promise<IntelligenceResponse> {
@@ -465,8 +473,21 @@ export async function getTrends(venueId: string | number): Promise<TrendsRespons
 
 export interface AudiencePlatformRow {
   platform: string;
-  usage_type: string;   // "discovery" | "validation" | "booking" | "post_visit_review" | "wom"
-  strength: string;     // "primary" | "secondary" | "minimal"
+  usage_type: string;
+  strength: string;
+}
+
+export interface OccasionMultiplier {
+  occasion_label: string;
+  multiplier_min: number;
+  multiplier_max: number;
+  notes: string | null;
+}
+
+export interface SpendTrigger {
+  archetype_name: string;
+  trigger_text: string;
+  staff_script: string | null;
 }
 
 export interface AudienceSegmentProfile {
@@ -509,6 +530,8 @@ export interface AudienceSegmentProfile {
   // Related
   top_archetypes: ArchetypeChip[];
   platforms: AudiencePlatformRow[];
+  occasion_multipliers: OccasionMultiplier[];
+  spend_triggers: SpendTrigger[];
 }
 
 export interface AudienceAggregate {
@@ -536,4 +559,51 @@ export async function getAudience(venueId: string | number): Promise<AudienceRes
   });
   if (!res.ok) throw new Error(`Audience failed: ${res.status}`);
   return res.json() as Promise<AudienceResponse>;
+}
+
+// ─── Ad Brief Generator ───────────────────────────────────────────────────────
+
+export interface PlatformBriefRules {
+  format: string;
+  hook_style: string;
+  cta: string;
+  dont: string[];
+}
+
+export interface AdBrief {
+  venue_name: string;
+  venue_area: string;
+  target_segment: string;
+  target_archetype: string;
+  channel: string;
+  channel_label: string;
+  tone: string;
+  emotional_driver: string;
+  hook: string;
+  cta: string;
+  visual_direction: string;
+  india_rules: string[];
+  trust_first: boolean;
+  language_rec: string;
+  occasion_anchor: string | null;
+  dont_say: string[];
+  anti_pattern_flags: string[];
+  platform_rules: PlatformBriefRules;
+  copy_hooks: string[];
+  data_confidence: string;
+}
+
+export async function getAdBrief(
+  venueId: string | number,
+  channel?: string,
+): Promise<AdBrief> {
+  const params = new URLSearchParams();
+  if (channel) params.set("channel", channel);
+  const qs = params.toString();
+  const res = await fetch(
+    `${API_BASE}/api/venues/${venueId}/marketing/brief${qs ? `?${qs}` : ""}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) throw new Error(`Ad brief failed: ${res.status}`);
+  return res.json() as Promise<AdBrief>;
 }

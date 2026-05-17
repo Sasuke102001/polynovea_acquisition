@@ -15,7 +15,7 @@ from fastapi import APIRouter, HTTPException, Path
 from database import get_pool
 from models import (
     AudienceResponse, AudienceSegmentProfile, AudienceAggregate,
-    AudiencePlatformRow, ArchetypeChip,
+    AudiencePlatformRow, ArchetypeChip, OccasionMultiplier, SpendTrigger,
 )
 from routers.utils import ARCHETYPE_DESCRIPTORS
 
@@ -180,6 +180,43 @@ async def get_audience(venue_id: int = Path(...)):
             seg_keys,
         )
 
+        # Occasion spend multipliers per segment
+        occasion_rows = await conn.fetch(
+            """
+            SELECT
+                sbp.segment_key,
+                som.occasion_label,
+                som.multiplier_min,
+                som.multiplier_max,
+                som.notes
+            FROM  segment_occasion_multipliers som
+            JOIN  segment_behavioral_profiles sbp ON sbp.id = som.segment_id
+            WHERE sbp.segment_key = ANY($1::text[])
+            ORDER BY sbp.segment_key, som.multiplier_max DESC
+            """,
+            seg_keys,
+        )
+
+        # Top spend trigger (staff script) per archetype in top 2 per segment
+        trigger_rows = await conn.fetch(
+            """
+            SELECT
+                sbp.segment_key,
+                abp.label        AS archetype_name,
+                ast.trigger_text,
+                ast.staff_script
+            FROM  segment_archetype_affinity saa
+            JOIN  segment_behavioral_profiles   sbp ON sbp.id = saa.segment_id
+            JOIN  archetype_behavioral_profiles abp ON abp.id = saa.archetype_id
+            JOIN  archetype_spend_triggers      ast ON ast.archetype_id = abp.id
+            WHERE sbp.segment_key = ANY($1::text[])
+              AND saa.affinity_rank <= 2
+              AND ast.trigger_rank  = 1
+            ORDER BY sbp.segment_key, saa.affinity_rank
+            """,
+            seg_keys,
+        )
+
         # Platform usage per segment (primary + secondary for discovery)
         platform_rows = await conn.fetch(
             """
@@ -206,6 +243,27 @@ async def get_audience(venue_id: int = Path(...)):
             archs_by_seg[sk].append(ArchetypeChip(
                 name=r["archetype_label"],
                 demographic_label=ARCHETYPE_DESCRIPTORS.get(r["archetype_label"], r["archetype_label"]),
+            ))
+
+    occasions_by_seg: dict[str, list[OccasionMultiplier]] = {k: [] for k in seg_keys}
+    for r in occasion_rows:
+        sk = r["segment_key"]
+        if sk in occasions_by_seg:
+            occasions_by_seg[sk].append(OccasionMultiplier(
+                occasion_label=r["occasion_label"],
+                multiplier_min=float(r["multiplier_min"]),
+                multiplier_max=float(r["multiplier_max"]),
+                notes=r["notes"],
+            ))
+
+    triggers_by_seg: dict[str, list[SpendTrigger]] = {k: [] for k in seg_keys}
+    for r in trigger_rows:
+        sk = r["segment_key"]
+        if sk in triggers_by_seg:
+            triggers_by_seg[sk].append(SpendTrigger(
+                archetype_name=r["archetype_name"],
+                trigger_text=r["trigger_text"],
+                staff_script=r["staff_script"],
             ))
 
     plat_by_seg: dict[str, list[AudiencePlatformRow]] = {k: [] for k in seg_keys}
@@ -258,6 +316,8 @@ async def get_audience(venue_id: int = Path(...)):
             low_to_high_spend_trigger=r["low_to_high_spend_trigger"],
             top_archetypes=archs_by_seg.get(r["segment_id"], []),
             platforms=plat_by_seg.get(r["segment_id"], []),
+            occasion_multipliers=occasions_by_seg.get(r["segment_id"], []),
+            spend_triggers=triggers_by_seg.get(r["segment_id"], []),
         ))
 
     # ── Weighted aggregate across top 3 segments ──────────────────────────────
