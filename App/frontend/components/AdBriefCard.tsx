@@ -136,6 +136,84 @@ export default function AdBriefCard({ venueId, initialBrief }: Props) {
         </div>
       </div>
 
+      {/* ── Content Generator ── */}
+      <div className="border border-primary/20 bg-primary/5 rounded-lg p-md flex flex-col gap-sm">
+        <div className="text-[10px] font-data-mono uppercase tracking-widest text-brand-label">
+          GENERATE CONTENT FROM BRIEF
+        </div>
+        <p className="text-[11px] text-on-surface-variant/70">
+          AI writes 3 {brief.channel_label} pieces using this brief as constraints. All India rules and don&apos;ts are pre-loaded.
+        </p>
+        <div className="flex gap-sm items-end">
+          <div className="flex-1 flex flex-col gap-xs">
+            <label className="text-[10px] font-data-mono uppercase tracking-wider text-on-surface-variant">
+              Direction (optional)
+            </label>
+            <input
+              type="text"
+              value={direction}
+              onChange={(e) => setDirection(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && !generating && generateContent()}
+              placeholder="e.g. promote Sunday brunch, mention quiet corner seating, Diwali offer…"
+              className="bg-surface border border-outline-variant rounded px-sm py-xs text-body-sm font-body-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-primary"
+            />
+          </div>
+          <button
+            onClick={generateContent}
+            disabled={generating || loading}
+            className="flex items-center gap-xs bg-primary text-on-primary px-md py-sm rounded text-label-sm font-label-sm hover:opacity-90 disabled:opacity-50 transition-opacity shrink-0"
+          >
+            {generating ? (
+              <>
+                <div className="w-3 h-3 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
+                Generating…
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                Generate
+              </>
+            )}
+          </button>
+        </div>
+
+        {content && (
+          <div className="bg-[#1A1A28] border border-primary/30 rounded-lg p-md flex flex-col gap-sm">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-data-mono uppercase tracking-wider text-primary">
+                GENERATED · {brief.channel_label} · {brief.target_archetype}
+              </div>
+              <div className="flex gap-xs">
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(content);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="flex items-center gap-xs border border-primary/40 text-primary text-[11px] px-sm py-[2px] rounded hover:bg-primary/10 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {copied ? "check" : "content_copy"}
+                  </span>
+                  {copied ? "Copied" : "Copy"}
+                </button>
+                <button
+                  onClick={generateContent}
+                  disabled={generating}
+                  className="flex items-center gap-xs border border-outline-variant text-on-surface-variant text-[11px] px-sm py-[2px] rounded hover:bg-surface-container transition-colors disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-sm">refresh</span>
+                  Redo
+                </button>
+              </div>
+            </div>
+            <p className="text-[13px] text-on-surface leading-[1.8] whitespace-pre-wrap font-body-sm">
+              {content}
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Platform rules */}
       <div className="bg-background border border-brand-border rounded p-sm flex flex-col gap-sm">
         <div className="text-[10px] font-data-mono uppercase tracking-widest text-brand-label">
@@ -240,80 +318,6 @@ export default function AdBriefCard({ venueId, initialBrief }: Props) {
 
       <div className="text-[10px] font-data-mono text-on-surface-variant/40 text-right">
         DATA CONFIDENCE: {brief.data_confidence} · Source: india_fb_ad_brief_generator_research.md (Kimi 2026)
-      </div>
-
-      {/* ── Content Generator ── */}
-      <div className="border-t border-brand-border pt-md flex flex-col gap-sm">
-        <div className="text-[10px] font-data-mono uppercase tracking-widest text-brand-label">
-          GENERATE CONTENT FROM BRIEF
-        </div>
-        <p className="text-[11px] text-on-surface-variant/70">
-          AI writes 3 {brief.channel_label} pieces using this brief as constraints. All India rules and don&apos;ts are pre-loaded.
-        </p>
-        <div className="flex flex-col gap-xs">
-          <label className="text-[10px] font-data-mono uppercase tracking-wider text-on-surface-variant">
-            Direction (optional)
-          </label>
-          <input
-            type="text"
-            value={direction}
-            onChange={(e) => setDirection(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !generating && generateContent()}
-            placeholder="e.g. promote Sunday brunch, mention quiet corner seating, Diwali offer…"
-            className="bg-surface border border-outline-variant rounded px-sm py-xs text-body-sm font-body-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-primary"
-          />
-        </div>
-        <button
-          onClick={generateContent}
-          disabled={generating || loading}
-          className="self-start flex items-center gap-xs bg-primary text-on-primary px-md py-sm rounded text-label-sm font-label-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
-        >
-          {generating ? (
-            <>
-              <div className="w-3 h-3 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
-              Generating…
-            </>
-          ) : (
-            <>
-              <span className="material-symbols-outlined text-sm">auto_awesome</span>
-              Generate Content
-            </>
-          )}
-        </button>
-
-        {content && (
-          <div className="bg-[#1A1A28] border border-primary/30 rounded-lg p-md flex flex-col gap-sm">
-            <div className="flex items-center justify-between">
-              <div className="text-[10px] font-data-mono uppercase tracking-wider text-primary">
-                GENERATED · {brief.channel_label} · {brief.target_archetype}
-              </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(content);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-                className="flex items-center gap-xs border border-primary/40 text-primary text-[11px] px-sm py-[2px] rounded hover:bg-primary/10 transition-colors"
-              >
-                <span className="material-symbols-outlined text-sm">
-                  {copied ? "check" : "content_copy"}
-                </span>
-                {copied ? "Copied" : "Copy all"}
-              </button>
-            </div>
-            <p className="text-[13px] text-on-surface leading-[1.8] whitespace-pre-wrap font-body-sm">
-              {content}
-            </p>
-            <button
-              onClick={generateContent}
-              disabled={generating}
-              className="self-start flex items-center gap-xs border border-outline-variant text-on-surface-variant text-[11px] px-sm py-[2px] rounded hover:bg-surface-container transition-colors disabled:opacity-50"
-            >
-              <span className="material-symbols-outlined text-sm">refresh</span>
-              Regenerate
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
