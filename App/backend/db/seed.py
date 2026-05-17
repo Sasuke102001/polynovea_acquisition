@@ -11,6 +11,7 @@ Files are executed in filename order:
     001_schema.sql
     002_seed_segments_archetypes.sql
     003_seed_mechanisms_channels_weights.sql
+    004_seed_new_archetypes_corrections.sql
 
 Requires the same env vars as the main app: PG_HOST, PG_PORT, PG_DB, PG_USER, PG_PASSWORD
 """
@@ -34,6 +35,7 @@ SQL_FILES = [
     "001_schema.sql",
     "002_seed_segments_archetypes.sql",
     "003_seed_mechanisms_channels_weights.sql",
+    "004_seed_new_archetypes_corrections.sql",
 ]
 
 RESET_SQL = """

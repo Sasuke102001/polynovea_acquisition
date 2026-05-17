@@ -29,13 +29,22 @@ def _load(filename: str) -> str:
 
 
 # Full research documents — loaded once at startup
+_PHASE1_RESEARCH        = _load("PHASE_1_INDIA_BEHAVIORAL_RESEARCH.md")
+_MARKETING_FRAMEWORK    = _load("MARKETING_ENGINE_FRAMEWORK.md")
 _BEHAVIORAL_RESEARCH    = _load("behavioral_acquisition_mechanisms_hospitality.md")
 _CHANNEL_EFFECTIVENESS  = _load("Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md")
 _SEGMENTATION_MARKETING = _load("Behavioral Segmentation and Targeted Marketing for Hospitality Venues.md")
 _VALIDATION_REPORT      = _load("Indian_FB_Consumer_Segmentation_Validation_Report.md")
 _BEHAVIORAL_INTEL       = _load("behavioral_intelligence_module.md")
 _MARKETING_RESEARCH     = _load("marketing_channel_strategy_research.md")
+_EXEC_SUMMARY           = _load("A concise executive summary.md")
+_THREE_LAYER_ARCH       = _load("polynovea_three_layer_behavioral_intelligence_architecture_module2.md")
+_SEGMENT_ALIGNMENT      = _load("venue_segment_alignment_research.md")
+_CUISINE_RESEARCH       = _load("venue_cuisine_type_research.md")
 _MASTER_OPERATING_DOC   = _load("Polynovea_Master_Operating_Document_FINAL.md")
+_MARKET_INTEL_PERPLEXITY = _load("india_market_intelligence_perplexity.md")
+_ARCHETYPE_VALIDATION   = _load("archetype_segment_validation_kimi.md")
+_AD_BRIEF_RESEARCH      = _load("india_fb_ad_brief_generator_research.md")
 
 
 # ─── Identity guardrail ───────────────────────────────────────────────────────
@@ -342,6 +351,16 @@ SEGMENT PSYCHOLOGICAL INTELLIGENCE (copy triggers, timing, platform behavior)
 {_SEGMENT_RESEARCH}
 
 ══════════════════════════════════════════════════════════════════
+RESEARCH — PHASE 1 INDIA BEHAVIORAL RESEARCH
+══════════════════════════════════════════════════════════════════
+{_PHASE1_RESEARCH}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — MARKETING ENGINE FRAMEWORK
+══════════════════════════════════════════════════════════════════
+{_MARKETING_FRAMEWORK}
+
+══════════════════════════════════════════════════════════════════
 RESEARCH — BEHAVIORAL ACQUISITION MECHANISMS (academic backbone)
 ══════════════════════════════════════════════════════════════════
 {_BEHAVIORAL_RESEARCH}
@@ -372,6 +391,65 @@ RESEARCH — SEGMENT & ARCHETYPE BEHAVIORAL INTELLIGENCE MODULE
 RESEARCH — MARKETING CHANNEL STRATEGY
 ══════════════════════════════════════════════════════════════════
 {_MARKETING_RESEARCH}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — INDIA F&B CHANNEL BENCHMARKS (EXECUTIVE SUMMARY)
+══════════════════════════════════════════════════════════════════
+{_EXEC_SUMMARY}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — THREE-LAYER BEHAVIORAL INTELLIGENCE ARCHITECTURE
+══════════════════════════════════════════════════════════════════
+{_THREE_LAYER_ARCH}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — VENUE SEGMENT ALIGNMENT & SCORING WEIGHTS
+══════════════════════════════════════════════════════════════════
+{_SEGMENT_ALIGNMENT}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — CUISINE PREFERENCES BY SEGMENT
+══════════════════════════════════════════════════════════════════
+{_CUISINE_RESEARCH}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — INDIA F&B MARKET INTELLIGENCE (PERPLEXITY, 2025–26)
+══════════════════════════════════════════════════════════════════
+Hard numbers: Mumbai spend ₹877/visit, RevPASH bands, WhatsApp/SMS/Reels
+benchmarks, micro-influencer costs, platform behavior matrix by segment.
+Treat figures flagged INDIA DATA as ground truth; INDIA BENCHMARK as
+operator heuristics; GLOBAL/GENERIC as directional proxies only.
+{_MARKET_INTEL_PERPLEXITY}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — ARCHETYPE & SEGMENT VALIDATION REPORT (KIMI, 2026)
+══════════════════════════════════════════════════════════════════
+Peer-reviewed validation of all 13 archetypes and 7 segments.
+Baseline peer influence coefficient: 0.142 (Herhausen et al., Nature
+Communications 2024). Use VALIDATED / INFERRED / HYPOTHESIS flags when
+citing mechanism or archetype evidence. Scene Seeker, Calm Pairs,
+Premium Prioritizer, Power Regular are HYPOTHESIS — no academic correlate.
+{_ARCHETYPE_VALIDATION}
+
+══════════════════════════════════════════════════════════════════
+RESEARCH — INDIA F&B AD BRIEF CREATIVE LAYER (KIMI, 2026)
+══════════════════════════════════════════════════════════════════
+India-specific creative rules for ad brief generation. Validated tone
+per archetype (CONFIRMED / ADJUST), platform-creative fit for WhatsApp /
+Reels / Meta / SMS / micro-influencer, mechanism-to-creative mapping,
+anti-patterns, and 7 missing elements for brief generator v2.0.
+
+Critical India rules to always apply:
+- Scarcity must be EARNED, not gated. "Limited covers. Regulars book first." not "Not for everyone."
+- Trust-first sequencing for new venues — trust signals before any scarcity or urgency.
+- FOMO must be occasion-bound for families/premium ("Diwali weekend filling fast") not time-bound.
+- Family decisions are collective — ads must speak to provider AND experience.
+- Value-consciousness applies at ALL price points including premium.
+- WhatsApp = conversational for repeat visitors. Deal-first only for lapsed (60+ days).
+- Reels = UGC-style outperforms polished production. Regional language = 1.5-2x engagement.
+- Never use Western minimalist aesthetic for mass-market Indian segments.
+- Social proof: specific beats generic. "Your friends love it here" > "1,000 people came."
+{_AD_BRIEF_RESEARCH}
 
 {_POLYNOVEA_CONTEXT}
 
