@@ -8,7 +8,7 @@ Logs all conversations to Supabase for training data collection.
 import asyncio
 import json
 import os
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Any
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -483,21 +483,37 @@ async def chat_with_venue(venue_id: int, request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error building prompt: {str(e)}")
 
+    # Trim context for Supabase — exclude large list fields that bloat the snapshot
+    _OMIT_FROM_SNAPSHOT = {"channel_effectiveness", "campaign_templates", "interventions", "risk_signals"}
+    context_snapshot: dict[str, Any] = {
+        k: v for k, v in context.items() if k not in _OMIT_FROM_SNAPSHOT
+    }
+
     async def response_generator():
+        buffer: list[str] = []
         try:
             if request.mode == "council":
-                # Council of Models: 3-model debate → Nemotron synthesis (15–20s)
                 async for chunk in run_council(
                     venue_id, request.tab, request.question, system_prompt
                 ):
+                    buffer.append(chunk)
                     yield chunk
             else:
-                # Fast path: single Nemotron stream, responds in ~3s
                 async for chunk in stream_from_nvidia(
                     system_prompt, request.question, request.tab
                 ):
+                    buffer.append(chunk)
                     yield chunk
         except Exception as exc:
             yield f"\n\n[Error: {exc}]"
+        finally:
+            full_response = "".join(buffer)
+            if full_response:
+                asyncio.create_task(
+                    log_chat_to_supabase(
+                        venue_id, request.tab, request.question,
+                        context_snapshot, full_response,
+                    )
+                )
 
     return StreamingResponse(response_generator(), media_type="text/event-stream")
