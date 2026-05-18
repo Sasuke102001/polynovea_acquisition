@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 import {
   getTransform,
+  getCompetitorDeepDive,
   type TransformResponse,
   type DeltaBar,
   type SimilarVenueCard,
+  type CompetitorDeepDive,
 } from "@/lib/api";
+import CompetitorDrawer from "@/components/CompetitorDrawer";
 
 const LIMIT = 40;
 
@@ -62,7 +65,12 @@ function DeltaMetric({ bar }: { bar: DeltaBar }) {
 
 // ─── Similar venue card (with tier + effort badges) ──────────────────────────
 
-function SimilarCard({ venue }: { venue: SimilarVenueCard }) {
+interface SimilarCardProps {
+  venue: SimilarVenueCard;
+  onSelect: (id: number) => void;
+}
+
+function SimilarCard({ venue, onSelect }: SimilarCardProps) {
   const bars = [...venue.delta_bars].sort(
     (a, b) => Math.abs(b.delta) - Math.abs(a.delta),
   );
@@ -83,7 +91,7 @@ function SimilarCard({ venue }: { venue: SimilarVenueCard }) {
           </div>
         )}
 
-        {/* Left accent stripe (role model only) */}
+        {/* Left accent stripe */}
         {tier === "role_model" && (
           <div className="absolute top-0 left-0 w-[3px] h-full bg-[#E6D3A3] rounded-l" />
         )}
@@ -91,12 +99,24 @@ function SimilarCard({ venue }: { venue: SimilarVenueCard }) {
           <div className="absolute top-0 left-0 w-[3px] h-full bg-[#38bdf8] rounded-l" />
         )}
 
-        <h4 className="text-headline-md font-headline-md text-on-surface truncate pr-xl">
-          {venue.name}
-        </h4>
-        <p className="text-[11px] text-on-surface-variant/60 font-body-sm -mt-xs truncate">
-          {venue.area}
-        </p>
+        {/* Clickable header — opens deep-dive drawer */}
+        <button
+          onClick={() => onSelect(venue.id)}
+          className="text-left group w-full"
+          aria-label={`Analyse ${venue.name}`}
+        >
+          <div className="flex justify-between items-start pr-xl">
+            <h4 className="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors truncate">
+              {venue.name}
+            </h4>
+            <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-[16px] transition-colors flex-shrink-0 ml-xs">
+              open_in_new
+            </span>
+          </div>
+          <p className="text-[11px] text-on-surface-variant/60 font-body-sm truncate">
+            {venue.area}
+          </p>
+        </button>
 
         {/* Effort badge */}
         {venue.effort_label && effortColor && (
@@ -180,6 +200,32 @@ export default function TransformPage({
   const [loading, setLoading] = useState(false);
   const [growthTarget, setGrowthTarget] = useState<string | null>(null);
   const [targetConfirmed, setTargetConfirmed] = useState(false);
+
+  // ── Drawer state ─────────────────────────────────────────────────────────
+  const [deepDive, setDeepDive]               = useState<CompetitorDeepDive | null>(null);
+  const [deepDiveLoading, setDeepDiveLoading] = useState(false);
+  const [deepDiveError, setDeepDiveError]     = useState<string | null>(null);
+
+  const handleSelectVenue = useCallback(
+    (venueCardId: number) => {
+      setDeepDive(null);
+      setDeepDiveError(null);
+      setDeepDiveLoading(true);
+      getCompetitorDeepDive(id, venueCardId)
+        .then((d) => { setDeepDive(d); setDeepDiveLoading(false); })
+        .catch((e: unknown) => {
+          setDeepDiveError(e instanceof Error ? e.message : "Analysis failed");
+          setDeepDiveLoading(false);
+        });
+    },
+    [id],
+  );
+
+  const handleCloseDrawer = useCallback(() => {
+    setDeepDive(null);
+    setDeepDiveError(null);
+    setDeepDiveLoading(false);
+  }, []);
 
   // Read stored growth target from localStorage on mount
   useEffect(() => {
@@ -459,7 +505,7 @@ export default function TransformPage({
                       <div className="overflow-x-auto custom-scrollbar pb-sm">
                         <div className="flex gap-md min-w-max">
                           {venues.map((sv) => (
-                            <SimilarCard key={sv.id} venue={sv} />
+                            <SimilarCard key={sv.id} venue={sv} onSelect={handleSelectVenue} />
                           ))}
                         </div>
                       </div>
@@ -527,6 +573,15 @@ export default function TransformPage({
           )}
         </div>
       )}
+
+      {/* ── Venue deep-dive drawer (reuses competitor analysis) ── */}
+      <CompetitorDrawer
+        venueId={Number(id)}
+        data={deepDive}
+        loading={deepDiveLoading}
+        error={deepDiveError}
+        onClose={handleCloseDrawer}
+      />
     </div>
   );
 }
