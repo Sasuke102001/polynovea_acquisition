@@ -12,6 +12,14 @@ echo "── Pulling latest code ───────────────�
 cd "$REPO_DIR"
 git pull origin master
 
+echo "── Pulling research content ─────────────────────────"
+if [ -d "$REPO_DIR/research/.git" ]; then
+  cd "$REPO_DIR/research" && git pull origin main
+  cd "$REPO_DIR"
+else
+  echo "  ⚠ research/ not initialised — run once: git clone https://<PAT>@github.com/Sasuke102001/polynovea-research.git research"
+fi
+
 echo "── Installing/updating dependencies ─────────────────"
 cd App/backend
 pip install -r requirements.txt --quiet --break-system-packages
