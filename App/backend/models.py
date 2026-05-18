@@ -123,7 +123,8 @@ class SimilarVenueCard(BaseModel):
     delta_bars: list[DeltaBar]          # 8 pre-computed, UI shows 3 at a time
     similarity_score: float
     rank: int
-    tier: str | None = None             # Transform only: "role_model" | "transition" | "pure_target"
+    tier: str | None = None             # Transform only: "role_model" | "bridge" | "transition" | "pure_target"
+    effort_label: str | None = None     # Transform only: "Quick Win" | "Major Initiative" | "Strategic Pivot"
 
 
 class ClientVenueCard(BaseModel):
