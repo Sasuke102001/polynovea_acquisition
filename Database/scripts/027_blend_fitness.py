@@ -103,17 +103,35 @@ UPSERT_SUMMARY_SQL = """
 
 
 def blend_venue(source_rows: list[dict]) -> dict:
-    """Equal weight per source present: 1/N where N = number of sources."""
-    n = len(source_rows)
-    if n == 0:
+    """
+    Equal weight per source that has a non-zero value for each dimension.
+    N is computed per-dimension, not globally.
+
+    Rationale: a 0.0 from a source means "no signal detected", not "genuinely zero
+    performance". Averaging a real score with a no-signal zero would dilute it
+    incorrectly. Only sources that detected signal (> 0.0) contribute to the average
+    for that dimension.
+
+    If ALL sources are 0.0 for a dimension → blended stays 0.0 (correct: no signal
+    anywhere means no basis for a non-zero score).
+    """
+    if not source_rows:
         return {d: 0.0 for d in FITNESS_DIMS}
 
     totals = {d: 0.0 for d in FITNESS_DIMS}
+    counts = {d: 0   for d in FITNESS_DIMS}
+
     for row in source_rows:
         for dim in FITNESS_DIMS:
-            totals[dim] += float(row.get(dim) or 0.0)
+            val = float(row.get(dim) or 0.0)
+            if val > 0.0:
+                totals[dim] += val
+                counts[dim] += 1
 
-    return {d: round(totals[d] / n, 4) for d in FITNESS_DIMS}
+    return {
+        d: round(totals[d] / counts[d], 4) if counts[d] > 0 else 0.0
+        for d in FITNESS_DIMS
+    }
 
 
 def main():
