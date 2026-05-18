@@ -36,7 +36,7 @@ DB_CONFIG = {
 
 INSERT_PATTERN_SQL = """
     INSERT INTO behavioral_patterns
-        (area, pattern_name, co_occurring_primitives, total_venues_in_city, prevalence_percentage)
+        (area, source, pattern_name, co_occurring_primitives, total_venues_in_city, prevalence_percentage)
     VALUES %s
     RETURNING id;
 """
@@ -74,11 +74,11 @@ def load_city(cursor, city: str) -> dict:
         cursor.execute(
             """
             INSERT INTO behavioral_patterns
-                (area, pattern_name, co_occurring_primitives, total_venues_in_city, prevalence_percentage)
-            VALUES (%s, %s, %s, %s, %s)
+                (area, source, pattern_name, co_occurring_primitives, total_venues_in_city, prevalence_percentage)
+            VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING id;
             """,
-            (city, pattern_name, json.dumps(primitives), total_venues, prevalence)
+            (city, 'google', pattern_name, json.dumps(primitives), total_venues, prevalence)
         )
         pattern_id = cursor.fetchone()[0]
         patterns_loaded += 1

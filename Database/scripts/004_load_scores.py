@@ -37,14 +37,14 @@ DB_CONFIG = {
 
 FITNESS_SQL = """
     INSERT INTO venue_fitness_dimensions
-        (venue_id, fitness_for_office_lunch, fitness_for_repeat_habit,
+        (venue_id, source, fitness_for_office_lunch, fitness_for_repeat_habit,
          fitness_for_social_dwell, fitness_for_group_energy, fitness_for_destination_visit,
          operational_quality, retention_strength, monetization_potential,
          fitness_details)
-    SELECT v.id, %s, %s, %s, %s, %s, %s, %s, %s, %s
+    SELECT v.id, 'google', %s, %s, %s, %s, %s, %s, %s, %s, %s
     FROM venues v
     WHERE v.name_normalized = LOWER(TRIM(%s)) AND v.city = %s
-    ON CONFLICT (venue_id) DO UPDATE SET
+    ON CONFLICT (venue_id, source) DO UPDATE SET
         fitness_for_office_lunch      = EXCLUDED.fitness_for_office_lunch,
         fitness_for_repeat_habit      = EXCLUDED.fitness_for_repeat_habit,
         fitness_for_social_dwell      = EXCLUDED.fitness_for_social_dwell,
@@ -58,13 +58,13 @@ FITNESS_SQL = """
 
 INTERVENTION_SQL = """
     INSERT INTO intervention_triggers
-        (venue_id, intervention_type, description, fit_score, priority_tier,
+        (venue_id, source, intervention_type, description, fit_score, priority_tier,
          recommended, tier_description, matched_signals, missing_signals,
          matched_signal_count, match_ratio, confidence_basis)
-    SELECT v.id, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+    SELECT v.id, 'google', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     FROM venues v
     WHERE v.name_normalized = LOWER(TRIM(%s)) AND v.city = %s
-    ON CONFLICT (venue_id, intervention_type) DO UPDATE SET
+    ON CONFLICT (venue_id, source, intervention_type) DO UPDATE SET
         description          = EXCLUDED.description,
         fit_score            = EXCLUDED.fit_score,
         priority_tier        = EXCLUDED.priority_tier,
@@ -79,11 +79,11 @@ INTERVENTION_SQL = """
 
 SUMMARY_SQL = """
     INSERT INTO behavioral_summary
-        (venue_id, operational_quality, retention_strength, monetization_potential)
-    SELECT v.id, %s, %s, %s
+        (venue_id, source, operational_quality, retention_strength, monetization_potential)
+    SELECT v.id, 'google', %s, %s, %s
     FROM venues v
     WHERE v.name_normalized = LOWER(TRIM(%s)) AND v.city = %s
-    ON CONFLICT (venue_id) DO UPDATE SET
+    ON CONFLICT (venue_id, source) DO UPDATE SET
         operational_quality    = EXCLUDED.operational_quality,
         retention_strength     = EXCLUDED.retention_strength,
         monetization_potential = EXCLUDED.monetization_potential;

@@ -239,6 +239,64 @@ def _fmt_interventions(interventions: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def _fmt_primitives(primitives: list[dict]) -> str:
+    if not primitives:
+        return "  [No primitive signal data]"
+    lines = []
+    for p in primitives:
+        bar = "█" * int(p.get("confidence", 0) * 10)
+        lines.append(
+            f"  {p['signal']:<45} {p['confidence']:.2f}  {bar}"
+        )
+    return "\n".join(lines)
+
+
+def _fmt_patterns(patterns: list[dict]) -> str:
+    if not patterns:
+        return "  [No behavioral pattern data]"
+    lines = []
+    for p in patterns:
+        signals = ", ".join(p.get("signals", [])[:5]) if p.get("signals") else "—"
+        lines.append(
+            f"  [{p.get('source','?')}] {p['pattern']}  prevalence={p.get('prevalence',0):.1f}%"
+        )
+        lines.append(f"    Co-occurring signals: {signals}")
+    return "\n".join(lines)
+
+
+def _fmt_drift(drift: list[dict]) -> str:
+    if not drift:
+        return "  [No drift signal data for this area]"
+    lines = []
+    for d in drift:
+        direction = {"emerging": "↑ EMERGING", "declining": "↓ DECLINING"}.get(
+            d.get("direction", ""), d.get("direction", "")
+        )
+        lines.append(
+            f"  {direction:<14} conf={d.get('confidence',0):.2f}  [{d.get('source','?')}]  {d['pattern']}"
+        )
+    return "\n".join(lines)
+
+
+def _fmt_dish_signals(dish_signals: list[dict]) -> str:
+    if not dish_signals:
+        return "  [No dish signal data]"
+    lines = []
+    for ds in dish_signals[:2]:  # cap at 2 platform blocks
+        platform = ds.get("platform", "unknown")
+        data     = ds.get("data", {})
+        signals  = data.get("dish_signals", data.get("signals", []))
+        if signals:
+            lines.append(f"  [{platform}]")
+            for s in signals[:8]:
+                if isinstance(s, dict):
+                    lines.append(
+                        f"    {s.get('dish','?'):<30} conf={s.get('confidence',0):.2f}"
+                        f"  mentions={s.get('mention_count',0)}"
+                    )
+    return "\n".join(lines) if lines else "  [No dish signal data]"
+
+
 # ─── Main prompt builder ──────────────────────────────────────────────────────
 
 def build_venue_prompt(
@@ -255,6 +313,11 @@ def build_venue_prompt(
     campaign_templates: list[dict] | None = None,
     interventions: list[dict] | None = None,
     risk_signals: list[dict] | None = None,
+    behavioral_primitives: list[dict] | None = None,
+    behavioral_patterns: list[dict] | None = None,
+    dish_signals: list[dict] | None = None,
+    mechanisms: list[dict] | None = None,
+    drift_signals: list[dict] | None = None,
 ) -> str:
 
     # ── Basic venue snapshot ────────────────────────────────────────────────
@@ -281,6 +344,10 @@ def build_venue_prompt(
     channels_str        = _fmt_channels(channel_effectiveness or [])
     templates_str       = _fmt_templates(campaign_templates or [])
     interventions_str   = _fmt_interventions(interventions or [])
+    primitives_str      = _fmt_primitives(behavioral_primitives or [])
+    patterns_str        = _fmt_patterns(behavioral_patterns or [])
+    drift_str           = _fmt_drift(drift_signals or [])
+    dish_str            = _fmt_dish_signals(dish_signals or [])
 
     risk_str = ""
     if risk_signals:
@@ -332,6 +399,18 @@ CHANNEL EFFECTIVENESS (from research database):
 
 CAMPAIGN TEMPLATES (for primary segment):
 {templates_str}
+
+BEHAVIORAL PRIMITIVES (raw signals from reviews — stimuli, frictions, compensations):
+{primitives_str}
+
+BEHAVIORAL PATTERNS (cluster-level patterns this venue belongs to):
+{patterns_str}
+
+DISH SIGNALS (menu items driving behavioral responses from review data):
+{dish_str}
+
+DRIFT SIGNALS (emerging behavioral trends in this area — act before competitors do):
+{drift_str}
 
 STRATEGIC INTERVENTIONS (ranked by fit score):
 {interventions_str}{risk_str}
@@ -484,4 +563,9 @@ def get_system_prompt(tab: str, venue_context: dict) -> str:
         campaign_templates=venue_context.get("campaign_templates"),
         interventions=venue_context.get("interventions"),
         risk_signals=venue_context.get("risk_signals"),
+        behavioral_primitives=venue_context.get("behavioral_primitives"),
+        behavioral_patterns=venue_context.get("behavioral_patterns"),
+        dish_signals=venue_context.get("dish_signals"),
+        mechanisms=venue_context.get("mechanisms"),
+        drift_signals=venue_context.get("drift_signals"),
     )

@@ -1,10 +1,12 @@
-﻿"""
-007_load_governance.py
-Loads step_4b_governance_report.json for all 4 cities into:
-  - data_quality_metrics  (overall quality per city)
-  - drift_signals         (emerging patterns per city)
-  - cluster_quality       (cluster reliability stats)
-Run after 001_init_schema.sql (independent of other loaders)
+"""
+023_load_magicpin_step4b.py
+Loads step_4b_governance_report.json (MagicPin BIF) for all 4 regions into:
+  - data_quality_metrics  (source='magicpin_upper')
+  - drift_signals         (source='magicpin_upper')
+  - cluster_quality       (source='magicpin_upper')
+
+All UPSERTs on (area, source) — Google rows are untouched.
+Run after: 018_add_source_columns.py
 """
 
 import json
@@ -15,11 +17,11 @@ import psycopg2.extras
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-BASE_PATH  = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw', 'google_places')
-CITIES     = ['navi-mumbai', 'mumbai-sobo', 'mumbai-main', 'thane']
+BASE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw', 'magicpin')
+REGIONS   = ['mumbai', 'navi-mumbai', 'sobo', 'thane']
 
 DB_CONFIG = {
-    'host':     os.getenv('PG_HOST',     'your-db-instance.xxxxxxxxxxxx.ap-south-1.rds.amazonaws.com'),
+    'host':     os.getenv('PG_HOST',     'your-db-instance.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
     'dbname':   os.getenv('PG_DB',       'polynovea_module2'),
     'user':     os.getenv('PG_USER',     'your_user'),
@@ -31,7 +33,7 @@ QUALITY_SQL = """
     INSERT INTO data_quality_metrics
         (area, source, avg_confidence, avg_reliability, reliability_score,
          high_reliability_clusters, total_clusters)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    VALUES (%s, 'magicpin_upper', %s, %s, %s, %s, %s)
     ON CONFLICT (area, source) DO UPDATE SET
         avg_confidence            = EXCLUDED.avg_confidence,
         avg_reliability           = EXCLUDED.avg_reliability,
@@ -51,7 +53,7 @@ DRIFT_SQL = """
 
 CLUSTER_SQL = """
     INSERT INTO cluster_quality (area, source, total_clusters, high_reliability, low_confidence)
-    VALUES (%s, %s, %s, %s, %s)
+    VALUES (%s, 'magicpin_upper', %s, %s, %s)
     ON CONFLICT (area, source) DO UPDATE SET
         total_clusters   = EXCLUDED.total_clusters,
         high_reliability = EXCLUDED.high_reliability,
@@ -59,16 +61,14 @@ CLUSTER_SQL = """
 """
 
 
-def load_city(cursor, city: str) -> dict:
-    path = os.path.join(BASE_PATH, city, 'step_4b_governance_report.json')
+def load_region(cursor, region: str) -> dict:
+    path = os.path.join(BASE_PATH, region, 'step_4b_governance_report.json')
 
     with open(path, 'r', encoding='utf-8') as f:
         data = json.load(f)
 
-    # data_quality_metrics
     cursor.execute(QUALITY_SQL, (
-        city,
-        'google',
+        region,
         data.get('avg_confidence', 0.0),
         data.get('avg_reliability', 0.0),
         data.get('reliability_score', 0.0),
@@ -76,22 +76,18 @@ def load_city(cursor, city: str) -> dict:
         data.get('total_clusters', 0),
     ))
 
-    # cluster_quality
     cursor.execute(CLUSTER_SQL, (
-        city,
-        'google',
+        region,
         data.get('total_clusters', 0),
         data.get('high_reliability_clusters', 0),
         data.get('low_confidence_clusters', 0),
     ))
 
-    # drift_signals — batch insert
     drift_rows = []
     for ds in data.get('drift_signals', []):
         direction = ds.get('drift_type', 'emerging').replace('new_pattern', 'emerging')
         drift_rows.append((
-            city,
-            'google',
+            region, 'magicpin_upper',
             ds.get('pattern', ''),
             ds.get('current_confidence', 0.0),
             direction,
@@ -100,36 +96,27 @@ def load_city(cursor, city: str) -> dict:
     if drift_rows:
         psycopg2.extras.execute_values(cursor, DRIFT_SQL, drift_rows)
 
-    return {
-        'city':         city,
-        'drift_count':  len(drift_rows),
-        'avg_conf':     data.get('avg_confidence', 0.0),
-        'reliability':  data.get('reliability_score', 0.0),
-    }
+    return {'region': region, 'drift': len(drift_rows)}
 
 
 def main():
-    print("\n007_load_governance.py -- Loading data quality metrics & drift signals\n")
+    print("\n023_load_magicpin_step4b.py — MagicPin governance → data_quality_metrics\n")
 
     conn   = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-
     summary = []
+
     try:
-        for city in CITIES:
-            print(f"\n  City: {city}")
-            result = load_city(cursor, city)
+        for region in REGIONS:
+            print(f"  Region: {region}")
+            result = load_region(cursor, region)
             summary.append(result)
-            print(f"  Avg confidence : {result['avg_conf']}")
-            print(f"  Reliability    : {result['reliability']}")
-            print(f"  Drift signals  : {result['drift_count']}")
+            print(f"    drift signals: {result['drift']}")
 
         conn.commit()
-        print("\n" + "="*55)
-        print("  COMPLETE")
-        print(f"  Cities loaded  : {len(summary)}")
-        print(f"  Total drift    : {sum(r['drift_count'] for r in summary)} signals")
-        print("="*55 + "\n")
+        print(f"\n{'='*55}")
+        print(f"  COMPLETE — {len(REGIONS)} regions, {sum(r['drift'] for r in summary)} drift signals")
+        print(f"{'='*55}\n")
 
     except Exception as e:
         conn.rollback()
@@ -142,4 +129,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
