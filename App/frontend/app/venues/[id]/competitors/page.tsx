@@ -1,15 +1,18 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 import {
   getCompetitors,
+  getCompetitorDeepDive,
   type CompetitorsResponse,
+  type CompetitorDeepDive,
   type DeltaBar,
   type FitnessDimension,
   type SimilarVenueCard,
   type ClientVenueCard,
 } from "@/lib/api";
+import CompetitorDrawer from "@/components/CompetitorDrawer";
 
 const LIMIT = 3;
 
@@ -134,18 +137,32 @@ function ClientColumn({ venue }: { venue: ClientVenueCard }) {
 
 // ─── Similar venue column ─────────────────────────────────────────────────────
 
-function SimilarColumn({ venue }: { venue: SimilarVenueCard }) {
+interface SimilarColumnProps {
+  venue: SimilarVenueCard;
+  onSelect: (id: number) => void;
+}
+
+function SimilarColumn({ venue, onSelect }: SimilarColumnProps) {
   // All 7 dimensions, most differentiated first — Equal rows show what can be improved.
   const bars = topDeltaBars(venue.delta_bars, 7);
   return (
     <article className="bg-[#18181B] border border-[#27272A] rounded-lg p-md flex flex-col gap-md h-full">
-      <div>
+      {/* Clickable header — opens deep-dive drawer */}
+      <button
+        onClick={() => onSelect(venue.id)}
+        className="text-left group w-full"
+        aria-label={`Analyse ${venue.name}`}
+      >
         <div className="flex justify-between items-start">
-          <h2 className="text-body-lg font-body-lg font-semibold text-on-surface">{venue.name}</h2>
-          <span className="material-symbols-outlined text-secondary text-[18px]">military_tech</span>
+          <h2 className="text-body-lg font-body-lg font-semibold text-on-surface group-hover:text-primary transition-colors">
+            {venue.name}
+          </h2>
+          <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-[18px] transition-colors">
+            open_in_new
+          </span>
         </div>
         <span className="text-on-surface-variant text-body-sm font-body-sm">{venue.area}</span>
-      </div>
+      </button>
       <div className="flex flex-wrap gap-xs">
         {venue.types.slice(0, 4).map((t) => <VenueTypeBadge key={t} label={t} />)}
       </div>
@@ -187,6 +204,35 @@ export default function CompetitorsPage({
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // ── Drawer state ────────────────────────────────────────────────────────────
+  const [drawerCompId, setDrawerCompId]     = useState<number | null>(null);
+  const [deepDive, setDeepDive]             = useState<CompetitorDeepDive | null>(null);
+  const [deepDiveLoading, setDeepDiveLoading] = useState(false);
+  const [deepDiveError, setDeepDiveError]   = useState<string | null>(null);
+
+  const handleSelectCompetitor = useCallback(
+    (compId: number) => {
+      setDrawerCompId(compId);
+      setDeepDive(null);
+      setDeepDiveError(null);
+      setDeepDiveLoading(true);
+      getCompetitorDeepDive(id, compId)
+        .then((d) => { setDeepDive(d); setDeepDiveLoading(false); })
+        .catch((e: unknown) => {
+          setDeepDiveError(e instanceof Error ? e.message : "Analysis failed");
+          setDeepDiveLoading(false);
+        });
+    },
+    [id],
+  );
+
+  const handleCloseDrawer = useCallback(() => {
+    setDrawerCompId(null);
+    setDeepDive(null);
+    setDeepDiveError(null);
+    setDeepDiveLoading(false);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -262,7 +308,7 @@ export default function CompetitorsPage({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-md min-w-[1000px] items-stretch">
               <ClientColumn venue={data.client_venue} />
               {data.similar_venues.map((sv) => (
-                <SimilarColumn key={sv.id} venue={sv} />
+                <SimilarColumn key={sv.id} venue={sv} onSelect={handleSelectCompetitor} />
               ))}
               {/* Placeholder columns if fewer than 3 similar venues */}
               {Array.from({ length: Math.max(0, 3 - data.similar_venues.length) }).map((_, i) => (
@@ -313,6 +359,15 @@ export default function CompetitorsPage({
           </div>
         </>
       )}
+
+      {/* ── Competitor deep-dive drawer ── */}
+      <CompetitorDrawer
+        venueId={Number(id)}
+        data={deepDive}
+        loading={deepDiveLoading}
+        error={deepDiveError}
+        onClose={handleCloseDrawer}
+      />
     </div>
   );
 }

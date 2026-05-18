@@ -568,6 +568,93 @@ HOW TO RESPOND
   include the confidence level (MEDIUM / HIGH / LOW) from the research."""
 
 
+# ─── Competitor deep-dive prompt ─────────────────────────────────────────────
+
+def build_competitor_analysis_prompt(
+    client_name: str,  client_area: str,  client_types: list[str],
+    comp_name:   str,  comp_area:   str,  comp_types:   list[str],
+    all_scores:  list[dict],   # [{dim, label, client_score, comp_score, delta}]
+    learn_dims:  list[dict],   # top N where delta > 0
+    avoid_dims:  list[dict],   # top N where delta < 0
+) -> tuple[str, str]:
+    """
+    Returns (system_prompt, user_message) for the competitor deep-dive endpoint.
+    AI outputs strict JSON — no markdown fences, no prose outside the object.
+    Tone: objective, analytical, data-referenced. No marketing language.
+    """
+    system = (
+        "You are a behavioral intelligence analyst. Output valid JSON only — "
+        "no markdown fences, no prose outside the JSON object.\n\n"
+        "Your analysis must be:\n"
+        "- Objective and technical — reference actual scores and deltas\n"
+        "- Behaviorally framed — explain what the numbers mean in terms of customer "
+        "behavior: repeat-visit patterns, dwell dynamics, social pressure, "
+        "occasion-type distribution\n"
+        "- Direct — no marketing language, no promotional framing, no operational advice\n"
+        "- Specific — write '0.71 vs 0.42 — delta +0.29' not 'much stronger'\n\n"
+        'Output format (return this exact structure, no deviations):\n'
+        '{\n'
+        '  "learn_from": [\n'
+        '    {\n'
+        '      "dimension": "<snake_case_key>",\n'
+        '      "label": "<human label>",\n'
+        '      "client_score": <float>,\n'
+        '      "competitor_score": <float>,\n'
+        '      "delta": <positive float>,\n'
+        '      "narrative": "<2-3 sentences: what the gap implies behaviorally, '
+        'what customer behavior pattern it reveals, why the delta matters>"\n'
+        '    }\n'
+        '  ],\n'
+        '  "avoid": [\n'
+        '    {\n'
+        '      "dimension": "<key>",\n'
+        '      "label": "<label>",\n'
+        '      "client_score": <float>,\n'
+        '      "competitor_score": <float>,\n'
+        '      "delta": <negative float>,\n'
+        '      "narrative": "<2-3 sentences: what this weakness implies behaviorally, '
+        'what pattern it suggests, what the client risks if it copies this posture>"\n'
+        '    }\n'
+        '  ],\n'
+        '  "strategic_brief": "<2-3 sentences: overall competitive picture — '
+        'where each venue\'s behavioral profile pulls differently, what this means '
+        'for how they compete for the same customer occasions. Use actual score ranges. '
+        'No marketing language.>"\n'
+        '}'
+    )
+
+    # Score table
+    score_lines = []
+    for s in all_scores:
+        delta_str = f"+{s['delta']:+.3f}" if s["delta"] >= 0 else f"{s['delta']:.3f}"
+        score_lines.append(
+            f"  {s['label']:<26} client={s['client_score']:.3f}  "
+            f"competitor={s['comp_score']:.3f}  delta={delta_str}"
+        )
+    score_table = "\n".join(score_lines)
+
+    learn_line = ", ".join(
+        f"{d['label']} (delta +{d['delta']:.3f})" for d in learn_dims
+    ) or "none"
+    avoid_line = ", ".join(
+        f"{d['label']} (delta {d['delta']:.3f})" for d in avoid_dims
+    ) or "none"
+
+    user = (
+        f"Client venue (A): {client_name}, {client_area}"
+        f" — types: {', '.join(client_types or ['Unknown'])}\n"
+        f"Competitor venue (B): {comp_name}, {comp_area}"
+        f" — types: {', '.join(comp_types or ['Unknown'])}\n\n"
+        f"Fitness scores (0.0–1.0 scale, 7 behavioral dimensions):\n"
+        f"{score_table}\n\n"
+        f"Dimensions where competitor outperforms client (learn_from): {learn_line}\n"
+        f"Dimensions where client outperforms competitor (avoid):       {avoid_line}\n\n"
+        "Generate the competitive analysis JSON. Do not include any text outside the JSON."
+    )
+
+    return system, user
+
+
 # ─── Public interface ─────────────────────────────────────────────────────────
 
 def get_system_prompt(tab: str, venue_context: dict) -> str:
