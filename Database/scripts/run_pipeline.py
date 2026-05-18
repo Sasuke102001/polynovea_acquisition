@@ -20,20 +20,35 @@ sys.stdout.reconfigure(encoding='utf-8')
 SCRIPTS_DIR = os.path.dirname(__file__)
 
 # Ordered list: (script_number, filename, description)
+# ── Google Places pipeline ──────────────────────────────────────────────────
 PIPELINE = [
-    (2, '002_load_venues.py',          'Venues (6,007 rows)'),
-    (3, '003_load_patterns.py',        'Behavioral patterns + venue links'),
-    (4, '004_load_scores.py',          'Fitness dimensions + interventions'),
-    (5, '005_load_similarity.py',      'Venue vectors + similarity pairs'),
-    (6, '006_load_pattern_scores.py',  'Pattern confidence scores'),
-    (7, '007_load_governance.py',      'Data quality + drift signals'),
-    (8, '008_load_surveys.py',         'Survey responses + archetypes'),
-    (9,  '009_load_marketing_engine.py', 'Marketing engine lookup tables'),
-    (10, '010_load_primitives.py',      'Per-venue primitive scores (54 signals)'),
-    (11, '011_load_demographics.py',    'Demographic segments & archetype mappings'),
-    (12, '012_compute_venue_demographics.py', 'Venue→segment scores + similarity rank'),
-    (13, '013_compute_fitness_deltas.py',     'Delta rules + pre-computed similarity deltas'),
-    (14, '014_create_optional_scaffolds.py',  'Optional data scaffold tables'),
+    (2,  '002_load_venues.py',               'Venues'),
+    (10, '010_load_primitives.py',           'Google primitives (54 signals)'),
+    (3,  '003_load_patterns.py',             'Google behavioral patterns + venue links'),
+    (19, '019_load_google_step4_clusters.py','Google step4 clusters → raw_venue_data'),
+    (7,  '007_load_governance.py',           'Google data quality + drift signals'),
+    (5,  '005_load_similarity.py',           'Google venue vectors + similarity pairs'),
+    (20, '020_load_google_step6.py',         'Google step6 → raw_venue_data'),
+
+# ── MagicPin upper pipeline ─────────────────────────────────────────────────
+    (21, '021_load_magicpin_step3.py',       'MagicPin primitives'),
+    (22, '022_load_magicpin_step4.py',       'MagicPin patterns + clusters'),
+    (23, '023_load_magicpin_step4b.py',      'MagicPin governance'),
+    (24, '024_load_magicpin_step5_scores.py','MagicPin pattern scores'),
+    (25, '025_load_magicpin_step5b.py',      'MagicPin vectors + similarity'),
+    (26, '026_load_magicpin_step6_fitness.py','MagicPin fitness + interventions'),
+
+# ── Blend ───────────────────────────────────────────────────────────────────
+    (27, '027_blend_fitness.py',             'Blend all sources → source=blended'),
+
+# ── Static / reference data (run once) ─────────────────────────────────────
+    (8,  '008_load_surveys.py',              'Survey responses + archetypes'),
+    (9,  '009_load_marketing_engine.py',     'Marketing engine lookup tables'),
+    (11, '011_load_demographics.py',         'Demographic segments & archetype mappings'),
+
+# ── Compute (run after all sources loaded) ──────────────────────────────────
+    (12, '012_compute_venue_demographics.py','Venue→segment scores + similarity rank'),
+    (13, '013_compute_fitness_deltas.py',    'Delta rules + pre-computed similarity deltas'),
 ]
 
 
