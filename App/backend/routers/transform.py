@@ -3,16 +3,20 @@ routers/transform.py
 GET /api/venues/{venue_id}/transform  →  TransformResponse  (Screen 3 — Transform Tab)
 
 Purpose: client selects a target demographic to attract.
-System returns venues that already attract that segment, categorised by tier:
+System returns venues already attracting that segment, classified by four tiers:
 
-  ROLE MODEL   — target=rank-1 AND client's primary segment=rank-2 in that venue
-                 Best case: venue already bridges both audiences.
-  TRANSITION   — target=rank-1 AND client's primary segment=rank-3.
-                 Has pivoted somewhat but client's base is still present.
-  PURE TARGET  — target=rank-1, client's primary segment absent from top-3.
-                 Fully pivoted; most distant from client's current identity.
+  ROLE MODEL   — target=rank-1, ATA ≥ 0.50
+                 Client's primary segment is meaningfully present (best to learn from).
+  BRIDGE       — target=rank-2 or rank-3 (mid-pivot), alignment ≥ 0.30
+                 Venue hasn't fully committed but target is growing — mid-pivot.
+  TRANSITION   — target=rank-1, ATA 0.20–0.50
+                 Some client-like audience present; venue is in transition.
+  PURE TARGET  — target=rank-1, ATA < 0.20
+                 Fully committed to target segment; most distant from client identity.
 
-If no ROLE MODEL venues exist, TRANSITION venues are shown first (fall-through).
+ATA (Audience Transition Affinity) = client_alignment_at_venue / target_alignment_at_venue
+Composite sort = target_alignment × (1 − effort) × (0.70 + 0.30 × geo_multiplier)
+Quota: role_model=10, bridge=8, transition=14, pure_target=8
 """
 
 from fastapi import APIRouter, HTTPException, Path, Query
@@ -34,6 +38,57 @@ router = APIRouter()
 
 def _float(v) -> float:
     return float(v) if v is not None else 0.0
+
+
+# ─── Effort scoring ────────────────────────────────────────────────────────────
+
+# Dimension weights for effort — upward-only gaps (venue > client) only
+_DIM_EFFORT_WEIGHTS: dict[str, float] = {
+    "operational_quality":           1.0,
+    "retention_strength":            0.9,
+    "fitness_for_office_lunch":      0.8,
+    "fitness_for_repeat_habit":      0.7,
+    "fitness_for_destination_visit": 0.5,
+    "fitness_for_social_dwell":      0.4,
+    "fitness_for_group_energy":      0.4,
+}
+_TOTAL_EFFORT_WEIGHT = sum(_DIM_EFFORT_WEIGHTS.values())
+
+# Tier quotas
+_QUOTA: dict[str, int] = {
+    "role_model":  10,
+    "bridge":       8,
+    "transition":  14,
+    "pure_target":  8,
+}
+
+_TIER_ORDER = ["role_model", "bridge", "transition", "pure_target"]
+
+
+def _compute_effort(client_fd, sim_fd) -> float:
+    """Weighted upward-only effort: sum(max(0, venue − client) × weight) / total_weight."""
+    total = 0.0
+    for dim, w in _DIM_EFFORT_WEIGHTS.items():
+        c = _float(client_fd[dim]) if client_fd else 0.0
+        s = _float(sim_fd[dim])    if sim_fd    else 0.0
+        total += max(0.0, s - c) * w
+    return total / _TOTAL_EFFORT_WEIGHT
+
+
+def _effort_label(effort: float) -> str:
+    if effort < 0.12:
+        return "Quick Win"
+    if effort < 0.25:
+        return "Major Initiative"
+    return "Strategic Pivot"
+
+
+def _geo_mult(client_area: str, client_city: str, v_area: str, v_city: str) -> float:
+    if v_area and v_area == client_area:
+        return 1.0
+    if v_city and v_city == client_city:
+        return 0.70
+    return 0.15
 
 
 # ─── Current segment options ──────────────────────────────────────────────────
@@ -76,93 +131,113 @@ async def _fetch_segment_ladder_venues(
     offset: int,
 ) -> tuple[list[SimilarVenueCard], int]:
     """
-    Find venues where target_segment is rank-1, classify by tier, paginate.
-    Within each tier sorted by target segment alignment_score DESC.
-    Delta bars use pre-computed venue_similarity_deltas when available.
+    Find venues for the target segment, classify by ATA-based tier, apply quotas.
+
+    Tier assignment:
+      rank-1 pool  — target is rank-1 at that venue
+        ATA ≥ 0.50  → role_model
+        ATA ≥ 0.20  → transition
+        ATA < 0.20  → pure_target
+      bridge pool  — target is rank-2/3, alignment ≥ 0.30, not in rank-1 pool
+
+    Composite sort within each tier:
+      target_alignment × (1 − effort) × (0.70 + 0.30 × geo_multiplier)
+
+    Quotas: role_model=10, bridge=8, transition=14, pure_target=8
     """
-    # Total venues with target as rank-1 (excluding client), capped at 40
-    raw_total = await conn.fetchval(
+    # ── 1. Rank-1 candidate pool (up to 80) ──────────────────────────────────
+    rank1_rows = await conn.fetch(
         """
-        SELECT COUNT(DISTINCT vds_t.venue_id)
-        FROM   venue_demographic_scores vds_t
-        WHERE  vds_t.segment_id  = $1
-          AND  vds_t.segment_rank = 1
-          AND  vds_t.venue_id    != $2
+        SELECT venue_id, alignment_score AS target_alignment
+        FROM   venue_demographic_scores
+        WHERE  segment_id   = $1
+          AND  segment_rank = 1
+          AND  venue_id    != $2
+        ORDER BY alignment_score DESC
+        LIMIT  80
         """,
         target_segment, venue_id,
     )
-    total = min(int(raw_total or 0), 40)
+    rank1_ids: set[int] = {r["venue_id"] for r in rank1_rows}
+    target_align_map: dict[int, float] = {
+        r["venue_id"]: float(r["target_alignment"]) for r in rank1_rows
+    }
 
-    # Tier classification + diversity sort:
-    # diversity_score = sum of abs fitness differences from client.
-    # Within each tier, most-distinct-from-client venues surface first so
-    # every card the user sees is instructive and visually different.
-    tier_rows = await conn.fetch(
+    # ── 2. Bridge candidate pool (target rank-2/3, alignment ≥ 0.30) ─────────
+    bridge_rows = await conn.fetch(
         """
-        SELECT
-            vds_t.venue_id,
-            vds_t.alignment_score AS target_alignment,
-            CASE
-                WHEN vds_c.segment_rank = 2 THEN 'role_model'
-                WHEN vds_c.segment_rank = 3 THEN 'transition'
-                ELSE                              'pure_target'
-            END AS tier,
-            (
-                ABS(COALESCE(vfd_s.fitness_for_group_energy,      0) - COALESCE(vfd_c.fitness_for_group_energy,      0)) +
-                ABS(COALESCE(vfd_s.fitness_for_social_dwell,      0) - COALESCE(vfd_c.fitness_for_social_dwell,      0)) +
-                ABS(COALESCE(vfd_s.fitness_for_destination_visit, 0) - COALESCE(vfd_c.fitness_for_destination_visit, 0)) +
-                ABS(COALESCE(vfd_s.fitness_for_repeat_habit,      0) - COALESCE(vfd_c.fitness_for_repeat_habit,      0)) +
-                ABS(COALESCE(vfd_s.fitness_for_office_lunch,      0) - COALESCE(vfd_c.fitness_for_office_lunch,      0)) +
-                ABS(COALESCE(vfd_s.operational_quality,           0) - COALESCE(vfd_c.operational_quality,           0)) +
-                ABS(COALESCE(vfd_s.retention_strength,            0) - COALESCE(vfd_c.retention_strength,            0))
-            ) AS diversity_score
-        FROM   venue_demographic_scores vds_t
-        LEFT JOIN venue_demographic_scores vds_c
-               ON vds_c.venue_id   = vds_t.venue_id
-              AND vds_c.segment_id = $1
-        LEFT JOIN venue_fitness_dimensions vfd_s ON vfd_s.venue_id = vds_t.venue_id AND vfd_s.source = 'blended'
-        LEFT JOIN venue_fitness_dimensions vfd_c ON vfd_c.venue_id = $3 AND vfd_c.source = 'blended'
-        WHERE  vds_t.segment_id   = $2
-          AND  vds_t.segment_rank = 1
-          AND  vds_t.venue_id    != $3
-        ORDER BY
-            CASE
-                WHEN vds_c.segment_rank = 2 THEN 1
-                WHEN vds_c.segment_rank = 3 THEN 2
-                ELSE                              3
-            END,
-            diversity_score DESC,
-            vds_t.alignment_score DESC
-        LIMIT  $4 OFFSET $5
+        SELECT venue_id, alignment_score AS target_alignment
+        FROM   venue_demographic_scores
+        WHERE  segment_id        = $1
+          AND  segment_rank     IN (2, 3)
+          AND  alignment_score  >= 0.30
+          AND  venue_id         != $2
+        ORDER BY alignment_score DESC
+        LIMIT  80
         """,
-        client_primary_seg, target_segment, venue_id, limit, offset,
+        target_segment, venue_id,
     )
+    for r in bridge_rows:
+        vid = r["venue_id"]
+        if vid not in rank1_ids:
+            target_align_map[vid] = float(r["target_alignment"])
 
-    if not tier_rows:
-        return [], total
+    all_ids = list(target_align_map.keys())
+    if not all_ids:
+        return [], 0
 
-    sim_ids  = [r["venue_id"] for r in tier_rows]
-    tier_map = {r["venue_id"]: r["tier"] for r in tier_rows}
+    # ── 3. Client primary-segment alignment at each candidate ─────────────────
+    c_align_rows = await conn.fetch(
+        """
+        SELECT venue_id, alignment_score
+        FROM   venue_demographic_scores
+        WHERE  venue_id    = ANY($1::int[])
+          AND  segment_id  = $2
+        """,
+        all_ids, client_primary_seg,
+    )
+    client_align_map: dict[int, float] = {
+        r["venue_id"]: float(r["alignment_score"]) for r in c_align_rows
+    }
 
-    # ── Venue details ─────────────────────────────────────────────────────────
+    # ── 4. Client area/city for geo multiplier ────────────────────────────────
+    client_vrow = await conn.fetchrow(
+        "SELECT area, city FROM venues WHERE id = $1", venue_id
+    )
+    client_area = (client_vrow["area"] or "") if client_vrow else ""
+    client_city = (client_vrow["city"] or "") if client_vrow else ""
+
+    # ── 5. Fitness dimensions (client + all candidates) ───────────────────────
+    client_fd = await conn.fetchrow(
+        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions "
+        "WHERE venue_id = $1 AND source = 'blended'",
+        venue_id,
+    )
+    sim_fd_rows = await conn.fetch(
+        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions "
+        "WHERE venue_id = ANY($1::int[]) AND source = 'blended'",
+        all_ids,
+    )
+    sim_fd_map = {r["venue_id"]: r for r in sim_fd_rows}
+
+    # ── 6. Venue details ──────────────────────────────────────────────────────
     venue_rows = await conn.fetch(
         "SELECT id, name, area, city, types FROM venues WHERE id = ANY($1::int[])",
-        sim_ids,
+        all_ids,
     )
     venue_map = {r["id"]: r for r in venue_rows}
 
-    # ── Primary segment → archetypes for each similar venue ───────────────────
+    # ── 7. Primary segment + top-3 segments per candidate ─────────────────────
     pseg_rows = await conn.fetch(
         """
         SELECT venue_id, segment_id
         FROM   venue_demographic_scores
         WHERE  venue_id = ANY($1::int[]) AND segment_rank = 1
         """,
-        sim_ids,
+        all_ids,
     )
     primary_seg_map = {r["venue_id"]: r["segment_id"] for r in pseg_rows}
 
-    # ── Top 3 segment display names ───────────────────────────────────────────
     top3_rows = await conn.fetch(
         """
         SELECT venue_id, segment_id, segment_rank
@@ -170,44 +245,94 @@ async def _fetch_segment_ladder_venues(
         WHERE  venue_id = ANY($1::int[]) AND segment_rank <= 3
         ORDER  BY venue_id, segment_rank
         """,
-        sim_ids,
+        all_ids,
     )
     top_seg_map: dict[int, list[str]] = {}
     for r in top3_rows:
-        label = SEGMENT_LABELS.get(r["segment_id"], {}).get("label", r["segment_id"])
-        top_seg_map.setdefault(r["venue_id"], []).append(label)
-
-    # ── Fitness dimensions: client + all similar venues (on-the-fly deltas) ─────
-    client_fd = await conn.fetchrow(
-        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'",
-        venue_id,
-    )
-    sim_fd_rows = await conn.fetch(
-        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = ANY($1::int[]) AND source = 'blended'",
-        sim_ids,
-    )
-    sim_fd_map = {r["venue_id"]: r for r in sim_fd_rows}
+        lbl = SEGMENT_LABELS.get(r["segment_id"], {}).get("label", r["segment_id"])
+        top_seg_map.setdefault(r["venue_id"], []).append(lbl)
 
     rules_by_dim = await _load_delta_rules(conn)
 
-    # ── Assemble cards ────────────────────────────────────────────────────────
-    cards: list[SimilarVenueCard] = []
-    rank_offset = offset + 1
-
-    for idx, tr in enumerate(tier_rows):
-        sim_id = tr["venue_id"]
-        v      = venue_map.get(sim_id)
+    # ── 8. Score and tier each candidate ─────────────────────────────────────
+    scored: list[dict] = []
+    for vid in all_ids:
+        v = venue_map.get(vid)
         if not v:
             continue
 
-        p_seg     = primary_seg_map.get(sim_id, "office_workers")
+        target_align = target_align_map[vid]
+        client_align = client_align_map.get(vid, 0.0)
+
+        # ATA: how much of the client audience is present here vs the target audience
+        ata = (client_align / target_align) if target_align > 0 else 0.0
+
+        # Tier
+        if vid in rank1_ids:
+            if ata >= 0.50:
+                tier = "role_model"
+            elif ata >= 0.20:
+                tier = "transition"
+            else:
+                tier = "pure_target"
+        else:
+            tier = "bridge"
+
+        # Effort (upward-only gaps — how hard to get from client's level to this venue's level)
+        sim_fd = sim_fd_map.get(vid)
+        effort = _compute_effort(client_fd, sim_fd) if (client_fd and sim_fd) else 0.5
+        effort_lbl = _effort_label(effort)
+
+        # Geo multiplier
+        v_area = v["area"] or ""
+        v_city = v["city"] or ""
+        geo = _geo_mult(client_area, client_city, v_area, v_city)
+
+        # Composite sort score
+        composite = target_align * (1.0 - effort) * (0.70 + 0.30 * geo)
+
+        scored.append({
+            "venue_id":       vid,
+            "tier":           tier,
+            "target_align":   target_align,
+            "effort":         effort,
+            "effort_label":   effort_lbl,
+            "composite":      composite,
+        })
+
+    # ── 9. Apply tier quotas with composite sort ──────────────────────────────
+    tier_buckets: dict[str, list[dict]] = {t: [] for t in _TIER_ORDER}
+    for s in scored:
+        tier_buckets[s["tier"]].append(s)
+
+    for t in _TIER_ORDER:
+        tier_buckets[t].sort(key=lambda x: x["composite"], reverse=True)
+
+    flat: list[dict] = []
+    for t in _TIER_ORDER:
+        flat.extend(tier_buckets[t][: _QUOTA[t]])
+
+    total = len(flat)
+    page  = flat[offset: offset + limit]
+    if not page:
+        return [], total
+
+    # ── 10. Assemble SimilarVenueCard objects ─────────────────────────────────
+    cards: list[SimilarVenueCard] = []
+    for idx, item in enumerate(page):
+        vid = item["venue_id"]
+        v   = venue_map.get(vid)
+        if not v:
+            continue
+
+        p_seg     = primary_seg_map.get(vid, "office_workers")
         arc_names = SEGMENT_TOP_ARCHETYPES.get(p_seg, [])
-        sim_fd    = sim_fd_map.get(sim_id)
+        sim_fd    = sim_fd_map.get(vid)
 
         delta_bars: list[DeltaBar] = []
         for dim in ALL_DIMS:
             c_score   = _float(client_fd[dim]) if client_fd else 0.0
-            s_score   = _float(sim_fd[dim])    if sim_fd   else 0.0
+            s_score   = _float(sim_fd[dim])    if sim_fd    else 0.0
             delta_val = round(s_score - c_score, 4)
             rule      = _lookup_rule(rules_by_dim, dim, delta_val)
 
@@ -223,17 +348,18 @@ async def _fetch_segment_ladder_venues(
             ))
 
         cards.append(SimilarVenueCard(
-            id=sim_id,
+            id=vid,
             name=v["name"],
             area=v["area"],
             city=v["city"],
             types=map_venue_types(list(v["types"] or [])),
             top_archetypes=[make_archetype_chip(n) for n in arc_names],
-            top_segments=top_seg_map.get(sim_id, []),
+            top_segments=top_seg_map.get(vid, []),
             delta_bars=delta_bars,
-            similarity_score=_float(tr["target_alignment"]),
-            rank=rank_offset + idx,
-            tier=tier_map.get(sim_id, "pure_target"),
+            similarity_score=item["target_align"],
+            rank=offset + idx + 1,
+            tier=item["tier"],
+            effort_label=item["effort_label"],
         ))
 
     return cards, total
@@ -272,11 +398,19 @@ def _build_gap_callout(
         "see how similar venues below have closed this gap."
     )
 
-    # Tier fall-through notice
+    # Tier composition notice
     if similar_venues:
         has_role_model  = any(s.tier == "role_model"  for s in similar_venues)
+        has_bridge      = any(s.tier == "bridge"      for s in similar_venues)
         has_transition  = any(s.tier == "transition"  for s in similar_venues)
         has_pure_target = any(s.tier == "pure_target" for s in similar_venues)
+
+        if has_bridge:
+            callout += (
+                " BRIDGE venues (mid-pivot) are shown alongside — these venues have "
+                f"{target_name} as a growing secondary audience and represent the "
+                "earliest, lowest-effort entry point."
+            )
 
         if not has_role_model and has_transition:
             callout += (
@@ -286,7 +420,7 @@ def _build_gap_callout(
             )
         elif not has_role_model and not has_transition and has_pure_target:
             callout += (
-                f" No overlap found with your current audience. "
+                " No overlap found with your current audience. "
                 "Showing PURE TARGET venues — these have fully committed to "
                 f"the {target_name} segment."
             )

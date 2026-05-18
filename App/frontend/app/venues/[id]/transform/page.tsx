@@ -13,12 +13,20 @@ const LIMIT = 40;
 
 // ─── Tier config ──────────────────────────────────────────────────────────────
 
-type Tier = "role_model" | "transition" | "pure_target";
+type Tier = "role_model" | "bridge" | "transition" | "pure_target";
 
-const TIER_CONFIG: Record<Tier, { label: string; color: string; borderColor: string }> = {
-  role_model:  { label: "ROLE MODEL",   color: "#E6D3A3", borderColor: "#E6D3A3" },
-  transition:  { label: "TRANSITION",   color: "#F59E0B", borderColor: "#F59E0B" },
-  pure_target: { label: "PURE TARGET",  color: "#8b8b9e", borderColor: "#4b4b5e" },
+const TIER_CONFIG: Record<Tier, { label: string; color: string; description: string }> = {
+  role_model:  { label: "ROLE MODEL",  color: "#E6D3A3", description: "Already bridges both audiences — closest to your ideal path." },
+  bridge:      { label: "BRIDGE",      color: "#38bdf8", description: "Target segment is growing here — earliest pivot point." },
+  transition:  { label: "TRANSITION",  color: "#F59E0B", description: "Has partially pivoted — in motion toward the target." },
+  pure_target: { label: "PURE TARGET", color: "#8b8b9e", description: "Fully committed to the target — most distant from your identity." },
+};
+
+// Effort badge colours
+const EFFORT_COLORS: Record<string, string> = {
+  "Quick Win":         "#10b981",
+  "Major Initiative":  "#F59E0B",
+  "Strategic Pivot":   "#ef4444",
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -52,42 +60,59 @@ function DeltaMetric({ bar }: { bar: DeltaBar }) {
   );
 }
 
-// ─── Similar venue card (with tier badge) ────────────────────────────────────
+// ─── Similar venue card (with tier + effort badges) ──────────────────────────
 
-function SimilarCard({
-  venue,
-}: {
-  venue: SimilarVenueCard;
-}) {
+function SimilarCard({ venue }: { venue: SimilarVenueCard }) {
   const bars = [...venue.delta_bars].sort(
-    (a, b) => Math.abs(b.delta) - Math.abs(a.delta)
+    (a, b) => Math.abs(b.delta) - Math.abs(a.delta),
   );
-  const tier = venue.tier as Tier | null | undefined;
+  const tier     = venue.tier as Tier | null | undefined;
   const tierConf = tier ? TIER_CONFIG[tier] : null;
+  const effortColor = venue.effort_label ? (EFFORT_COLORS[venue.effort_label] ?? "#8b8b9e") : null;
 
   return (
     <div className="w-72 flex-shrink-0 flex flex-col gap-sm">
       <div className="bg-surface border border-outline-variant p-md flex flex-col gap-sm h-full relative">
-        {/* Tier badge */}
+        {/* Tier badge — top-right corner */}
         {tierConf && (
           <div
             className="absolute top-0 right-0 text-[9px] font-bold uppercase tracking-wider px-xs py-[2px] rounded-bl"
-            style={{
-              color: "#0d0d11",
-              backgroundColor: tierConf.color,
-            }}
+            style={{ color: "#0d0d11", backgroundColor: tierConf.color }}
           >
             {tierConf.label}
           </div>
         )}
-        {/* Left accent stripe */}
+
+        {/* Left accent stripe (role model only) */}
         {tier === "role_model" && (
           <div className="absolute top-0 left-0 w-[3px] h-full bg-[#E6D3A3] rounded-l" />
+        )}
+        {tier === "bridge" && (
+          <div className="absolute top-0 left-0 w-[3px] h-full bg-[#38bdf8] rounded-l" />
         )}
 
         <h4 className="text-headline-md font-headline-md text-on-surface truncate pr-xl">
           {venue.name}
         </h4>
+        <p className="text-[11px] text-on-surface-variant/60 font-body-sm -mt-xs truncate">
+          {venue.area}
+        </p>
+
+        {/* Effort badge */}
+        {venue.effort_label && effortColor && (
+          <div className="flex items-center gap-xs">
+            <span
+              className="text-[9px] font-bold uppercase tracking-wider px-xs py-[2px] rounded border"
+              style={{
+                color: effortColor,
+                borderColor: `${effortColor}40`,
+                backgroundColor: `${effortColor}12`,
+              }}
+            >
+              {venue.effort_label}
+            </span>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-xs">
           {venue.types.slice(0, 2).map((t) => (
@@ -348,13 +373,27 @@ export default function TransformPage({
 
               {/* Tier legend */}
               <div className="flex gap-md flex-wrap text-[10px] font-data-mono text-on-surface-variant">
-                {(Object.keys(TIER_CONFIG) as Tier[]).map((t) => (
-                  <span key={t} className="flex items-center gap-xs">
+                {(["role_model", "bridge", "transition", "pure_target"] as Tier[]).map((t) => (
+                  <span key={t} className="flex items-center gap-xs" title={TIER_CONFIG[t].description}>
                     <span
                       className="inline-block w-2 h-2 rounded-sm"
                       style={{ backgroundColor: TIER_CONFIG[t].color }}
                     />
                     {TIER_CONFIG[t].label}
+                  </span>
+                ))}
+              </div>
+
+              {/* Effort legend */}
+              <div className="flex gap-md flex-wrap text-[10px] font-data-mono text-on-surface-variant/60">
+                <span className="text-on-surface-variant/40 uppercase tracking-wider">Effort:</span>
+                {(["Quick Win", "Major Initiative", "Strategic Pivot"] as const).map((lbl) => (
+                  <span key={lbl} className="flex items-center gap-xs">
+                    <span
+                      className="inline-block w-2 h-2 rounded-sm"
+                      style={{ backgroundColor: EFFORT_COLORS[lbl] }}
+                    />
+                    {lbl}
                   </span>
                 ))}
               </div>
@@ -387,7 +426,7 @@ export default function TransformPage({
                   </div>
                 )}
 
-                {(["role_model", "transition", "pure_target"] as Tier[]).map((tier) => {
+                {(["role_model", "bridge", "transition", "pure_target"] as Tier[]).map((tier) => {
                   const allVenues = data.similar_venues.filter((sv) => sv.tier === tier);
                   if (!allVenues.length) return null;
                   const venues = allVenues.slice(0, 12);
@@ -407,7 +446,12 @@ export default function TransformPage({
                           {tierConf.label}
                         </span>
                         <span className="text-[10px] text-on-surface-variant/50 font-data-mono">
-                          — showing {venues.length} of {allVenues.length}
+                          — {venues.length} of {allVenues.length}
+                        </span>
+                        <span
+                          className="text-[10px] text-on-surface-variant/35 font-body-sm italic ml-xs hidden sm:inline"
+                        >
+                          {tierConf.description}
                         </span>
                       </div>
 

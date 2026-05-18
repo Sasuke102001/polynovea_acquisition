@@ -149,7 +149,8 @@ export interface SimilarVenueCard {
   delta_bars: DeltaBar[];
   similarity_score: number;
   rank: number;
-  tier?: string | null;   // Transform only: "role_model" | "transition" | "pure_target"
+  tier?: string | null;          // Transform only: "role_model" | "bridge" | "transition" | "pure_target"
+  effort_label?: string | null;  // Transform only: "Quick Win" | "Major Initiative" | "Strategic Pivot"
 }
 
 export interface ClientVenueCard {
