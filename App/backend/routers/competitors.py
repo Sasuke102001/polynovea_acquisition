@@ -562,10 +562,24 @@ async def get_similar_venues(
 
 # ─── AI helper ────────────────────────────────────────────────────────────────
 
+def _sanitize_json(text: str) -> str:
+    """
+    Fix the most common LLM JSON syntax errors so json.loads can parse them:
+      - Trailing commas before } or ]   e.g.  "x": 1, }  →  "x": 1 }
+      - Stray whitespace / newline artefacts are left to json.loads
+    """
+    # Trailing comma before closing brace/bracket (one or more, with optional whitespace)
+    return _re.sub(r",\s*([}\]])", r"\1", text)
+
+
 async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
     """
     Non-streaming Nvidia API call. Returns parsed JSON dict.
-    Strips markdown fences if the model wraps its output in them.
+
+    Parse strategy (most-lenient-last):
+      1. Parse raw output directly
+      2. Sanitise trailing commas, parse again
+      3. Extract first {...} block, sanitise, parse
     stream is omitted intentionally — some Nvidia-compatible endpoints reject
     an explicit stream=False even though it is the default.
     """
@@ -588,14 +602,36 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
     # Strip markdown fences — model sometimes wraps output despite instructions
     raw = _re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
 
+    # ── 1. Direct parse ───────────────────────────────────────────────────────
     try:
         return _json.loads(raw)
-    except Exception:
-        # Try to extract the first JSON object from the text
-        match = _re.search(r"\{[\s\S]*\}", raw)
-        if match:
+    except _json.JSONDecodeError:
+        pass
+
+    # ── 2. Sanitise trailing commas, try again ────────────────────────────────
+    sanitised = _sanitize_json(raw)
+    try:
+        return _json.loads(sanitised)
+    except _json.JSONDecodeError:
+        pass
+
+    # ── 3. Extract first {...} block, sanitise, parse ─────────────────────────
+    match = _re.search(r"\{[\s\S]*\}", sanitised)
+    if match:
+        try:
             return _json.loads(match.group())
-        raise ValueError(f"AI returned non-JSON: {raw[:300]}")
+        except _json.JSONDecodeError:
+            pass
+
+    # ── 4. Same on original raw (in case sanitise over-corrected) ─────────────
+    match = _re.search(r"\{[\s\S]*\}", raw)
+    if match:
+        try:
+            return _json.loads(_sanitize_json(match.group()))
+        except _json.JSONDecodeError:
+            pass
+
+    raise ValueError(f"AI returned unparseable JSON: {raw[:400]}")
 
 
 # ─── Competitor deep-dive route ───────────────────────────────────────────────
