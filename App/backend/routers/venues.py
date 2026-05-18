@@ -35,7 +35,14 @@ async def search_venues(
             """
             SELECT COUNT(*)
             FROM   venues v
-            JOIN   venue_fitness_dimensions fd ON fd.venue_id = v.id
+            JOIN   venue_fitness_dimensions fd
+                     ON fd.venue_id = v.id
+                    AND fd.source = (
+                        SELECT source FROM venue_fitness_dimensions
+                        WHERE venue_id = v.id
+                        ORDER BY CASE source WHEN 'blended' THEN 0 WHEN 'google' THEN 1 ELSE 2 END
+                        LIMIT 1
+                    )
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
             """,
@@ -65,6 +72,12 @@ async def search_venues(
             FROM   venues v
             JOIN   venue_fitness_dimensions fd
                      ON fd.venue_id = v.id
+                    AND fd.source = (
+                        SELECT source FROM venue_fitness_dimensions
+                        WHERE venue_id = v.id
+                        ORDER BY CASE source WHEN 'blended' THEN 0 WHEN 'google' THEN 1 ELSE 2 END
+                        LIMIT 1
+                    )
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
             ORDER BY (COALESCE(fd.operational_quality, 0) + COALESCE(fd.retention_strength, 0)) DESC

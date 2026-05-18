@@ -113,7 +113,7 @@ async def _fetch_client(conn, venue_id: int) -> ClientVenueCard:
             fitness_for_social_dwell,  fitness_for_group_energy,
             fitness_for_destination_visit, operational_quality,
             retention_strength
-        FROM venue_fitness_dimensions WHERE venue_id = $1
+        FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'
         """,
         venue_id,
     )
@@ -176,7 +176,7 @@ async def _fetch_similar_venues(
 
     # ── Client fitness dimensions ─────────────────────────────────────────────
     client_fd = await conn.fetchrow(
-        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = $1",
+        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'",
         venue_id,
     )
 
@@ -229,7 +229,7 @@ async def _fetch_similar_venues(
                 SELECT v.id
                 FROM   venues v
                 JOIN   venue_demographic_scores vds ON vds.venue_id = v.id
-                JOIN   venue_fitness_dimensions vfd ON vfd.venue_id = v.id
+                JOIN   venue_fitness_dimensions vfd ON vfd.venue_id = v.id AND vfd.source = 'blended'
                 WHERE  vds.segment_id = $1
                   AND  vds.segment_rank = 1
                   AND  v.id != ALL($2::int[])
@@ -283,7 +283,7 @@ async def _fetch_similar_venues(
 
     # ── Similar venue fitness dimensions (for on-the-fly delta computation) ───
     sim_fd_rows = await conn.fetch(
-        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = ANY($1::int[])",
+        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = ANY($1::int[]) AND source = 'blended'",
         sim_ids,
     )
     sim_fd_map = {r["venue_id"]: r for r in sim_fd_rows}

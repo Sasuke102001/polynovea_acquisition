@@ -92,7 +92,7 @@ async def get_risk(venue_id: int = Path(...)):
             raise HTTPException(status_code=404, detail="Venue not found")
 
         fd = await conn.fetchrow(
-            "SELECT retention_strength FROM venue_fitness_dimensions WHERE venue_id = $1",
+            "SELECT retention_strength FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'",
             venue_id,
         )
         retention = _float(fd["retention_strength"]) if fd else 0.0

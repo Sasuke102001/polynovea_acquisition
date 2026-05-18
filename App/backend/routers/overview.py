@@ -54,7 +54,7 @@ async def get_overview(venue_id: int = Path(...)):
                 retention_strength,
                 monetization_potential
             FROM venue_fitness_dimensions
-            WHERE venue_id = $1
+            WHERE venue_id = $1 AND source = 'blended'
             """,
             venue_id,
         )

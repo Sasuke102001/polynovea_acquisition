@@ -192,7 +192,7 @@ async def get_intelligence(venue_id: int = Path(...)):
                 fitness_for_destination_visit, fitness_for_social_dwell,
                 fitness_for_group_energy, operational_quality,
                 retention_strength, monetization_potential
-            FROM venue_fitness_dimensions WHERE venue_id = $1
+            FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'
             """,
             venue_id,
         )
