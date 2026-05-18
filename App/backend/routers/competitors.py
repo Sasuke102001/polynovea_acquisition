@@ -583,6 +583,8 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
     )
 
     raw = (response.choices[0].message.content or "").strip()
+    # Strip <think>...</think> blocks — reasoning models emit these before output
+    raw = _re.sub(r"<think>[\s\S]*?</think>", "", raw).strip()
     # Strip markdown fences — model sometimes wraps output despite instructions
     raw = _re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
 
@@ -723,6 +725,7 @@ async def get_competitor_deep_dive(
             learn_dims=learn_dims,
             avoid_dims=avoid_dims,
         )
+        _ai_error: str = ""
         try:
             ai = await _call_nvidia_json(sys_p, usr_p)
 
@@ -741,14 +744,13 @@ async def get_competitor_deep_dive(
             brief      = str(ai.get("strategic_brief", ""))
             ai_used    = True
 
-        except Exception:
-            # AI call failed — fall back silently, never 502 the user
-            pass
+        except Exception as _exc:
+            _ai_error = str(_exc)
 
     if not ai_used:
         reason = (
-            "AI analysis temporarily unavailable — showing raw signal data."
-            if _NVIDIA_API_KEY
+            f"AI error: {_ai_error}"
+            if _NVIDIA_API_KEY and "_ai_error" in dir() and _ai_error
             else "AI key not configured — showing raw signal data."
         )
         learn_from, avoid, brief = _build_fallback(reason)
