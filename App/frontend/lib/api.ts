@@ -593,6 +593,42 @@ export interface AdBrief {
   data_confidence: string;
 }
 
+// ─── Competitor Deep Dive ─────────────────────────────────────────────────────
+
+export interface CompetitorInsight {
+  dimension: string;
+  label: string;
+  client_score: number;
+  competitor_score: number;
+  delta: number;           // competitor − client (positive = competitor stronger)
+  narrative: string;       // AI-generated, objective analytical text
+}
+
+export interface CompetitorDeepDive {
+  client_name: string;
+  competitor_id: number;
+  competitor_name: string;
+  competitor_area: string;
+  competitor_city: string;
+  competitor_types: string[];
+  bucket_label: string;    // "Direct Peer" | "Close Match" | "Partial Match" | "Segment Match"
+  learn_from: CompetitorInsight[];
+  avoid: CompetitorInsight[];
+  strategic_brief: string;
+}
+
+export async function getCompetitorDeepDive(
+  venueId: string | number,
+  compId: string | number,
+): Promise<CompetitorDeepDive> {
+  const res = await fetch(
+    `${API_BASE}/api/venues/${venueId}/competitor/${compId}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) throw new Error(`Competitor deep dive failed: ${res.status}`);
+  return res.json() as Promise<CompetitorDeepDive>;
+}
+
 export async function getAdBrief(
   venueId: string | number,
   channel?: string,

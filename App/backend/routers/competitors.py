@@ -28,19 +28,38 @@ Geography multipliers (ChatGPT / Kimi / Perplexity consensus — substantial, no
 Deltas: computed on-the-fly from venue_fitness_dimensions + fitness_delta_rules.
 """
 
+import json as _json
 import math
+import os
+import re as _re
 
 from fastapi import APIRouter, HTTPException, Path, Query
 
 from database import get_pool
 from models import (
     CompetitorsResponse, ClientVenueCard, SimilarVenueCard, FitnessDimension, DeltaBar,
+    CompetitorDeepDive, CompetitorInsight,
 )
+from prompts import build_competitor_analysis_prompt
 from routers.utils import (
     map_venue_types, make_archetype_chip,
     DIM_LABELS, ALL_DIMS,
     SEGMENT_LABELS, SEGMENT_TOP_ARCHETYPES,
 )
+
+# Nvidia API config — mirrors chat.py
+_NVIDIA_API_BASE = "https://integrate.api.nvidia.com/v1"
+_NVIDIA_API_KEY  = os.getenv("NVIDIA_API_KEY_CREATIVE")
+_NVIDIA_MODEL    = os.getenv(
+    "NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+)
+
+_BUCKET_LABELS: dict[int, str] = {
+    0: "Direct Peer",
+    1: "Close Match",
+    2: "Partial Match",
+    3: "Segment Match",
+}
 
 router = APIRouter()
 
@@ -538,4 +557,193 @@ async def get_similar_venues(
         offset=offset,
         limit=limit,
         insight_callout=callout,
+    )
+
+
+# ─── AI helper ────────────────────────────────────────────────────────────────
+
+async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
+    """
+    Non-streaming Nvidia API call. Returns parsed JSON dict.
+    Strips markdown fences if the model wraps its output in them.
+    """
+    from openai import AsyncOpenAI
+
+    client = AsyncOpenAI(api_key=_NVIDIA_API_KEY, base_url=_NVIDIA_API_BASE)
+    response = await client.chat.completions.create(
+        model=_NVIDIA_MODEL,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user",   "content": user_message},
+        ],
+        temperature=0.2,
+        max_tokens=2000,
+        stream=False,
+    )
+
+    raw = (response.choices[0].message.content or "").strip()
+    # Strip markdown fences — model sometimes wraps output despite instructions
+    raw = _re.sub(r"```(?:json)?\s*", "", raw).strip().rstrip("`").strip()
+
+    try:
+        return _json.loads(raw)
+    except Exception:
+        # Try to extract the first JSON object from the text
+        match = _re.search(r"\{[\s\S]*\}", raw)
+        if match:
+            return _json.loads(match.group())
+        raise ValueError(f"AI returned non-JSON: {raw[:300]}")
+
+
+# ─── Competitor deep-dive route ───────────────────────────────────────────────
+
+@router.get("/{venue_id}/competitor/{comp_id}", response_model=CompetitorDeepDive)
+async def get_competitor_deep_dive(
+    venue_id: int = Path(...),
+    comp_id:  int = Path(...),
+):
+    """
+    Competitor deep-dive — AI-generated behavioral analysis comparing the client
+    against a specific competitor.
+
+    Returns:
+      learn_from : top 3 dimensions where competitor outperforms client (+narrative)
+      avoid      : top 3 dimensions where client outperforms competitor (+narrative)
+      strategic_brief : 2-3 sentence objective competitive positioning summary
+
+    Narrative tone: objective, analytical, data-referenced. No marketing language.
+    """
+    pool = get_pool()
+
+    async with pool.acquire() as conn:
+        await conn.execute("SET statement_timeout = '20s'")
+
+        client_v = await conn.fetchrow(
+            "SELECT name, area, city, types FROM venues WHERE id = $1", venue_id
+        )
+        comp_v = await conn.fetchrow(
+            "SELECT name, area, city, types FROM venues WHERE id = $1", comp_id
+        )
+
+        if not client_v:
+            raise HTTPException(status_code=404, detail="Client venue not found")
+        if not comp_v:
+            raise HTTPException(status_code=404, detail="Competitor venue not found")
+
+        dims_sel = ", ".join(ALL_DIMS)
+        client_fd = await conn.fetchrow(
+            f"SELECT {dims_sel} FROM venue_fitness_dimensions "
+            f"WHERE venue_id = $1 AND source = 'blended'",
+            venue_id,
+        )
+        comp_fd = await conn.fetchrow(
+            f"SELECT {dims_sel} FROM venue_fitness_dimensions "
+            f"WHERE venue_id = $1 AND source = 'blended'",
+            comp_id,
+        )
+
+    # ── Compute deltas for all 7 dimensions ───────────────────────────────────
+    all_scores = []
+    for dim in ALL_DIMS:
+        c = _float(client_fd.get(dim) if client_fd else 0.0)
+        s = _float(comp_fd.get(dim)   if comp_fd   else 0.0)
+        all_scores.append({
+            "dim":          dim,
+            "label":        DIM_LABELS[dim],
+            "client_score": round(c, 3),
+            "comp_score":   round(s, 3),
+            "delta":        round(s - c, 3),
+        })
+
+    # Top 3 learn_from (competitor > client, meaningful gap > 0.02)
+    learn_dims = sorted(
+        [s for s in all_scores if s["delta"] > 0.02],
+        key=lambda x: -x["delta"],
+    )[:3]
+    # Top 3 avoid (client > competitor, meaningful gap > 0.02)
+    avoid_dims = sorted(
+        [s for s in all_scores if s["delta"] < -0.02],
+        key=lambda x: x["delta"],
+    )[:3]
+
+    # ── Bucket label ──────────────────────────────────────────────────────────
+    client_cascade = _venue_type_cascade(list(client_v["types"] or []))
+    comp_cascade   = _venue_type_cascade(list(comp_v["types"]   or []))
+    intersection   = sum(1 for t in client_cascade if t in comp_cascade)
+    bucket         = _assign_bucket(intersection, len(client_cascade))
+
+    # ── AI narrative generation ───────────────────────────────────────────────
+    if not _NVIDIA_API_KEY:
+        # Graceful fallback — rule-based text when AI is not configured
+        def _fallback_narrative(d: dict, is_learn: bool) -> str:
+            direction = "stronger" if is_learn else "weaker"
+            return (
+                f"{comp_v['name']} scores {d['comp_score']:.3f} on {d['label']} "
+                f"vs {d['client_score']:.3f} for {client_v['name']} "
+                f"(delta {d['delta']:+.3f}). This venue is behaviorally {direction} "
+                "on this dimension based on available signal data."
+            )
+
+        learn_from = [
+            CompetitorInsight(
+                dimension=d["dim"], label=d["label"],
+                client_score=d["client_score"], competitor_score=d["comp_score"],
+                delta=d["delta"], narrative=_fallback_narrative(d, True),
+            )
+            for d in learn_dims
+        ]
+        avoid = [
+            CompetitorInsight(
+                dimension=d["dim"], label=d["label"],
+                client_score=d["client_score"], competitor_score=d["comp_score"],
+                delta=d["delta"], narrative=_fallback_narrative(d, False),
+            )
+            for d in avoid_dims
+        ]
+        brief = (
+            f"{client_v['name']} and {comp_v['name']} share {intersection} of "
+            f"{len(client_cascade)} primary venue types ({_BUCKET_LABELS[bucket]}). "
+            "Full strategic brief unavailable — AI key not configured."
+        )
+    else:
+        sys_p, usr_p = build_competitor_analysis_prompt(
+            client_name=client_v["name"],  client_area=client_v["area"] or "",
+            client_types=list(client_v["types"] or []),
+            comp_name=comp_v["name"],      comp_area=comp_v["area"] or "",
+            comp_types=list(comp_v["types"] or []),
+            all_scores=all_scores,
+            learn_dims=learn_dims,
+            avoid_dims=avoid_dims,
+        )
+
+        try:
+            ai = await _call_nvidia_json(sys_p, usr_p)
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"AI analysis failed: {exc}")
+
+        def _parse_insight(raw: dict) -> CompetitorInsight:
+            return CompetitorInsight(
+                dimension=str(raw.get("dimension", "")),
+                label=str(raw.get("label", "")),
+                client_score=float(raw.get("client_score", 0)),
+                competitor_score=float(raw.get("competitor_score", 0)),
+                delta=float(raw.get("delta", 0)),
+                narrative=str(raw.get("narrative", "")),
+            )
+
+        learn_from = [_parse_insight(r) for r in ai.get("learn_from", [])]
+        avoid      = [_parse_insight(r) for r in ai.get("avoid", [])]
+        brief      = str(ai.get("strategic_brief", ""))
+
+    return CompetitorDeepDive(
+        client_name=client_v["name"],
+        competitor_id=comp_id,
+        competitor_name=comp_v["name"],
+        competitor_area=comp_v["area"] or "",
+        competitor_city=comp_v["city"] or "",
+        competitor_types=map_venue_types(list(comp_v["types"] or [])),
+        bucket_label=_BUCKET_LABELS.get(bucket, "Match"),
+        learn_from=learn_from,
+        avoid=avoid,
+        strategic_brief=brief,
     )

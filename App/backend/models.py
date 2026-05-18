@@ -146,6 +146,30 @@ class CompetitorsResponse(BaseModel):
     insight_callout: str     # auto-generated from largest delta
 
 
+# ─── Competitor Deep Dive ─────────────────────────────────────────────────────
+
+class CompetitorInsight(BaseModel):
+    dimension: str
+    label: str
+    client_score: float
+    competitor_score: float
+    delta: float           # competitor − client (positive = competitor stronger)
+    narrative: str         # AI-generated, objective analytical tone
+
+
+class CompetitorDeepDive(BaseModel):
+    client_name: str
+    competitor_id: int
+    competitor_name: str
+    competitor_area: str
+    competitor_city: str
+    competitor_types: list[str]
+    bucket_label: str      # "Direct Peer" | "Close Match" | "Partial Match" | "Segment Match"
+    learn_from: list[CompetitorInsight]   # top 3 where competitor > client
+    avoid: list[CompetitorInsight]        # top 3 where client > competitor
+    strategic_brief: str                  # AI-generated 2–3 sentence overview
+
+
 # ─── Screen 3 — Transform Tab ────────────────────────────────────────────────
 
 class SegmentOption(BaseModel):
