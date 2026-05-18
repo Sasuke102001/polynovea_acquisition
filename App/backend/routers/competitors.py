@@ -566,6 +566,8 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
     """
     Non-streaming Nvidia API call. Returns parsed JSON dict.
     Strips markdown fences if the model wraps its output in them.
+    stream is omitted intentionally — some Nvidia-compatible endpoints reject
+    an explicit stream=False even though it is the default.
     """
     from openai import AsyncOpenAI
 
@@ -578,7 +580,6 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
         ],
         temperature=0.2,
         max_tokens=2000,
-        stream=False,
     )
 
     raw = (response.choices[0].message.content or "").strip()
@@ -672,19 +673,18 @@ async def get_competitor_deep_dive(
     intersection   = sum(1 for t in client_cascade if t in comp_cascade)
     bucket         = _assign_bucket(intersection, len(client_cascade))
 
-    # ── AI narrative generation ───────────────────────────────────────────────
-    if not _NVIDIA_API_KEY:
-        # Graceful fallback — rule-based text when AI is not configured
-        def _fallback_narrative(d: dict, is_learn: bool) -> str:
-            direction = "stronger" if is_learn else "weaker"
-            return (
-                f"{comp_v['name']} scores {d['comp_score']:.3f} on {d['label']} "
-                f"vs {d['client_score']:.3f} for {client_v['name']} "
-                f"(delta {d['delta']:+.3f}). This venue is behaviorally {direction} "
-                "on this dimension based on available signal data."
-            )
+    # ── Shared fallback builder ───────────────────────────────────────────────
+    def _fallback_narrative(d: dict, is_learn: bool) -> str:
+        direction = "stronger" if is_learn else "weaker"
+        return (
+            f"{comp_v['name']} scores {d['comp_score']:.3f} on {d['label']} "
+            f"vs {d['client_score']:.3f} for {client_v['name']} "
+            f"(delta {d['delta']:+.3f}). "
+            f"This venue is behaviorally {direction} on this dimension."
+        )
 
-        learn_from = [
+    def _build_fallback(reason: str) -> tuple[list, list, str]:
+        lf = [
             CompetitorInsight(
                 dimension=d["dim"], label=d["label"],
                 client_score=d["client_score"], competitor_score=d["comp_score"],
@@ -692,7 +692,7 @@ async def get_competitor_deep_dive(
             )
             for d in learn_dims
         ]
-        avoid = [
+        av = [
             CompetitorInsight(
                 dimension=d["dim"], label=d["label"],
                 client_score=d["client_score"], competitor_score=d["comp_score"],
@@ -700,12 +700,20 @@ async def get_competitor_deep_dive(
             )
             for d in avoid_dims
         ]
-        brief = (
+        br = (
             f"{client_v['name']} and {comp_v['name']} share {intersection} of "
             f"{len(client_cascade)} primary venue types ({_BUCKET_LABELS[bucket]}). "
-            "Full strategic brief unavailable — AI key not configured."
+            f"{reason}"
         )
-    else:
+        return lf, av, br
+
+    # ── AI narrative generation ───────────────────────────────────────────────
+    learn_from: list[CompetitorInsight] = []
+    avoid:      list[CompetitorInsight] = []
+    brief:      str = ""
+    ai_used = False
+
+    if _NVIDIA_API_KEY:
         sys_p, usr_p = build_competitor_analysis_prompt(
             client_name=client_v["name"],  client_area=client_v["area"] or "",
             client_types=list(client_v["types"] or []),
@@ -715,25 +723,76 @@ async def get_competitor_deep_dive(
             learn_dims=learn_dims,
             avoid_dims=avoid_dims,
         )
-
         try:
             ai = await _call_nvidia_json(sys_p, usr_p)
-        except Exception as exc:
-            raise HTTPException(status_code=502, detail=f"AI analysis failed: {exc}")
 
-        def _parse_insight(raw: dict) -> CompetitorInsight:
-            return CompetitorInsight(
-                dimension=str(raw.get("dimension", "")),
-                label=str(raw.get("label", "")),
-                client_score=float(raw.get("client_score", 0)),
-                competitor_score=float(raw.get("competitor_score", 0)),
-                delta=float(raw.get("delta", 0)),
-                narrative=str(raw.get("narrative", "")),
-            )
+            def _parse_insight(raw: dict) -> CompetitorInsight:
+                return CompetitorInsight(
+                    dimension=str(raw.get("dimension", "")),
+                    label=str(raw.get("label", "")),
+                    client_score=float(raw.get("client_score", 0)),
+                    competitor_score=float(raw.get("competitor_score", 0)),
+                    delta=float(raw.get("delta", 0)),
+                    narrative=str(raw.get("narrative", "")),
+                )
 
-        learn_from = [_parse_insight(r) for r in ai.get("learn_from", [])]
-        avoid      = [_parse_insight(r) for r in ai.get("avoid", [])]
-        brief      = str(ai.get("strategic_brief", ""))
+            learn_from = [_parse_insight(r) for r in ai.get("learn_from", [])]
+            avoid      = [_parse_insight(r) for r in ai.get("avoid", [])]
+            brief      = str(ai.get("strategic_brief", ""))
+            ai_used    = True
+
+        except Exception:
+            # AI call failed — fall back silently, never 502 the user
+            pass
+
+    if not ai_used:
+        reason = (
+            "AI analysis temporarily unavailable — showing raw signal data."
+            if _NVIDIA_API_KEY
+            else "AI key not configured — showing raw signal data."
+        )
+        learn_from, avoid, brief = _build_fallback(reason)
+
+    # ── Supabase logging (fire-and-forget) ───────────────────────────────────
+    import asyncio as _asyncio
+    import httpx as _httpx
+
+    async def _log_deep_dive() -> None:
+        try:
+            supa_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+            supa_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY", "")
+            if not supa_url or not supa_key:
+                return
+            url = f"{supa_url}/rest/v1/competitor_deep_dive_logs"
+            payload = {
+                "venue_id":        str(venue_id),
+                "competitor_id":   str(comp_id),
+                "client_name":     client_v["name"],
+                "competitor_name": comp_v["name"],
+                "bucket_label":    _BUCKET_LABELS.get(bucket, "Match"),
+                "ai_used":         ai_used,
+                "learn_from": [
+                    {"dimension": i.dimension, "delta": i.delta, "narrative": i.narrative}
+                    for i in learn_from
+                ],
+                "avoid": [
+                    {"dimension": i.dimension, "delta": i.delta, "narrative": i.narrative}
+                    for i in avoid
+                ],
+                "strategic_brief": brief,
+            }
+            headers = {
+                "apikey":        supa_key,
+                "Authorization": f"Bearer {supa_key}",
+                "Content-Type":  "application/json",
+                "Prefer":        "return=minimal",
+            }
+            async with _httpx.AsyncClient(timeout=8) as hx:
+                await hx.post(url, json=payload, headers=headers)
+        except Exception:
+            pass   # Never let logging block or crash the response
+
+    _asyncio.create_task(_log_deep_dive())
 
     return CompetitorDeepDive(
         client_name=client_v["name"],
