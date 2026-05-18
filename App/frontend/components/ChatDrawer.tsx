@@ -227,7 +227,7 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
     }, mode);
   };
 
-  const { label, subtitle } = TAB_META[tab] ?? { label: "AI Assistant", subtitle: "" };
+  const { label, subtitle } = TAB_META[tab] ?? { label: "Polynovea Intelligence", subtitle: "" };
 
   return (
     <>

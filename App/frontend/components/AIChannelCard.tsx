@@ -161,7 +161,7 @@ export default function AIChannelCard({ venueId, channel, title, badge, targetSe
                 className="text-[10px] font-data-mono uppercase tracking-widest font-bold"
                 style={{ color: accent }}
               >
-                AI SUGGESTION
+                POLYNOVEA INSIGHT
               </span>
               {loading && (
                 <div
