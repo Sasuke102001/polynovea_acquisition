@@ -2,19 +2,33 @@
 routers/competitors.py
 GET /api/venues/{venue_id}/similar  →  CompetitorsResponse  (Screen 2 — Competitors Tab)
 
-Pagination: offset=0 → similar rank 1–3, offset=3 → rank 4–6, etc.
-Deltas: computed on-the-fly from venue_fitness_dimensions + fitness_delta_rules.
-        No dependency on the pre-computed venue_similarity_deltas table.
+Matching  — multi-type intersection waterfall (Tversky-inspired):
+  Bucket A: competitor shares ALL of client's non-generic cascade types
+  Bucket B: competitor shares 2+ (but not all) cascade types
+  Bucket C: competitor shares exactly 1 cascade type
+  Bucket D: segment fallback (same demographic segment, no type overlap)
+  Buckets filled in order A→D, capped at _MAX_POOL=40.
 
-Competitor type cascade (per client type, per competitor position):
-  For each of the client's top-3 non-generic types (in Google's original order):
-    Try competitors where that type is at position 0 (primary→primary)
-    Try competitors where that type is at position 1 (primary→secondary)
-    Try competitors where that type is at position 2 (primary→tertiary)
-  Stop at the first combination that yields results.
-  If nothing found across all 3 client types: fall back to segment-only.
-  If no segment data: fall back to raw cosine similarity.
+Sorting (within each bucket) — two views:
+  threat    (default): weighted cosine similarity × geography multiplier DESC
+                       "who competes for the same behavioral demand pocket"
+  benchmark          : composite fitness excellence score DESC
+                       "who is winning this category"
+
+Weighted cosine uses softmax-normalised weights derived from the client's own
+fitness scores (α=2). This preserves emphasis on the client's strong dimensions
+without collapsing matching into single-axis dominance (ChatGPT / Kimi concern).
+
+Geography multipliers (ChatGPT / Kimi / Perplexity consensus — substantial, not cosmetic):
+  same area            → ×1.00  (direct market overlap)
+  same city            → ×0.70
+  adjacent city        → ×0.40
+  different city       → ×0.15
+
+Deltas: computed on-the-fly from venue_fitness_dimensions + fitness_delta_rules.
 """
+
+import math
 
 from fastapi import APIRouter, HTTPException, Path, Query
 
@@ -149,121 +163,257 @@ async def _fetch_client(conn, venue_id: int) -> ClientVenueCard:
     )
 
 
+# ─── Geography helpers ────────────────────────────────────────────────────────
+
+# Mumbai MMR adjacency map — cities that share meaningful consumer catchment
+_ADJACENT_CITIES: dict[str, frozenset] = {
+    "Mumbai":           frozenset({"Navi Mumbai", "Thane", "Kalyan", "Mira Road",
+                                   "Mira-Bhayandar", "Vasai", "Virar", "Dombivli"}),
+    "Navi Mumbai":      frozenset({"Mumbai", "Thane", "Panvel", "Belapur"}),
+    "Thane":            frozenset({"Mumbai", "Navi Mumbai", "Kalyan", "Mira Road",
+                                   "Mira-Bhayandar", "Dombivli"}),
+    "Kalyan":           frozenset({"Thane", "Mumbai", "Navi Mumbai", "Dombivli",
+                                   "Ulhasnagar"}),
+    "Mira Road":        frozenset({"Mumbai", "Thane", "Mira-Bhayandar"}),
+    "Mira-Bhayandar":   frozenset({"Mumbai", "Thane", "Mira Road"}),
+    "Pune":             frozenset({"Pimpri-Chinchwad", "Pimpri", "Chinchwad"}),
+    "Pimpri-Chinchwad": frozenset({"Pune", "Pimpri", "Chinchwad"}),
+}
+
+
+def _geo_multiplier(client_area: str, client_city: str,
+                    comp_area: str,   comp_city: str) -> float:
+    """
+    Geography relevance multiplier. Substantial weights per consensus:
+      same micro-area  → 1.00  (direct market overlap — full weight)
+      same city        → 0.70  (shared catchment, different neighbourhood)
+      adjacent city    → 0.40  (MMR spillover, some market overlap)
+      different market → 0.15  (aspirational benchmark only)
+    """
+    cc = (client_city or "").strip()
+    xc = (comp_city   or "").strip()
+    ca = (client_area or "").strip().lower()
+    xa = (comp_area   or "").strip().lower()
+
+    if cc and xc and cc.lower() == xc.lower():
+        return 1.0 if (ca and xa and ca == xa) else 0.70
+
+    adj = _ADJACENT_CITIES.get(cc, frozenset())
+    return 0.40 if xc in adj else 0.15
+
+
+# ─── Similarity helpers ───────────────────────────────────────────────────────
+
+def _softmax_weights(fd, dims: list[str], alpha: float = 2.0) -> dict[str, float]:
+    """
+    Softmax-normalised weights from the client's own fitness scores.
+    alpha=2 preserves relative emphasis on strong dimensions without letting
+    any single dimension dominate (ChatGPT recommendation — avoids weight
+    concentration collapse from raw proportional share).
+    """
+    scores = [float(fd.get(d) or 0.0) if fd else 0.0 for d in dims]
+    exps   = [math.exp(alpha * s) for s in scores]
+    total  = sum(exps) or 1.0
+    return {d: exps[i] / total for i, d in enumerate(dims)}
+
+
+def _weighted_cosine(c_fd, s_fd, weights: dict[str, float], dims: list[str]) -> float:
+    """
+    Weighted cosine similarity between two fitness vectors.
+    Answers: "do these venues succeed in the same behavioral ways?"
+    Returns 0.0 if either vector is zero (no fitness data).
+    """
+    dot   = sum(weights[d] * _float(c_fd.get(d) if c_fd else 0)
+                            * _float(s_fd.get(d) if s_fd else 0) for d in dims)
+    mag_c = math.sqrt(sum(weights[d] * _float(c_fd.get(d) if c_fd else 0) ** 2 for d in dims))
+    mag_s = math.sqrt(sum(weights[d] * _float(s_fd.get(d) if s_fd else 0) ** 2 for d in dims))
+    if mag_c < 1e-9 or mag_s < 1e-9:
+        return 0.0
+    return round(dot / (mag_c * mag_s), 4)
+
+
+def _composite_excellence(fd, dims: list[str]) -> float:
+    """Average fitness score across all dimensions — sort key for Benchmark Ladder view."""
+    if not fd:
+        return 0.0
+    return round(sum(_float(fd.get(d)) for d in dims) / len(dims), 4)
+
+
+# ─── Bucket assignment ────────────────────────────────────────────────────────
+
+def _assign_bucket(intersection_count: int, n_cascade: int) -> int:
+    """
+    Tversky-inspired bucket assignment. Client's types are the prototype;
+    candidates are measured against them.
+      0 = A  shares ALL client cascade types       (exact type peer)
+      1 = B  shares 2+ but not all                 (close type cousin)
+      2 = C  shares exactly 1 type                 (partial overlap)
+      3 = D  segment fallback — no type overlap
+    """
+    if n_cascade > 0 and intersection_count >= n_cascade:
+        return 0
+    if intersection_count >= 2:
+        return 1
+    if intersection_count == 1:
+        return 2
+    return 3
+
+
+# ─── Main competitor fetch ────────────────────────────────────────────────────
+
 async def _fetch_similar_venues(
     conn,
     venue_id: int,
     limit: int,
     offset: int,
+    view: str = "threat",
 ) -> tuple[list[SimilarVenueCard], int]:
     """
-    Type-waterfall competitor selection.
+    Multi-type intersection matching + weighted cosine sorting.
 
-    Walk the client's type tags in order. For each type, fill the bucket with
-    venues that share that type (excluding already-found ones and the client).
-    Stop as soon as the bucket is full. Paginate across the full ordered list.
-
-    Within each type bucket, venues are ordered by operational_quality DESC so
-    the strongest performers surface first.
-
-    Deltas are computed on-the-fly from venue_fitness_dimensions.
+    view="threat"    → sort by weighted cosine × geo multiplier DESC
+                       (most similar behavioral fingerprint + closest market)
+    view="benchmark" → sort by composite fitness excellence DESC within each bucket
+                       (best performers in the matched category)
     """
-    # ── Client's type cascade (raw Google types, non-generic, in original order) ─
-    raw_types = await conn.fetchval("SELECT types FROM venues WHERE id = $1", venue_id)
-    cascade_types = _venue_type_cascade(list(raw_types or []))
+    # ── Client venue (area + city for geography) ─────────────────────────────
+    client_venue = await conn.fetchrow(
+        "SELECT area, city, types FROM venues WHERE id = $1", venue_id
+    )
+    client_area  = client_venue["area"] or ""
+    client_city  = client_venue["city"] or ""
+    cascade_types = _venue_type_cascade(list(client_venue["types"] or []))
+    n_cascade     = len(cascade_types)
 
     # ── Fitness delta rules ───────────────────────────────────────────────────
     rules_by_dim = await _load_delta_rules(conn)
 
-    # ── Client fitness dimensions ─────────────────────────────────────────────
+    # ── Client fitness ────────────────────────────────────────────────────────
     client_fd = await conn.fetchrow(
-        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'",
+        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions "
+        f"WHERE venue_id = $1 AND source = 'blended'",
         venue_id,
     )
 
-    # ── Type waterfall: collect ordered venue IDs ─────────────────────────────
-    # Walk the client's cascade types in order.  For each type, find competitors
-    # where that type is their #1 or #2 non-generic type.  Rank by (tier, comp_pos)
-    # so: client-type[0] × comp-primary > client-type[0] × comp-secondary >
-    #     client-type[1] × comp-primary > …  No operational_quality involvement.
-    candidates: list[tuple[int, int, int]] = []  # (tier, comp_pos, venue_id)
-    seen: set[int] = {venue_id}
+    # ── Step 1: Collect all candidates sharing any cascade type ──────────────
+    # One query per cascade type; deduplicate in Python.
+    all_candidates: dict[int, dict] = {}
 
-    for tier, type_key in enumerate(cascade_types):
+    for type_key in cascade_types:
         rows = await conn.fetch(
             """
-            SELECT v.id, v.types
+            SELECT v.id, v.types, v.area, v.city
             FROM   venues v
             WHERE  v.types @> jsonb_build_array($1::text)
-              AND  v.id != ALL($2::int[])
+              AND  v.id != $2
             LIMIT  300
             """,
-            type_key, list(seen),
+            type_key, venue_id,
         )
         for r in rows:
-            comp_cascade = _venue_type_cascade(list(r["types"] or []))
-            try:
-                comp_pos = comp_cascade.index(type_key)
-            except ValueError:
-                continue
-            if comp_pos > 1:
-                continue
             vid = r["id"]
-            seen.add(vid)
-            candidates.append((tier, comp_pos, vid))
+            if vid not in all_candidates:
+                all_candidates[vid] = {
+                    "types": list(r["types"] or []),
+                    "area":  r["area"] or "",
+                    "city":  r["city"] or "",
+                }
 
-    # Sort: tier first (client's type priority), then competitor's own cascade position
-    candidates.sort(key=lambda x: (x[0], x[1]))
+    # ── Step 2: Compute type intersection count → bucket ─────────────────────
+    bucketed: dict[int, list[int]] = {0: [], 1: [], 2: [], 3: []}
 
-    ordered_ids = [vid for _, _, vid in candidates[:_MAX_POOL]]
-    id_tier     = {vid: tier for tier, _, vid in candidates[:_MAX_POOL]}
+    for vid, info in all_candidates.items():
+        comp_cascade       = _venue_type_cascade(info["types"])
+        intersection_count = sum(1 for t in cascade_types if t in comp_cascade)
+        bucket             = _assign_bucket(intersection_count, n_cascade)
+        info["bucket"]     = bucket
+        bucketed[bucket].append(vid)
 
-    # ── Segment fallback: venue has only generic types (e.g. pure bar/restaurant) ──
-    if not ordered_ids:
+    # ── Step 3: Segment fallback (Bucket D) if pool is thin ──────────────────
+    total_found = sum(len(v) for v in bucketed.values())
+    if total_found < _MAX_POOL:
         primary_seg = await conn.fetchval(
-            "SELECT segment_id FROM venue_demographic_scores WHERE venue_id = $1 ORDER BY segment_rank LIMIT 1",
+            "SELECT segment_id FROM venue_demographic_scores "
+            "WHERE venue_id = $1 ORDER BY segment_rank LIMIT 1",
             venue_id,
         )
         if primary_seg:
-            seg_fallback = await conn.fetch(
+            exclude_ids = list(all_candidates.keys()) + [venue_id]
+            seg_rows = await conn.fetch(
                 """
-                SELECT v.id
+                SELECT v.id, v.area, v.city, v.types
                 FROM   venues v
                 JOIN   venue_demographic_scores vds ON vds.venue_id = v.id
-                JOIN   venue_fitness_dimensions vfd ON vfd.venue_id = v.id AND vfd.source = 'blended'
-                WHERE  vds.segment_id = $1
+                WHERE  vds.segment_id   = $1
                   AND  vds.segment_rank = 1
                   AND  v.id != ALL($2::int[])
-                ORDER  BY vfd.operational_quality DESC NULLS LAST
+                ORDER  BY vds.alignment_score DESC
                 LIMIT  $3
                 """,
-                primary_seg, [venue_id], _MAX_POOL,
+                primary_seg, exclude_ids, _MAX_POOL - total_found,
             )
-            ordered_ids = [r["id"] for r in seg_fallback]
-            id_tier     = {r["id"]: 2 for r in seg_fallback}
+            for r in seg_rows:
+                vid = r["id"]
+                all_candidates[vid] = {
+                    "types":  list(r["types"] or []),
+                    "area":   r["area"] or "",
+                    "city":   r["city"] or "",
+                    "bucket": 3,
+                }
+                bucketed[3].append(vid)
 
-    total = len(ordered_ids)
-    page_ids = ordered_ids[offset: offset + limit]
+    if not all_candidates:
+        return [], 0
+
+    # ── Step 4: Fetch fitness for all candidates ──────────────────────────────
+    all_ids = list(all_candidates.keys())
+    sim_fd_rows = await conn.fetch(
+        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions "
+        f"WHERE venue_id = ANY($1::int[]) AND source = 'blended'",
+        all_ids,
+    )
+    sim_fd_map = {r["venue_id"]: r for r in sim_fd_rows}
+
+    # ── Step 5: Score each candidate ─────────────────────────────────────────
+    weights = _softmax_weights(client_fd, ALL_DIMS, alpha=2.0)
+
+    for vid, info in all_candidates.items():
+        sim_fd = sim_fd_map.get(vid)
+        cos    = _weighted_cosine(client_fd, sim_fd, weights, ALL_DIMS)
+        geo    = _geo_multiplier(client_area, client_city, info["area"], info["city"])
+        info["threat_score"]    = round(cos * geo, 4)
+        info["benchmark_score"] = _composite_excellence(sim_fd, ALL_DIMS)
+
+    # ── Step 6: Sort within each bucket, concatenate A→D ─────────────────────
+    def _sort_key(vid: int) -> float:
+        info = all_candidates[vid]
+        return info["benchmark_score"] if view == "benchmark" else info["threat_score"]
+
+    ordered_ids: list[int] = []
+    for bucket in range(4):
+        ordered_ids.extend(
+            sorted(bucketed[bucket], key=_sort_key, reverse=True)
+        )
+
+    ordered_ids = ordered_ids[:_MAX_POOL]
+    total       = len(ordered_ids)
+    page_ids    = ordered_ids[offset: offset + limit]
 
     if not page_ids:
         return [], total
 
-    sim_ids = page_ids
-
-    # ── Venue details ─────────────────────────────────────────────────────────
+    # ── Step 7: Venue details for page ───────────────────────────────────────
     venue_rows = await conn.fetch(
         "SELECT id, name, area, city, types FROM venues WHERE id = ANY($1::int[])",
-        sim_ids,
+        page_ids,
     )
     venue_map = {r["id"]: r for r in venue_rows}
 
-    # ── Primary segment + top-3 segments per similar venue ────────────────────
+    # ── Step 8: Segment data for page ────────────────────────────────────────
     seg_rows = await conn.fetch(
-        """
-        SELECT venue_id, segment_id
-        FROM   venue_demographic_scores
-        WHERE  venue_id = ANY($1::int[]) AND segment_rank = 1
-        """,
-        sim_ids,
+        "SELECT venue_id, segment_id FROM venue_demographic_scores "
+        "WHERE venue_id = ANY($1::int[]) AND segment_rank = 1",
+        page_ids,
     )
     primary_seg_map = {r["venue_id"]: r["segment_id"] for r in seg_rows}
 
@@ -274,40 +424,33 @@ async def _fetch_similar_venues(
         WHERE  venue_id = ANY($1::int[]) AND segment_rank <= 3
         ORDER  BY venue_id, segment_rank
         """,
-        sim_ids,
+        page_ids,
     )
     top3_seg_map: dict[int, list[str]] = {}
     for r in top3_seg_rows:
         label = SEGMENT_LABELS.get(r["segment_id"], {}).get("label", r["segment_id"])
         top3_seg_map.setdefault(r["venue_id"], []).append(label)
 
-    # ── Similar venue fitness dimensions (for on-the-fly delta computation) ───
-    sim_fd_rows = await conn.fetch(
-        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = ANY($1::int[]) AND source = 'blended'",
-        sim_ids,
-    )
-    sim_fd_map = {r["venue_id"]: r for r in sim_fd_rows}
-
-    # ── Assemble SimilarVenueCard list ────────────────────────────────────────
+    # ── Step 9: Assemble cards ────────────────────────────────────────────────
     cards: list[SimilarVenueCard] = []
     rank_offset = offset + 1
 
-    for idx, sim_id in enumerate(sim_ids):
+    for idx, sim_id in enumerate(page_ids):
         v = venue_map.get(sim_id)
         if not v:
             continue
 
+        info      = all_candidates[sim_id]
         p_seg     = primary_seg_map.get(sim_id, "office_workers")
         arc_names = SEGMENT_TOP_ARCHETYPES.get(p_seg, [])
         sim_fd    = sim_fd_map.get(sim_id)
 
         delta_bars: list[DeltaBar] = []
         for dim in ALL_DIMS:
-            c_score   = _float(client_fd[dim]) if client_fd else 0.0
-            s_score   = _float(sim_fd[dim])    if sim_fd   else 0.0
+            c_score   = _float(client_fd.get(dim)) if client_fd else 0.0
+            s_score   = _float(sim_fd.get(dim))    if sim_fd   else 0.0
             delta_val = round(s_score - c_score, 4)
             rule      = _lookup_rule(rules_by_dim, dim, delta_val)
-
             delta_bars.append(DeltaBar(
                 dimension=dim,
                 label=DIM_LABELS[dim],
@@ -319,9 +462,10 @@ async def _fetch_similar_venues(
                 client_statement=rule["client_statement"],
             ))
 
-        # similarity_score reflects cascade tier: type[0]=1.0, type[1]=0.9, type[2]=0.8
-        tier      = id_tier.get(sim_id, 0)
-        sim_score = max(0.5, 1.0 - tier * 0.1)
+        sim_score = (
+            info["benchmark_score"] if view == "benchmark"
+            else info["threat_score"]
+        )
 
         cards.append(SimilarVenueCard(
             id=sim_id,
@@ -336,7 +480,7 @@ async def _fetch_similar_venues(
             rank=rank_offset + idx,
         ))
 
-    return cards, total or 0
+    return cards, total
 
 
 def _build_insight_callout(similar_venues: list[SimilarVenueCard]) -> str:
@@ -376,13 +520,14 @@ async def get_similar_venues(
     venue_id: int = Path(...),
     limit:    int = Query(default=3, ge=1, le=25),
     offset:   int = Query(default=0, ge=0),
+    view:     str = Query(default="threat", pattern="^(threat|benchmark)$"),
 ):
     pool = get_pool()
 
     async with pool.acquire() as conn:
         await conn.execute("SET statement_timeout = '15s'")
         client_card    = await _fetch_client(conn, venue_id)
-        similar, total = await _fetch_similar_venues(conn, venue_id, limit, offset)
+        similar, total = await _fetch_similar_venues(conn, venue_id, limit, offset, view)
 
     callout = _build_insight_callout(similar)
 
