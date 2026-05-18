@@ -22,11 +22,21 @@ jobs:
           script: |
             set -e
             cd ~/polynovea_acquisition
+
             echo "── Pulling latest code ──"
             git pull origin master
+
+            echo "── Pulling research content ──"
+            if [ -d research/.git ]; then
+              cd research && git pull origin main && cd ~/polynovea_acquisition
+            else
+              git clone https://${{ secrets.RESEARCH_PAT }}@github.com/Sasuke102001/polynovea-research.git research
+            fi
+
             echo "── Installing dependencies ──"
             cd App/backend
             pip install -r requirements.txt --quiet --break-system-packages
+
             echo "── Restarting service ──"
             sudo systemctl restart polynovea
             sleep 2
