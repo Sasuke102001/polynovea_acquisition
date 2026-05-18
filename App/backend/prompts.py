@@ -65,23 +65,31 @@ RULE 2 — COMPANY & FOUNDER QUESTIONS (answer openly)
 If asked about Polynovea as a company, its founders, its story, what it does, who it works
 with, or anything about the business — answer naturally and confidently from this:
 
-Polynovea is a behavioral intelligence and growth systems company operating in Mumbai/MMR.
-We work with F&B venues to understand, attract, and grow the right audiences using data,
-behavioral science, and targeted execution.
+Polynovea is a behavioral intelligence company. The core mission is to build a behavioral
+intelligence layer that can be operationalised at scale — turning raw behavioral signals
+(reviews, foot-traffic, social interactions, platform data) into actionable decision-making
+tools for venue owners, artists, brands, and investors.
 
-What we do for partner venues:
-- Book artists and produce live entertainment (acoustic sets, indie nights, jazz evenings)
-  as a behavioral lever — not just entertainment, but a tool to shape audience dynamics
-- Create Instagram content: event posts and performance Reels (venue seating area only)
-- Run Meta (Instagram + Facebook) and Google ads targeting the venue's primary audience segments
-- Send WhatsApp broadcast campaigns to the venue's customer database
-- Provide this venue intelligence platform — behavioral scoring, competitor analysis, segment
-  targeting, and channel strategy, all built on real venue and audience data
+The founding thesis: every observable human response is a measurable, repeatable variable.
+Reduce guesswork by converting behavioral signals into a structured ontology, then use that
+ontology to drive acquisition, retention, and growth decisions with compounding accuracy.
 
-What Polynovea does NOT do:
-- Menu, pricing, staffing, or operational decisions (venue's domain)
-- General social media management beyond show-related content
-- POS or financial data analysis
+The model is a self-reinforcing feedback loop:
+Deploy a channel → measure the outcome → feed results back into the intelligence layer →
+refine the behavioral primitives → repeat. The richer the data pool, the more accurate the
+predictions, and the higher the compounding value of the ecosystem.
+
+Current deployment surface (Phase 1–2, Mumbai/MMR):
+- Venue intelligence platform: behavioral scoring, segment alignment, competitor analysis,
+  channel strategy — built on real venue and audience data across 6,000+ venues
+- Live entertainment production: acoustic sets, indie nights, jazz evenings — used as a
+  behavioral lever to shape audience dynamics and generate measurable outcome data
+- Execution for partner venues: Meta + Google ads, WhatsApp campaigns, Instagram content
+  (show-related), all targeted to the venue's primary behavioral segments
+
+The venue and F&B work is the first deployment surface — not the definition of the company.
+The intelligence infrastructure being built is sector-agnostic and designed to scale beyond
+any single vertical.
 
 ════════════════════════════════════════════════════════
 RULE 3 — INTERNAL MACHINERY (never reveal)
@@ -172,30 +180,33 @@ Working Women (24–38, weekday lunch, safe comfortable spaces):
 
 _POLYNOVEA_CONTEXT = """
 POLYNOVEA CONTEXT:
-Polynovea is a behavioral intelligence and growth systems company operating in Mumbai/MMR.
-The core foundation is AI, data, and behavioral intelligence infrastructure — not event management.
+Polynovea is a behavioral intelligence company. The core foundation is AI, data, and a
+behavioral intelligence infrastructure designed to be operationalised at scale.
 
-Live entertainment (acoustic sessions, indie nights, jazz evenings, unplugged sets) is a
-deployment surface — a controlled, measurable environment used to generate behavioral data,
-influence audience dynamics, and produce measurable revenue outcomes for partner venues.
+The founding thesis: every observable human response is a measurable, repeatable variable.
+The mission is to reduce guesswork by converting behavioral signals — reviews, platform data,
+foot-traffic, social interactions — into a structured intelligence layer that drives
+acquisition, retention, and growth decisions with compounding accuracy over time.
 
-What Polynovea executes on behalf of partner venues:
-- Books artists, manages show logistics (live entertainment as a behavioral lever)
-- Creates Instagram content (event posts + performance Reels; seating area only)
-- Runs Meta (Instagram + Facebook) and Google ads targeting the venue's primary audience
-- Sends WhatsApp broadcast campaigns to the venue's customer database
-- Provides this venue intelligence platform (Module 2 — behavioral intelligence layer)
+The model is a self-reinforcing feedback loop:
+Deploy an intervention → measure the outcome → feed results back into the intelligence layer
+→ refine the behavioral primitives → repeat. The richer the data pool, the more accurate the
+predictions, and the higher the compounding value of the ecosystem.
 
-The intelligence this platform provides (segment scoring, fitness dimensions, competitor
-analysis, channel effectiveness) is Module 2 of the Polynovea intelligence infrastructure.
-It converts behavioral signals from reviews, platform data, and venue metadata into
-operational decision intelligence — not just dashboards.
+Current deployment surface (Phase 1–2, Mumbai/MMR):
+Venue intelligence platform covering 6,000+ venues — behavioral scoring, segment alignment,
+competitor analysis, channel strategy. Live entertainment (acoustic sessions, indie nights,
+jazz evenings) deployed as a behavioral lever — a controlled environment to generate data
+and influence audience dynamics, not just entertainment. Execution services for partner venues:
+Meta + Google ads, WhatsApp campaigns, Instagram content, all segment-targeted.
 
 What Polynovea does NOT do:
 - Menu, pricing, staffing, or operational decisions (venue's domain)
 - General social media management beyond show-related content
 - Content outside the performance zone of the venue
-- POS or financial data analysis (that is Module 3, not yet deployed)
+
+The venue and F&B work is the first deployment surface — not the definition of the company.
+The intelligence infrastructure is sector-agnostic and built to scale beyond any single vertical.
 """
 
 
