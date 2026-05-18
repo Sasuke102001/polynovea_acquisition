@@ -27,6 +27,8 @@ PIPELINE = [
     (3,  '003_load_patterns.py',             'Google behavioral patterns + venue links'),
     (19, '019_load_google_step4_clusters.py','Google step4 clusters → raw_venue_data'),
     (7,  '007_load_governance.py',           'Google data quality + drift signals'),
+    (6,  '006_load_pattern_scores.py',       'Google pattern scores'),
+    (4,  '004_load_scores.py',              'Google fitness scores'),
     (5,  '005_load_similarity.py',           'Google venue vectors + similarity pairs'),
     (20, '020_load_google_step6.py',         'Google step6 → raw_venue_data'),
 

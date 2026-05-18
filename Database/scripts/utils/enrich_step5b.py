@@ -1,4 +1,4 @@
-"""
+﻿"""
 enrich_step5b.py
 Adds place_id to step_5b_similarity.json for ALL sources so DB loaders
 can join on place_id (unique) instead of venue_name (fragile text).
@@ -25,7 +25,7 @@ from datetime import datetime
 sys.stdout.reconfigure(encoding='utf-8')
 
 SCRIPTS_DIR    = os.path.dirname(__file__)
-PROCESSED_PATH = os.path.join(SCRIPTS_DIR, '..', 'data', 'processed')
+PROCESSED_PATH = os.path.join(SCRIPTS_DIR, '..', '..', 'data', 'processed')
 
 # -----------------------------------------------------------------------
 # Source configuration
@@ -40,7 +40,7 @@ PROCESSED_PATH = os.path.join(SCRIPTS_DIR, '..', 'data', 'processed')
 SOURCES = [
     {
         'name':        'google',
-        'base_path':   os.path.join(SCRIPTS_DIR, '..', 'data', 'raw', 'google_places'),
+        'base_path':   os.path.join(SCRIPTS_DIR, '..', '..', 'data', 'raw', 'google_places'),
         'regions':     ['navi-mumbai', 'mumbai-sobo', 'mumbai-main', 'thane'],
         'lookup_file': 'step_1_venues_refined.json',
         'lookup_key':  None,        # file IS the list at top level
@@ -49,7 +49,7 @@ SOURCES = [
     },
     {
         'name':        'magicpin_upper',
-        'base_path':   os.path.join(SCRIPTS_DIR, '..', 'data', 'raw', 'magicpin'),
+        'base_path':   os.path.join(SCRIPTS_DIR, '..', '..', 'data', 'raw', 'magicpin'),
         'regions':     ['mumbai', 'navi-mumbai', 'sobo', 'thane'],
         'lookup_file': 'step_3_signals_extracted.json',
         'lookup_key':  'venues',    # file has {"venues": [...]}

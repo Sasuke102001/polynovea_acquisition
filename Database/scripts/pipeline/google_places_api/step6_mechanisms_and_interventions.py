@@ -1,4 +1,4 @@
-"""
+﻿"""
 020_load_google_step6.py
 Loads step_6_output.json (Google Places) for all 4 cities into:
   - raw_venue_data         mechanisms → data_type='api_response'
@@ -18,7 +18,7 @@ import psycopg2
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-BASE_PATH  = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw', 'google_places')
+BASE_PATH  = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'google_places')
 CITIES     = ['navi-mumbai', 'mumbai-sobo', 'mumbai-main', 'thane']
 COLLECTOR  = 'google-step6-1.0'
 
