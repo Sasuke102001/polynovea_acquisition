@@ -63,8 +63,14 @@ async def fetch_venue_context(venue_id: int, tab: str) -> dict:
         if not venue:
             raise HTTPException(status_code=404, detail="Venue not found")
 
+        # Prefer blended row; fall back to google if blend not yet computed
         fitness = await conn.fetchrow(
-            "SELECT * FROM venue_fitness_dimensions WHERE venue_id = $1",
+            """
+            SELECT * FROM venue_fitness_dimensions
+            WHERE venue_id = $1
+            ORDER BY CASE source WHEN 'blended' THEN 0 WHEN 'google' THEN 1 ELSE 2 END
+            LIMIT 1
+            """,
             venue_id,
         )
 
@@ -82,14 +88,15 @@ async def fetch_venue_context(venue_id: int, tab: str) -> dict:
         top_seg_ids = [r["segment_id"] for r in segments[:3]]
 
         # ── Competitors ─────────────────────────────────────────────────────
-        # venue_similarity has no rank column — order by similarity_score
+        # Deduplicate across sources — take highest similarity_score per similar venue
         competitors = await conn.fetch(
             """
-            SELECT v.id, v.name, v.area, v.city, vs.similarity_score
+            SELECT DISTINCT ON (vs.similar_venue_id)
+                v.id, v.name, v.area, v.city, vs.similarity_score, vs.source
             FROM venue_similarity vs
             JOIN venues v ON v.id = vs.similar_venue_id
             WHERE vs.venue_id = $1
-            ORDER BY vs.similarity_score DESC
+            ORDER BY vs.similar_venue_id, vs.similarity_score DESC
             LIMIT 5
             """,
             venue_id,
@@ -223,19 +230,104 @@ async def fetch_venue_context(venue_id: int, tab: str) -> dict:
         except Exception:
             pass
 
-        # ── Intervention triggers (all tabs; not just deep_risk) ────────────
+        # ── Intervention triggers — deduplicate across sources by type ─────
         intervention_rows: list = []
         try:
             intervention_rows = await conn.fetch(
                 """
-                SELECT intervention_type, description, priority_tier,
-                       fit_score, recommended
+                SELECT DISTINCT ON (intervention_type)
+                    intervention_type, description, priority_tier,
+                    fit_score, recommended, source
                 FROM intervention_triggers
                 WHERE venue_id = $1
-                ORDER BY fit_score DESC
+                ORDER BY intervention_type, fit_score DESC
                 LIMIT 10
                 """,
                 venue_id,
+            )
+        except Exception:
+            pass
+
+        # ── Behavioral primitives (top signals across all sources) ───────────
+        primitive_rows: list = []
+        try:
+            primitive_rows = await conn.fetch(
+                """
+                SELECT primitive_id, MAX(confidence) AS confidence
+                FROM primitives_scores
+                WHERE venue_id = $1
+                GROUP BY primitive_id
+                ORDER BY confidence DESC
+                LIMIT 15
+                """,
+                venue_id,
+            )
+        except Exception:
+            pass
+
+        # ── Behavioral patterns this venue belongs to ────────────────────────
+        pattern_rows: list = []
+        try:
+            pattern_rows = await conn.fetch(
+                """
+                SELECT bp.pattern_name, bp.source, bp.prevalence_percentage,
+                       bp.co_occurring_primitives
+                FROM pattern_venues pv
+                JOIN behavioral_patterns bp ON bp.id = pv.pattern_id
+                WHERE pv.venue_id = $1
+                ORDER BY bp.prevalence_percentage DESC
+                LIMIT 10
+                """,
+                venue_id,
+            )
+        except Exception:
+            pass
+
+        # ── Dish signals + mechanisms from raw_venue_data ────────────────────
+        dish_signals: list = []
+        mechanisms:   list = []
+        try:
+            raw_rows = await conn.fetch(
+                """
+                SELECT platform, data_type, raw_payload, collector_version
+                FROM raw_venue_data
+                WHERE venue_id = $1
+                  AND data_type IN ('review_batch', 'api_response')
+                ORDER BY collected_at DESC
+                LIMIT 6
+                """,
+                venue_id,
+            )
+            for row in raw_rows:
+                payload = row["raw_payload"]
+                if isinstance(payload, str):
+                    payload = json.loads(payload)
+                if row["data_type"] == "review_batch":
+                    dish_signals.append({
+                        "platform": row["platform"],
+                        "data":     payload,
+                    })
+                else:
+                    mechanisms.append({
+                        "platform": row["platform"],
+                        "data":     payload,
+                    })
+        except Exception:
+            pass
+
+        # ── Drift signals for the venue's area ───────────────────────────────
+        drift_rows: list = []
+        try:
+            venue_area = venue["area"] or venue["city"] or ""
+            drift_rows = await conn.fetch(
+                """
+                SELECT pattern_description, confidence_score, trend_direction, source
+                FROM drift_signals
+                WHERE area ILIKE $1
+                ORDER BY confidence_score DESC
+                LIMIT 8
+                """,
+                f"%{venue_area}%",
             )
         except Exception:
             pass
@@ -368,8 +460,49 @@ async def fetch_venue_context(venue_id: int, tab: str) -> dict:
             "tier":        r["priority_tier"] or "",
             "fit_score":   float(r["fit_score"] or 0),
             "recommended": bool(r["recommended"]),
+            "source":      r["source"],
         }
         for r in intervention_rows
+    ]
+
+    # Behavioral primitives — the raw signals driving this venue's behavior
+    context["behavioral_primitives"] = [
+        {
+            "signal":     r["primitive_id"],
+            "confidence": round(float(r["confidence"] or 0), 3),
+        }
+        for r in primitive_rows
+    ]
+
+    # Behavioral patterns this venue is part of
+    context["behavioral_patterns"] = []
+    for r in pattern_rows:
+        primitives = r["co_occurring_primitives"]
+        if isinstance(primitives, str):
+            try:
+                primitives = json.loads(primitives)
+            except Exception:
+                primitives = []
+        context["behavioral_patterns"].append({
+            "pattern":    r["pattern_name"],
+            "source":     r["source"],
+            "prevalence": round(float(r["prevalence_percentage"] or 0), 2),
+            "signals":    primitives,
+        })
+
+    # Dish signals from review data (MagicPin upper)
+    context["dish_signals"]   = dish_signals
+    context["mechanisms"]     = mechanisms
+
+    # Drift signals — emerging behavioral trends in this area
+    context["drift_signals"] = [
+        {
+            "pattern":    r["pattern_description"],
+            "confidence": round(float(r["confidence_score"] or 0), 3),
+            "direction":  r["trend_direction"],
+            "source":     r["source"],
+        }
+        for r in drift_rows
     ]
 
     # Risk signals for deep_risk tab
@@ -484,7 +617,10 @@ async def chat_with_venue(venue_id: int, request: ChatRequest):
         raise HTTPException(status_code=500, detail=f"Error building prompt: {str(e)}")
 
     # Trim context for Supabase — exclude large list fields that bloat the snapshot
-    _OMIT_FROM_SNAPSHOT = {"channel_effectiveness", "campaign_templates", "interventions", "risk_signals"}
+    _OMIT_FROM_SNAPSHOT = {
+        "channel_effectiveness", "campaign_templates", "interventions",
+        "risk_signals", "dish_signals", "mechanisms", "behavioral_patterns",
+    }
     context_snapshot: dict[str, Any] = {
         k: v for k, v in context.items() if k not in _OMIT_FROM_SNAPSHOT
     }

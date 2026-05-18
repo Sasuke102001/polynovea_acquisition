@@ -29,9 +29,9 @@ DB_CONFIG = {
 }
 
 VECTOR_SQL = """
-    INSERT INTO venue_vectors (venue_id, fitness_vector, vector_source)
+    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source)
     VALUES %s
-    ON CONFLICT (venue_id) DO UPDATE SET
+    ON CONFLICT (venue_id, source) DO UPDATE SET
         fitness_vector = EXCLUDED.fitness_vector,
         vector_source  = EXCLUDED.vector_source,
         last_computed  = CURRENT_TIMESTAMP;
@@ -39,9 +39,9 @@ VECTOR_SQL = """
 
 SIMILARITY_SQL = """
     INSERT INTO venue_similarity
-        (venue_id, similar_venue_id, similarity_score, shared_primitives, shared_primitive_count)
+        (venue_id, source, similar_venue_id, similarity_score, shared_primitives, shared_primitive_count)
     VALUES %s
-    ON CONFLICT (venue_id, similar_venue_id) DO UPDATE SET
+    ON CONFLICT (venue_id, source, similar_venue_id) DO UPDATE SET
         similarity_score       = EXCLUDED.similarity_score,
         shared_primitives      = EXCLUDED.shared_primitives,
         shared_primitive_count = EXCLUDED.shared_primitive_count;
@@ -77,7 +77,7 @@ def load_city(cursor, city: str, lookup: dict) -> dict:
             skipped += 1
             continue
 
-        vector_rows.append((venue_id, fitness_vector, vector_source))
+        vector_rows.append((venue_id, 'google', fitness_vector, vector_source))
 
         for similar in entry.get('similar_venues_pool', []):
             sim_place_id = similar.get('place_id')
@@ -87,6 +87,7 @@ def load_city(cursor, city: str, lookup: dict) -> dict:
                 continue
             sim_rows.append((
                 venue_id,
+                'google',
                 sim_venue_id,
                 similar.get('similarity_score', 0.0),
                 json.dumps(similar.get('shared_primitives', [])),
