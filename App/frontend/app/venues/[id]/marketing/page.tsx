@@ -226,7 +226,7 @@ function WhatsAppCard({ card, venueId, venueName }: { card: ChannelCard; venueId
 
         <div className="flex flex-col gap-xs">
           <div className="text-[10px] font-data-mono uppercase tracking-widest text-[#E6D3A3]/70">
-            AI MESSAGE GENERATOR
+            POLYNOVEA MESSAGE GENERATOR
           </div>
           <WhatsAppGenerator venueId={venueId} venueName={venueName} />
         </div>
