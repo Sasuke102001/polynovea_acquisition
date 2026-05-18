@@ -305,7 +305,7 @@ async def get_marketing(
             SELECT fitness_for_office_lunch, fitness_for_repeat_habit,
                    fitness_for_social_dwell, fitness_for_group_energy,
                    fitness_for_destination_visit, operational_quality, retention_strength
-            FROM venue_fitness_dimensions WHERE venue_id = $1
+            FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'
             """,
             venue_id,
         )

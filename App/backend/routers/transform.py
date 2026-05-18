@@ -120,8 +120,8 @@ async def _fetch_segment_ladder_venues(
         LEFT JOIN venue_demographic_scores vds_c
                ON vds_c.venue_id   = vds_t.venue_id
               AND vds_c.segment_id = $1
-        LEFT JOIN venue_fitness_dimensions vfd_s ON vfd_s.venue_id = vds_t.venue_id
-        LEFT JOIN venue_fitness_dimensions vfd_c ON vfd_c.venue_id = $3
+        LEFT JOIN venue_fitness_dimensions vfd_s ON vfd_s.venue_id = vds_t.venue_id AND vfd_s.source = 'blended'
+        LEFT JOIN venue_fitness_dimensions vfd_c ON vfd_c.venue_id = $3 AND vfd_c.source = 'blended'
         WHERE  vds_t.segment_id   = $2
           AND  vds_t.segment_rank = 1
           AND  vds_t.venue_id    != $3
@@ -179,11 +179,11 @@ async def _fetch_segment_ladder_venues(
 
     # ── Fitness dimensions: client + all similar venues (on-the-fly deltas) ─────
     client_fd = await conn.fetchrow(
-        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = $1",
+        f"SELECT {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = $1 AND source = 'blended'",
         venue_id,
     )
     sim_fd_rows = await conn.fetch(
-        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = ANY($1::int[])",
+        f"SELECT venue_id, {', '.join(ALL_DIMS)} FROM venue_fitness_dimensions WHERE venue_id = ANY($1::int[]) AND source = 'blended'",
         sim_ids,
     )
     sim_fd_map = {r["venue_id"]: r for r in sim_fd_rows}

@@ -67,7 +67,7 @@ async def get_benchmarks(venue_id: int = Path(...)):
               retention_strength,
               monetization_potential
             FROM venue_fitness_dimensions
-            WHERE venue_id = $1
+            WHERE venue_id = $1 AND source = 'blended'
             """,
             venue_id,
         )
@@ -86,7 +86,7 @@ async def get_benchmarks(venue_id: int = Path(...)):
               AVG(monetization_potential)::decimal(4,3) as monetization_potential
             FROM venue_fitness_dimensions vfd
             INNER JOIN venues v ON vfd.venue_id = v.id
-            WHERE v.city = $1
+            WHERE v.city = $1 AND vfd.source = 'blended'
             """,
             venue["city"],
         )
@@ -135,7 +135,7 @@ async def get_benchmarks(venue_id: int = Path(...)):
                   AVG(retention_strength)::decimal(4,3) as retention_strength,
                   AVG(monetization_potential)::decimal(4,3) as monetization_potential
                 FROM venue_fitness_dimensions
-                WHERE venue_id IN ({placeholders})
+                WHERE venue_id IN ({placeholders}) AND source = 'blended'
                 """,
                 *peer_venue_ids,
             )
