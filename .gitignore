@@ -46,3 +46,19 @@ Database/data/
 *.log
 *.csv
 session_retrospective.json
+
+# ── Internal docs / playbooks (NEVER commit these) ───────────────────────────
+HANDOVER_DATABASE_AND_APP_SETUP.md
+MODULE_2_AND_3_FRAMEWORK.md
+PERPLEXITY_DATABASE_RESEARCH_PROMPT.md
+PHASE_1_RESEARCH_INTEGRATION_SUMMARY.md
+survey_canonical_schema.json
+venue_cuisine_type_priors.py
+venue_cuisine_type_research.md
+venue_segment_alignment_research.py
+research/
+Docs for database/
+Database/PIPELINE_FOUNDATION.md
+Database/RDS_SETUP.md
+Database/pipeline_out.txt
+memory/
