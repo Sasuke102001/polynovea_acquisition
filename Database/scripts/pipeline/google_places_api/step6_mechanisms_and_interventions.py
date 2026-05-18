@@ -15,6 +15,7 @@ import json
 import os
 import sys
 import psycopg2
+import psycopg2.extras
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -50,20 +51,16 @@ INSERT_SQL = """
     VALUES (%s, 'google', %s, %s, %s, 1)
 """
 
+DELETE_INTERVENTIONS_SQL = """
+    DELETE FROM intervention_triggers WHERE venue_id = %s AND source = 'google'
+"""
+
 INTERVENTION_SQL = """
     INSERT INTO intervention_triggers
         (venue_id, source, intervention_type, description, fit_score,
          priority_tier, recommended, matched_signals, missing_signals,
          matched_signal_count)
-    VALUES (%s, 'google', %s, %s, %s, %s, %s, %s, %s, %s)
-    ON CONFLICT (venue_id, source, intervention_type) DO UPDATE SET
-        description          = EXCLUDED.description,
-        fit_score            = EXCLUDED.fit_score,
-        priority_tier        = EXCLUDED.priority_tier,
-        recommended          = EXCLUDED.recommended,
-        matched_signals      = EXCLUDED.matched_signals,
-        missing_signals      = EXCLUDED.missing_signals,
-        matched_signal_count = EXCLUDED.matched_signal_count;
+    VALUES %s
 """
 
 
@@ -80,7 +77,7 @@ def load_city(cursor, city: str) -> dict:
     venues        = data.get('venues', [])
     loaded        = 0
     skipped       = 0
-    interventions = 0
+    intervention_rows = []
 
     for entry in venues:
         name_norm = entry.get('venue', '').lower().strip()
@@ -90,6 +87,7 @@ def load_city(cursor, city: str) -> dict:
             continue
 
         cursor.execute(DELETE_SQL, (venue_id, COLLECTOR))
+        cursor.execute(DELETE_INTERVENTIONS_SQL, (venue_id,))
 
         mechanisms = entry.get('mechanisms', [])
 
@@ -101,25 +99,35 @@ def load_city(cursor, city: str) -> dict:
                 COLLECTOR,
             ))
 
+        # Deduplicate by intervention_type — keep highest match_ratio if same type appears in multiple mechanisms
+        seen: dict[str, tuple] = {}
         for mech in mechanisms:
             for opp in mech.get('intervention_opportunities', []):
-                cursor.execute(INTERVENTION_SQL, (
-                    venue_id,
-                    opp.get('intervention', ''),
-                    opp.get('description', ''),
-                    float(opp.get('match_ratio', 0.0)),
-                    opp.get('priority_tier', ''),
-                    False,
-                    json.dumps(opp.get('matched_signals', [])),
-                    json.dumps(opp.get('missing_signals', [])),
-                    str(opp.get('matched_signal_count', '')),
-                ))
-                interventions += 1
+                itype = opp.get('intervention', '')
+                score = float(opp.get('match_ratio', 0.0))
+                if itype not in seen or score > seen[itype][4]:
+                    seen[itype] = (
+                        venue_id,
+                        'google',
+                        itype,
+                        opp.get('description', ''),
+                        score,
+                        opp.get('priority_tier', ''),
+                        False,
+                        json.dumps(opp.get('matched_signals', [])),
+                        json.dumps(opp.get('missing_signals', [])),
+                        str(opp.get('matched_signal_count', '')),
+                    )
+        intervention_rows.extend(seen.values())
 
         loaded += 1
 
+    if intervention_rows:
+        deduped = list({(r[0], r[2]): r for r in intervention_rows}.values())
+        psycopg2.extras.execute_values(cursor, INTERVENTION_SQL, deduped, page_size=500)
+
     return {'city': city, 'total': len(venues), 'loaded': loaded, 'skipped': skipped,
-            'interventions': interventions}
+            'interventions': len(intervention_rows)}
 
 
 def main():
