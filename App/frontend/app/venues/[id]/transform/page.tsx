@@ -181,7 +181,7 @@ function SimilarCard({ venue, onSelect }: SimilarCardProps) {
 
 const ALL_SEGMENTS = [
   { id: "office_workers", label: "Office Workers" },
-  { id: "college_kids",   label: "College Kids" },
+  { id: "college_kids",   label: "Social Crowd" },
   { id: "couples",        label: "Couples" },
   { id: "families",       label: "Families" },
   { id: "premium",        label: "Premium" },
@@ -189,13 +189,17 @@ const ALL_SEGMENTS = [
   { id: "working_women",  label: "Working Women" },
 ];
 
+const TIER_ORDER: Record<string, number> = {
+  role_model: 0, bridge: 1, transition: 2, pure_target: 3,
+};
+
 export default function TransformPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
+  const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
   const [data, setData] = useState<TransformResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [growthTarget, setGrowthTarget] = useState<string | null>(null);
@@ -237,32 +241,51 @@ export default function TransformPage({
   useEffect(() => {
     setLoading(true);
     getTransform(id, undefined, LIMIT, 0)
-      .then((d) => {
-        setData(d);
-        setLoading(false);
-      })
+      .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, [id]);
 
-  // Reload when segment changes
+  // Reload when selected segments change — parallel calls, merged by best tier
   useEffect(() => {
-    if (!selectedSegment) return;
+    if (selectedSegments.length === 0) return;
     setLoading(true);
-    getTransform(id, selectedSegment, LIMIT, 0)
-      .then((d) => { setData(d); setLoading(false); })
+    Promise.all(selectedSegments.map((seg) => getTransform(id, seg, LIMIT, 0)))
+      .then((results) => {
+        const base = results[0];
+        const venueMap = new Map<number, SimilarVenueCard>();
+        results.forEach((result) => {
+          result.similar_venues.forEach((venue) => {
+            const existing = venueMap.get(venue.id);
+            const newTier = TIER_ORDER[venue.tier ?? ""] ?? 4;
+            const existTier = existing ? (TIER_ORDER[existing.tier ?? ""] ?? 4) : 99;
+            if (!existing || newTier < existTier) venueMap.set(venue.id, venue);
+          });
+        });
+        setData({ ...base, similar_venues: Array.from(venueMap.values()) });
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
-  }, [id, selectedSegment]);
+  }, [id, selectedSegments]);
+
+  function toggleSegment(segId: string) {
+    setSelectedSegments((prev) =>
+      prev.includes(segId) ? prev.filter((s) => s !== segId) : [...prev, segId],
+    );
+  }
 
   const currentSegmentIds = new Set(
     data?.current_segments.filter((s) => s.is_current).map((s) => s.segment_id) ?? [],
   );
 
-  const selectedLabel = ALL_SEGMENTS.find((s) => s.id === selectedSegment)?.label ?? "";
+  const selectedLabels = selectedSegments
+    .map((id) => ALL_SEGMENTS.find((s) => s.id === id)?.label ?? id);
+
+  const primarySegment = selectedSegments[0] ?? null;
 
   function handleSetTarget() {
-    if (!selectedSegment) return;
-    localStorage.setItem(`polynovea_target_${id}`, selectedSegment);
-    setGrowthTarget(selectedSegment);
+    if (!primarySegment) return;
+    localStorage.setItem(`polynovea_target_${id}`, primarySegment);
+    setGrowthTarget(primarySegment);
     setTargetConfirmed(true);
     setTimeout(() => setTargetConfirmed(false), 3000);
   }
@@ -274,6 +297,7 @@ export default function TransformPage({
   }
 
   const growthTargetLabel = ALL_SEGMENTS.find((s) => s.id === growthTarget)?.label;
+  const growthTargetActive = growthTarget && selectedSegments.includes(growthTarget);
 
   return (
     <div className="p-md md:p-margin flex flex-col gap-lg max-w-[1400px] w-full mx-auto">
@@ -326,15 +350,20 @@ export default function TransformPage({
 
         <div className="h-px w-full bg-outline-variant/50" />
 
-        {/* Segment selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-md flex-wrap">
-          <span className="text-body-sm font-body-sm text-on-surface-variant whitespace-nowrap">
-            Who do you want to attract?
-          </span>
+        {/* Segment selector — multi-select */}
+        <div className="flex flex-col gap-sm">
+          <div className="flex items-center gap-sm flex-wrap">
+            <span className="text-body-sm font-body-sm text-on-surface-variant whitespace-nowrap">
+              Who do you want to attract?
+            </span>
+            <span className="text-[10px] font-data-mono text-on-surface-variant/40 uppercase tracking-wider">
+              Select one or more
+            </span>
+          </div>
           <div className="flex flex-wrap gap-sm">
             {ALL_SEGMENTS.map((seg) => {
               const isCurrent = currentSegmentIds.has(seg.id);
-              const isSelected = selectedSegment === seg.id;
+              const isSelected = selectedSegments.includes(seg.id);
 
               if (isCurrent) {
                 return (
@@ -355,7 +384,7 @@ export default function TransformPage({
               return (
                 <button
                   key={seg.id}
-                  onClick={() => setSelectedSegment(isSelected ? null : seg.id)}
+                  onClick={() => toggleSegment(seg.id)}
                   className={`px-sm py-xs border text-label-sm font-label-sm rounded uppercase transition-colors flex items-center gap-xs ${
                     isSelected
                       ? "bg-secondary border-secondary text-on-secondary"
@@ -370,11 +399,16 @@ export default function TransformPage({
               );
             })}
           </div>
+          {selectedSegments.length > 1 && (
+            <div className="text-[10px] font-data-mono text-on-surface-variant/50">
+              {selectedSegments.length} segments selected — results merged, best tier per venue shown
+            </div>
+          )}
         </div>
       </section>
 
       {/* ── Results ── */}
-      {selectedSegment && (
+      {selectedSegments.length > 0 && (
         <>
           {loading && (
             <div className="text-center text-on-surface-variant py-xl">
@@ -389,21 +423,25 @@ export default function TransformPage({
               <div className="flex items-center justify-between flex-wrap gap-md">
                 <h3 className="text-headline-md font-headline-md text-on-surface">
                   To attract{" "}
-                  <span className="text-primary">{selectedLabel}</span>
+                  <span className="text-primary">
+                    {selectedLabels.length === 1
+                      ? selectedLabels[0]
+                      : selectedLabels.slice(0, -1).join(", ") + " + " + selectedLabels[selectedLabels.length - 1]}
+                  </span>
                   , study these venues
                 </h3>
 
-                {/* Set as Target Audience button */}
-                {growthTarget !== selectedSegment && (
+                {/* Growth target — only for primary (first) selected segment */}
+                {primarySegment && !growthTargetActive && (
                   <button
                     onClick={handleSetTarget}
                     className="flex items-center gap-xs px-md py-xs bg-[#7C3AED]/10 border border-[#7C3AED]/40 text-[#7C3AED] text-label-sm font-label-sm rounded uppercase hover:bg-[#7C3AED]/20 transition-colors"
                   >
                     <span className="material-symbols-outlined text-[14px]">flag</span>
-                    Set as Growth Target
+                    Set {selectedLabels[0]} as Growth Target
                   </button>
                 )}
-                {growthTarget === selectedSegment && (
+                {growthTargetActive && (
                   <div className="flex items-center gap-xs px-md py-xs bg-[#7C3AED]/10 border border-[#7C3AED]/40 text-[#7C3AED] text-label-sm font-label-sm rounded">
                     <span className="material-symbols-outlined text-[14px]">check_circle</span>
                     Growth Target Set
@@ -527,7 +565,7 @@ export default function TransformPage({
               )}
 
               {/* Growth target confirmation banner */}
-              {growthTarget === selectedSegment && (
+              {growthTargetActive && (
                 <div className="bg-[#7C3AED]/10 border border-[#7C3AED]/40 rounded p-md flex items-center justify-between gap-md flex-wrap">
                   <div className="flex items-center gap-sm text-[#C4B5FD] text-body-sm font-body-sm">
                     <span className="material-symbols-outlined text-[18px]">check_circle</span>
@@ -539,7 +577,7 @@ export default function TransformPage({
                     </span>
                   </div>
                   <Link
-                    href={`/venues/${id}/campaign?target=${selectedSegment}`}
+                    href={`/venues/${id}/campaign?target=${growthTarget}`}
                     className="flex items-center gap-xs text-label-sm font-label-sm text-[#7C3AED] border border-[#7C3AED]/50 px-md py-xs rounded hover:bg-[#7C3AED]/20 transition-colors uppercase"
                   >
                     View Campaign Strategy
@@ -552,19 +590,19 @@ export default function TransformPage({
         </>
       )}
 
-      {!selectedSegment && !loading && (
+      {selectedSegments.length === 0 && !loading && (
         <div className="text-center text-on-surface-variant py-xl">
           <span className="material-symbols-outlined text-primary text-[48px] mb-md block">
             auto_graph
           </span>
           <p className="font-body-md text-body-md">
-            Select a target segment above to see venues you can learn from.
+            Select one or more target segments above to see venues you can learn from.
           </p>
           {growthTargetLabel && (
             <p className="mt-sm text-label-sm font-label-sm text-[#C4B5FD]">
               Growth target set:{" "}
               <button
-                onClick={() => setSelectedSegment(growthTarget)}
+                onClick={() => growthTarget && toggleSegment(growthTarget)}
                 className="underline hover:text-[#7C3AED] transition-colors"
               >
                 {growthTargetLabel}
