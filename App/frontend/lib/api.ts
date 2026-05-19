@@ -562,6 +562,14 @@ export async function getAudience(venueId: string | number): Promise<AudienceRes
   return res.json() as Promise<AudienceResponse>;
 }
 
+export async function getAllSegments(): Promise<{ segments: AudienceSegmentProfile[] }> {
+  const res = await fetch(`${API_BASE}/api/venues/segments`, {
+    cache: "force-cache",
+  });
+  if (!res.ok) throw new Error(`Segments failed: ${res.status}`);
+  return res.json() as Promise<{ segments: AudienceSegmentProfile[] }>;
+}
+
 // ─── Ad Brief Generator ───────────────────────────────────────────────────────
 
 export interface PlatformBriefRules {
