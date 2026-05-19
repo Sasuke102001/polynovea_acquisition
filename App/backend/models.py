@@ -452,6 +452,12 @@ class AudienceResponse(BaseModel):
     aggregate: AudienceAggregate
 
 
+# ─── All Segments (simulator) ────────────────────────────────────────────────────
+
+class AllSegmentsResponse(BaseModel):
+    segments: list[AudienceSegmentProfile]
+
+
 # ─── Ad Brief Generator ──────────────────────────────────────────────────────────
 
 class PlatformBriefRules(BaseModel):
