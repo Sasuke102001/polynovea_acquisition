@@ -3,12 +3,11 @@ extract_primitives.py
 Extracts behavioral primitive signals from manual venue reviews using NVIDIA LLM.
 Equivalent to step_3_signals_extraction.py for MagicPin — populates primitives_scores.
 
-Input:  Database/data/raw/manual_reviews/{venue_id}_{slug}.json
+Input:  raw_venue_data (platform='manual_reviews', data_type='review_batch')
 Output: primitives_scores (source='manual_reviews')
 
 Usage:
     python extract_primitives.py --venue-id 12066
-    python extract_primitives.py --venue-id 12066 --reviews-file path/to/reviews.json
 """
 
 import argparse
@@ -176,27 +175,38 @@ def _heuristic_fallback(reviews: list[dict]) -> dict[str, float]:
     return signals
 
 
-def run(venue_id: int, reviews_file: str | None = None) -> dict[str, float]:
-    # ── Find reviews file ─────────────────────────────────────────────────────
-    if not reviews_file:
-        data_dir = os.path.join(
-            os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'manual_reviews'
+def run(venue_id: int) -> dict[str, float]:
+    # ── Load reviews from raw_venue_data ──────────────────────────────────────
+    conn = psycopg2.connect(**DB_CONFIG)
+    cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    try:
+        cur.execute("SELECT name FROM venues WHERE id = %s", (venue_id,))
+        v = cur.fetchone()
+        venue_name = v["name"] if v else f"venue_{venue_id}"
+
+        cur.execute(
+            """
+            SELECT raw_payload FROM raw_venue_data
+            WHERE venue_id = %s AND platform = 'manual_reviews' AND data_type = 'review_batch'
+            ORDER BY collected_at DESC LIMIT 1
+            """,
+            (venue_id,),
         )
-        matches = [
-            f for f in os.listdir(data_dir)
-            if f.startswith(f"{venue_id}_") and f.endswith(".json")
-        ]
-        if not matches:
-            print(f"  No reviews file found for venue_id={venue_id} in {data_dir}")
-            print(f"  Expected: {venue_id}_<slug>.json")
-            return {}
-        reviews_file = os.path.join(data_dir, matches[0])
+        row = cur.fetchone()
+    finally:
+        cur.close()
+        conn.close()
 
-    with open(reviews_file, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+    if not row:
+        print(f"  No review_batch found in raw_venue_data for venue_id={venue_id}")
+        print(f"  Ensure manual_reviews_*.py was run first to load reviews into the DB")
+        return {}
 
-    venue_name = data.get("name", f"venue_{venue_id}")
-    reviews    = data.get("reviews", [])
+    payload = row["raw_payload"]
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+
+    reviews = payload.get("reviews", [])
     print(f"  Loaded {len(reviews)} reviews for {venue_name}")
 
     # ── Extract signals ───────────────────────────────────────────────────────
@@ -249,7 +259,6 @@ def run(venue_id: int, reviews_file: str | None = None) -> dict[str, float]:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Extract behavioral primitives from manual venue reviews")
-    parser.add_argument('--venue-id',     type=int, required=True)
-    parser.add_argument('--reviews-file', type=str, default=None)
+    parser.add_argument('--venue-id', type=int, required=True)
     args = parser.parse_args()
-    run(args.venue_id, args.reviews_file)
+    run(args.venue_id)
