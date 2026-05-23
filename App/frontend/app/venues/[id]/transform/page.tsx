@@ -11,6 +11,7 @@ import {
   type CompetitorDeepDive,
 } from "@/lib/api";
 import CompetitorDrawer from "@/components/CompetitorDrawer";
+import CinTabBar from "@/components/CinTabBar";
 
 const LIMIT = 40;
 
@@ -79,8 +80,8 @@ function SimilarCard({ venue, onSelect }: SimilarCardProps) {
   const effortColor = venue.effort_label ? (EFFORT_COLORS[venue.effort_label] ?? "#8b8b9e") : null;
 
   return (
-    <div className="w-72 flex-shrink-0 flex flex-col gap-sm">
-      <div className="bg-surface border border-outline-variant p-md flex flex-col gap-sm h-full relative">
+    <div className="w-72 flex-shrink-0 flex flex-col gap-3">
+      <div className="cin-card rounded-xl p-4 flex flex-col gap-3 h-full relative">
         {/* Tier badge — top-right corner */}
         {tierConf && (
           <div
@@ -300,35 +301,12 @@ export default function TransformPage({
   const growthTargetActive = growthTarget && selectedSegments.includes(growthTarget);
 
   return (
-    <div className="p-md md:p-margin flex flex-col gap-lg max-w-[1400px] w-full mx-auto">
-      {/* ── Venue header / tab bar ── */}
-      <div className="flex flex-col gap-xs border-b border-outline-variant pb-md">
-        <div className="flex gap-md border-b border-outline-variant mt-sm overflow-x-auto no-scrollbar">
-          {[
-            { label: "Overview",    href: `/venues/${id}` },
-            { label: "Competitors", href: `/venues/${id}/competitors` },
-            { label: "Transform",   href: `/venues/${id}/transform` },
-            { label: "Marketing",   href: `/venues/${id}/marketing` },
-            { label: "Campaign",    href: `/venues/${id}/campaign` },
-            { label: "Audience",    href: `/venues/${id}/audience` },
-          ].map((tab) => (
-            <Link
-              key={tab.label}
-              href={tab.href}
-              className={`pb-sm px-sm text-label-md font-label-md whitespace-nowrap transition-colors ${
-                tab.label === "Transform"
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-on-surface-variant hover:text-primary"
-              }`}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
-      </div>
+    <div className="p-6 md:p-8 flex flex-col gap-6 max-w-[1400px] w-full mx-auto">
+      {/* ── Tab bar ── */}
+      <CinTabBar venueId={id} active="Transform" />
 
       {/* ── Target Selector ── */}
-      <section className="bg-[#1A1A24] border border-outline-variant p-lg flex flex-col gap-md">
+      <section className="cin-card rounded-xl p-5 md:p-6 flex flex-col gap-4">
         {/* You currently attract */}
         <div className="flex items-center gap-md flex-wrap">
           <span className="text-body-sm font-body-sm text-on-surface-variant whitespace-nowrap">

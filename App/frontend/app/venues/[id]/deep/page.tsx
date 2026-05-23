@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use, useRef } from "react";
-import Link from "next/link";
+import CinTabBar from "@/components/CinTabBar";
 import {
   getIntelligence,
   getRisk,
@@ -973,38 +973,21 @@ export default function DeepAnalysisPage({
   const error   = tabError[activeTab] ?? null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       {/* ── Top nav: venue tabs ── */}
-      <div className="px-margin py-sm border-b border-[#27272A]">
-        <div className="flex gap-md overflow-x-auto no-scrollbar">
-          {[
-            { label: "Overview",    href: `/venues/${id}` },
-            { label: "Competitors", href: `/venues/${id}/competitors` },
-            { label: "Transform",   href: `/venues/${id}/transform` },
-            { label: "Marketing",   href: `/venues/${id}/marketing` },
-            { label: "Campaign",    href: `/venues/${id}/campaign` },
-            { label: "Audience",    href: `/venues/${id}/audience` },
-          ].map((tab) => (
-            <Link
-              key={tab.label}
-              href={tab.href}
-              className="pb-sm px-sm text-label-md font-label-md whitespace-nowrap text-on-surface-variant hover:text-primary transition-colors"
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
+      <div className="px-6 pt-6">
+        <CinTabBar venueId={id} active="" />
       </div>
 
       {/* ── Deep Analysis header ── */}
-      <div className="px-margin pt-lg pb-sm flex flex-col gap-md max-w-[1400px] w-full mx-auto">
-        <div className="flex items-center justify-between gap-md flex-wrap">
-          <div className="flex items-center gap-sm">
-            <span className="material-symbols-outlined text-primary text-[20px]">bolt</span>
-            <h2 className="text-headline-md font-headline-md text-primary font-bold tracking-tight">
+      <div className="px-6 md:px-8 pt-6 pb-4 flex flex-col gap-5 max-w-[1400px] w-full mx-auto">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-[18px]" style={{ color: "#E6D3A3" }}>bolt</span>
+            <h2 className="text-sm font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#E6D3A3" }}>
               DEEP ANALYSIS
             </h2>
-            <span className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-bold px-xs py-[2px] rounded uppercase tracking-widest ml-xs">
+            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(230,211,163,0.08)", border: "1px solid rgba(230,211,163,0.2)", color: "#E6D3A3" }}>
               CONSULTANT MODE
             </span>
           </div>

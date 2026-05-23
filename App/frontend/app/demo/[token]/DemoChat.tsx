@@ -190,23 +190,20 @@ export default function DemoChat({ token }: DemoChatProps) {
   if (loadError) {
     const isExpired = loadError.status === 410;
     return (
-      <div className="min-h-screen bg-surface flex flex-col items-center justify-center px-lg text-center">
-        <span className="material-symbols-outlined text-[56px] text-on-surface-variant/40 mb-md">
+      <div className="min-h-screen flex flex-col items-center justify-center px-8 text-center" style={{ background: "#0A0A0A" }}>
+        <span className="material-symbols-outlined text-[52px] mb-5" style={{ color: "#27272A" }}>
           {isExpired ? "schedule" : "link_off"}
         </span>
-        <h1 className="text-[22px] font-bold text-on-surface mb-xs">
+        <h1 className="text-xl font-bold mb-2" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#F5F5F5" }}>
           {isExpired ? "This demo link has expired" : "Invalid demo link"}
         </h1>
-        <p className="text-[15px] text-on-surface-variant max-w-[400px]">
+        <p className="text-sm max-w-[400px]" style={{ color: "#71717A" }}>
           {isExpired
             ? "Demo links are valid for 72 hours. Ask your Polynovea contact for a fresh link."
             : loadError.detail}
         </p>
-        <a
-          href="https://polynovea.com"
-          className="mt-lg text-[14px] text-primary hover:underline"
-        >
-          polynovea.com
+        <a href="https://polynovea.in" className="mt-8 text-sm gold-glow hover:underline">
+          polynovea.in
         </a>
       </div>
     );
@@ -214,14 +211,14 @@ export default function DemoChat({ token }: DemoChatProps) {
 
   if (!venue) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="flex flex-col items-center gap-sm text-on-surface-variant">
-          <div className="flex gap-[5px]">
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:150ms]" />
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:300ms]" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0A0A0A" }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex gap-1.5">
+            {[0, 150, 300].map((d) => (
+              <div key={d} className="w-2 h-2 rounded-full animate-bounce" style={{ background: "#E6D3A3", animationDelay: `${d}ms` }} />
+            ))}
           </div>
-          <span className="text-[13px]">Loading intelligence…</span>
+          <span className="text-xs font-mono" style={{ color: "#71717A" }}>Loading intelligence…</span>
         </div>
       </div>
     );
@@ -229,49 +226,74 @@ export default function DemoChat({ token }: DemoChatProps) {
 
   // ── Main demo UI ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: "#0A0A0A", color: "#F5F5F5" }}>
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header className="bg-surface-dim border-b border-outline-variant px-lg py-md flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-sm">
-          <span className="material-symbols-outlined text-primary text-[26px]">smart_toy</span>
+      <header
+        className="flex items-center px-6 py-4 shrink-0"
+        style={{
+          background: "rgba(10,10,10,0.9)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(39,39,42,0.6)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{ background: "rgba(230,211,163,0.1)", border: "1px solid rgba(230,211,163,0.2)" }}
+          >
+            <span className="material-symbols-outlined text-[16px]" style={{ color: "#E6D3A3" }}>smart_toy</span>
+          </div>
           <div>
-            <p className="text-[11px] font-label-sm uppercase tracking-widest text-on-surface-variant/70">
+            <p className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#9A8F6A" }}>
               Polynovea Intelligence · Preview
             </p>
-            <h1 className="text-[18px] font-bold text-on-surface leading-tight">
+            <h1 className="text-base font-bold leading-tight gold-glow" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif" }}>
               {venue.venue_name}
             </h1>
-            <p className="text-[13px] text-on-surface-variant">
+            <p className="text-[11px]" style={{ color: "#71717A" }}>
               {[venue.venue_area, venue.venue_city].filter(Boolean).join(", ")}
             </p>
           </div>
         </div>
-
       </header>
 
       {/* ── Messages area ──────────────────────────────────────────────── */}
-      <main className="flex-1 overflow-y-auto px-lg py-md space-y-md max-w-[820px] w-full mx-auto custom-scrollbar">
+      <main className="flex-1 overflow-y-auto px-5 py-6 space-y-4 max-w-[820px] w-full mx-auto custom-scrollbar">
 
         {/* Empty state with starters */}
         {messages.length === 0 && !isLoading && (
-          <div className="flex flex-col items-center pt-xl pb-lg gap-lg">
+          <div className="flex flex-col items-center pt-12 pb-8 gap-8">
             <div className="text-center">
-              <p className="text-[17px] font-medium text-on-surface">
+              <p className="text-base font-medium" style={{ color: "#F5F5F5" }}>
                 What would you like to know about{" "}
-                <span className="text-primary">{venue.venue_name}</span>?
+                <span style={{ color: "#E6D3A3" }}>{venue.venue_name}</span>?
               </p>
-              <p className="text-[14px] text-on-surface-variant/70 mt-xs">
+              <p className="text-sm mt-1" style={{ color: "#71717A" }}>
                 Real behavioral intelligence. Powered by Polynovea.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm w-full max-w-[640px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-[640px]">
               {STARTERS.map((q) => (
                 <button
                   key={q}
                   onClick={() => handleSubmit(q)}
-                  className="text-left bg-surface-container hover:bg-surface-container-high border border-outline-variant rounded-xl px-md py-sm text-[14px] text-on-surface-variant hover:text-on-surface transition-colors"
+                  className="text-left rounded-xl px-4 py-3 text-sm transition-all duration-200"
+                  style={{
+                    background: "rgba(24,24,27,0.6)",
+                    border: "1px solid rgba(39,39,42,0.7)",
+                    color: "#A1A1AA",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(230,211,163,0.25)";
+                    (e.currentTarget as HTMLElement).style.color = "#F5F5F5";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(39,39,42,0.7)";
+                    (e.currentTarget as HTMLElement).style.color = "#A1A1AA";
+                  }}
                 >
                   {q}
                 </button>
@@ -287,11 +309,12 @@ export default function DemoChat({ token }: DemoChatProps) {
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[88%] px-md py-sm rounded-xl text-[15px] leading-relaxed ${
+              className="max-w-[88%] px-4 py-3 rounded-2xl text-[14px] leading-relaxed"
+              style={
                 msg.role === "user"
-                  ? "bg-primary text-surface rounded-br-sm font-body-sm"
-                  : "bg-surface-dim text-on-surface rounded-bl-sm border border-outline-variant"
-              }`}
+                  ? { background: "rgba(230,211,163,0.12)", border: "1px solid rgba(230,211,163,0.2)", color: "#F5F5F5", borderBottomRightRadius: 4 }
+                  : { background: "rgba(24,24,27,0.8)", border: "1px solid rgba(39,39,42,0.7)", color: "#E4E1E6", borderBottomLeftRadius: 4 }
+              }
             >
               {msg.role === "assistant" ? renderMarkdown(msg.content) : msg.content}
             </div>
@@ -301,16 +324,19 @@ export default function DemoChat({ token }: DemoChatProps) {
         {/* Typing indicator */}
         {isLoading && messages[messages.length - 1]?.role === "user" && (
           <div className="flex justify-start">
-            <div className="bg-surface-dim border border-outline-variant rounded-xl rounded-bl-sm px-md py-sm flex items-center gap-xs">
-              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
-              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:150ms]" />
-              <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:300ms]" />
+            <div
+              className="rounded-2xl px-4 py-3 flex items-center gap-1.5"
+              style={{ background: "rgba(24,24,27,0.8)", border: "1px solid rgba(39,39,42,0.7)", borderBottomLeftRadius: 4 }}
+            >
+              {[0, 150, 300].map((d) => (
+                <div key={d} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "#E6D3A3", animationDelay: `${d}ms` }} />
+              ))}
             </div>
           </div>
         )}
 
         {error && (
-          <div className="bg-error/10 border border-error/40 text-error px-md py-sm rounded-lg text-[14px]">
+          <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "rgba(251,113,133,0.08)", border: "1px solid rgba(251,113,133,0.2)", color: "#FB7185" }}>
             {error}
           </div>
         )}
@@ -319,14 +345,21 @@ export default function DemoChat({ token }: DemoChatProps) {
       </main>
 
       {/* ── Input bar ──────────────────────────────────────────────────── */}
-      <footer className="border-t border-outline-variant bg-surface-dim px-lg py-md shrink-0">
-        <div className="max-w-[820px] mx-auto flex flex-col gap-sm">
+      <footer
+        className="px-5 py-4 shrink-0"
+        style={{
+          background: "rgba(10,10,10,0.9)",
+          backdropFilter: "blur(20px)",
+          borderTop: "1px solid rgba(39,39,42,0.6)",
+        }}
+      >
+        <div className="max-w-[820px] mx-auto flex flex-col gap-2">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit(input);
             }}
-            className="flex gap-sm"
+            className="flex gap-3"
           >
             <input
               ref={inputRef}
@@ -335,20 +368,28 @@ export default function DemoChat({ token }: DemoChatProps) {
               onChange={(e) => setInput(e.target.value)}
               placeholder={`Ask about ${venue.venue_name}…`}
               disabled={isLoading}
-              className="flex-1 bg-surface border border-outline-variant rounded-lg px-md py-sm text-[16px] text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary disabled:opacity-50"
+              className="flex-1 rounded-xl px-4 py-3 text-sm focus:outline-none disabled:opacity-50 transition-all"
+              style={{
+                background: "rgba(24,24,27,0.8)",
+                border: "1px solid rgba(39,39,42,0.8)",
+                color: "#F5F5F5",
+                fontFamily: "'Inter', sans-serif",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "rgba(230,211,163,0.4)")}
+              onBlur={(e) => (e.target.style.borderColor = "rgba(39,39,42,0.8)")}
             />
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="bg-primary text-surface rounded-lg px-md py-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+              className="rounded-xl px-4 py-3 flex items-center justify-center transition-all disabled:opacity-40"
+              style={{ background: "rgba(230,211,163,0.12)", border: "1px solid rgba(230,211,163,0.25)", color: "#E6D3A3" }}
             >
-              <span className="material-symbols-outlined text-[24px]">send</span>
+              <span className="material-symbols-outlined text-[20px]">send</span>
             </button>
           </form>
 
-          {/* Mobile CTA + branding */}
           <div className="flex items-center justify-between">
-            <p className="text-[11px] text-on-surface-variant/50">
+            <p className="text-[10px]" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#3F3F46" }}>
               Powered by Polynovea's behavioral intelligence framework
             </p>
           </div>

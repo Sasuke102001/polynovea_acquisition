@@ -156,3 +156,42 @@ body {
   box-shadow: 0 0 0 1px #e6d3a3, 0 0 15px rgba(230, 211, 163, 0.1);
   transform: scale(1.01);
 }
+
+/* 3D orb ring spin */
+@keyframes ringSpin3d {
+  0%   { transform: translate(-50%,-50%) rotateX(60deg) rotateY(40deg) rotateZ(0deg); }
+  100% { transform: translate(-50%,-50%) rotateX(60deg) rotateY(40deg) rotateZ(360deg); }
+}
+
+/* Cinematic stagger entrance — only on server-rendered pages, not client-loaded */
+@keyframes cinSlideIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cin-stagger > * {
+  animation: cinSlideIn 0.45s ease both;
+}
+.cin-stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.cin-stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.cin-stagger > *:nth-child(3) { animation-delay: 0.20s; }
+.cin-stagger > *:nth-child(4) { animation-delay: 0.28s; }
+.cin-stagger > *:nth-child(5) { animation-delay: 0.36s; }
+.cin-stagger > *:nth-child(6) { animation-delay: 0.44s; }
+.cin-stagger > *:nth-child(7) { animation-delay: 0.52s; }
+.cin-stagger > *:nth-child(8) { animation-delay: 0.60s; }
+
+/* Cinematic card base */
+.cin-card {
+  background: rgba(24,24,27,0.65);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(39,39,42,0.85);
+  box-shadow: 0 24px 48px -12px rgba(0,0,0,0.75);
+}
+
+/* Gold glow text */
+.gold-glow { color: #E6D3A3; text-shadow: 0 0 20px rgba(230,211,163,0.35); }
+
+/* Emerald/amber/coral signal glows */
+.sig-emerald { color: #10B981; text-shadow: 0 0 8px rgba(16,185,129,0.5); }
+.sig-amber   { color: #F59E0B; text-shadow: 0 0 8px rgba(245,158,11,0.5); }
+.sig-coral   { color: #FB7185; text-shadow: 0 0 8px rgba(251,113,133,0.5); }
