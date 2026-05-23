@@ -21,11 +21,11 @@ BATCH_SIZE  = 500
 # DB connection — set via environment variables or edit directly
 # -------------------------------------------------------------------
 DB_CONFIG = {
-    'host':     os.getenv('PG_HOST',     'your-db-instance.xxxxxxxxxxxx.ap-south-1.rds.amazonaws.com'),
+    'host':     os.getenv('PG_HOST',     'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
     'dbname':   os.getenv('PG_DB',       'polynovea_module2'),
-    'user':     os.getenv('PG_USER',     'your_user'),
-    'password': os.getenv('PG_PASSWORD', 'your_password'),
+    'user':     os.getenv('PG_USER',     'polynovea_admin'),
+    'password': os.getenv('PG_PASSWORD', 'REDACTED_DB_PASSWORD'),
     'sslmode':  'require',
 }
 
