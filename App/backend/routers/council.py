@@ -30,7 +30,7 @@ COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]"
 # Council member definitions
 _NEMOTRON = {
     "name":  "nemotron",
-    "model": os.getenv("NVIDIA_MODEL_NEMOTRON", "nvidia/llama-3.1-nemotron-70b-instruct"),
+    "model": os.getenv("NVIDIA_MODEL_NEMOTRON", "meta/llama-3.3-70b-instruct"),
     "temp":  0.30,
 }
 _DEEPSEEK = {
@@ -40,7 +40,7 @@ _DEEPSEEK = {
 }
 _QWEN = {
     "name":  "qwen",
-    "model": os.getenv("NVIDIA_MODEL_QWEN", "qwen/qwen3.5-397b-a17b"),
+    "model": os.getenv("NVIDIA_MODEL_QWEN", "qwen/qwen2.5-72b-instruct"),
     "temp":  0.50,
 }
 
