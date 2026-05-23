@@ -49,7 +49,7 @@ from routers.utils import (
 
 # Nvidia API config — mirrors chat.py
 _NVIDIA_API_BASE = "https://integrate.api.nvidia.com/v1"
-_NVIDIA_API_KEY  = os.getenv("NVIDIA_API_KEY_CREATIVE")
+_NVIDIA_API_KEY  = os.getenv("NVIDIA_API_KEY")
 _NVIDIA_MODEL    = os.getenv(
     "NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
 )

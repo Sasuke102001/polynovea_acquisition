@@ -25,7 +25,7 @@ from models import (
 )
 
 _NVIDIA_API_BASE  = "https://integrate.api.nvidia.com/v1"
-_NVIDIA_KEY       = os.getenv("NVIDIA_API_KEY_CREATIVE")
+_NVIDIA_KEY       = os.getenv("NVIDIA_API_KEY")
 _NVIDIA_MODEL     = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
 from routers.utils import (
     SEGMENT_LABELS, SEGMENT_TOP_ARCHETYPES, make_archetype_chip,
@@ -1083,7 +1083,7 @@ async def _stream_brief_content(system_prompt: str, user_message: str):
         from openai import AsyncOpenAI
 
         if not _NVIDIA_KEY:
-            yield "[Error: NVIDIA_API_KEY_CREATIVE not configured]"
+            yield "[Error: NVIDIA_API_KEY not configured]"
             return
 
         client = AsyncOpenAI(api_key=_NVIDIA_KEY, base_url=_NVIDIA_API_BASE)
