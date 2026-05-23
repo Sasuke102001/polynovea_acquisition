@@ -17,6 +17,7 @@ import time
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 
+import httpx
 import jwt  # PyJWT
 from fastapi import APIRouter, Header, HTTPException
 from fastapi.responses import StreamingResponse
@@ -24,11 +25,49 @@ from pydantic import BaseModel
 
 from database import get_pool
 from prompts import get_demo_system_prompt
-from routers.chat import fetch_venue_context, stream_from_nvidia, log_chat_to_supabase
+from routers.chat import fetch_venue_context, stream_from_nvidia
 
 router = APIRouter()
 
 _DEFAULT_EXPIRES_HOURS = 72
+
+
+# ─── Supabase demo logging ─────────────────────────────────────────────────────
+
+async def log_demo_chat(
+    venue_id: int,
+    venue_name: str,
+    prospect_name: str,
+    question: str,
+    response: str,
+) -> None:
+    """Fire-and-forget: log demo chat exchange to demo_chat_logs table."""
+    try:
+        supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
+        supabase_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY", "")
+        if not supabase_url or not supabase_key:
+            return
+
+        headers = {
+            "apikey":        supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+            "Content-Type":  "application/json",
+        }
+        payload = {
+            "venue_id":      str(venue_id),
+            "venue_name":    venue_name,
+            "prospect_name": prospect_name,
+            "question":      question,
+            "response":      response,
+        }
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(
+                f"{supabase_url}/rest/v1/demo_chat_logs",
+                json=payload,
+                headers=headers,
+            )
+    except Exception as e:
+        print(f"[demo] Supabase logging failed: {e}")
 
 
 def _secret() -> str:
@@ -177,12 +216,12 @@ async def demo_chat(token: str, req: DemoChatRequest):
             full_response = "".join(buffer)
             if full_response:
                 asyncio.create_task(
-                    log_chat_to_supabase(
-                        venue_id, "demo", req.question,
-                        {"venue_name": context["venue_name"], "area": context["area"]},
+                    log_demo_chat(
+                        venue_id,
+                        context["venue_name"],
+                        prospect,
+                        req.question,
                         full_response,
-                        is_demo=True,
-                        prospect_name=prospect,
                     )
                 )
 
