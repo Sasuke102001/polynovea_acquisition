@@ -1,6 +1,21 @@
 import Link from "next/link";
 import VenueNav from "@/components/VenueNav";
 import ChatDrawerWrapper from "@/components/ChatDrawerWrapper";
+import AdminDemoPanel from "@/components/AdminDemoPanel";
+
+async function fetchVenueMeta(id: string): Promise<{ name: string; area: string }> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/venues/${id}/overview`,
+      { next: { revalidate: 3600 } }
+    );
+    if (!res.ok) return { name: "", area: "" };
+    const data = await res.json();
+    return { name: data.venue_name ?? "", area: data.area ?? "" };
+  } catch {
+    return { name: "", area: "" };
+  }
+}
 
 export default async function VenueHubLayout({
   children,
@@ -10,6 +25,7 @@ export default async function VenueHubLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const meta   = await fetchVenueMeta(id);
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -27,7 +43,7 @@ export default async function VenueHubLayout({
             </h1>
           </div>
 
-          <div className="flex items-center gap-md">
+          <div className="flex items-center gap-sm">
             {/* Deep Analysis link */}
             <Link
               href={`/venues/${id}/deep`}
@@ -36,6 +52,13 @@ export default async function VenueHubLayout({
               <span className="hidden sm:inline">DEEP ANALYSIS</span>
               <span className="material-symbols-outlined text-[16px]">bolt</span>
             </Link>
+
+            {/* Admin demo panel */}
+            <AdminDemoPanel
+              venueId={parseInt(id)}
+              venueName={meta.name}
+              venueArea={meta.area}
+            />
           </div>
         </header>
 
