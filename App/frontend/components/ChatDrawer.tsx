@@ -18,8 +18,6 @@ interface ChatDrawerProps {
 }
 
 // ─── Lightweight markdown renderer ───────────────────────────────────────────
-// Handles: **bold**, *italic*, `code`, headers (###), bullets (-), blank lines.
-// No external dependency — pure JSX.
 
 function renderMarkdown(text: string): React.ReactNode {
   const lines = text.split("\n");
@@ -29,35 +27,32 @@ function renderMarkdown(text: string): React.ReactNode {
   while (i < lines.length) {
     const raw = lines[i];
 
-    // Blank line → spacing
     if (!raw.trim()) {
       nodes.push(<div key={i} className="h-2" />);
       i++;
       continue;
     }
 
-    // Header: ###, ##, #
     const headerMatch = raw.match(/^(#{1,3})\s+(.+)/);
     if (headerMatch) {
       const level = headerMatch[1].length;
-      const className = level === 1
-        ? "text-[17px] font-bold text-on-surface mt-1"
-        : level === 2
-        ? "text-[16px] font-bold text-on-surface mt-1"
-        : "text-[14px] font-semibold text-on-surface-variant uppercase tracking-wide mt-1";
-      nodes.push(<p key={i} className={className}>{inlineFormat(headerMatch[2])}</p>);
+      const sz = level === 1 ? "text-[16px]" : level === 2 ? "text-[15px]" : "text-[13px]";
+      nodes.push(
+        <p key={i} className={`${sz} font-bold mt-1`} style={{ color: "#F5F5F5" }}>
+          {inlineFormat(headerMatch[2])}
+        </p>
+      );
       i++;
       continue;
     }
 
-    // Bullet: - item or * item
     if (/^[\-\*]\s+/.test(raw)) {
       const bulletNodes: React.ReactNode[] = [];
       while (i < lines.length && /^[\-\*]\s+/.test(lines[i])) {
         bulletNodes.push(
-          <li key={i} className="flex gap-xs items-start">
-            <span className="text-primary-container mt-[4px] shrink-0 text-[13px]">•</span>
-            <span>{inlineFormat(lines[i].replace(/^[\-\*]\s+/, ""))}</span>
+          <li key={i} className="flex gap-1.5 items-start">
+            <span className="mt-[5px] shrink-0 text-[10px]" style={{ color: "#E6D3A3" }}>•</span>
+            <span style={{ color: "#A1A1AA" }}>{inlineFormat(lines[i].replace(/^[\-\*]\s+/, ""))}</span>
           </li>
         );
         i++;
@@ -66,15 +61,14 @@ function renderMarkdown(text: string): React.ReactNode {
       continue;
     }
 
-    // Numbered list: 1. item
     if (/^\d+\.\s+/.test(raw)) {
       const listNodes: React.ReactNode[] = [];
       let num = 1;
       while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
         listNodes.push(
-          <li key={i} className="flex gap-xs items-start">
-            <span className="text-primary-container shrink-0 text-[14px] font-data-mono mt-[2px] min-w-[20px]">{num}.</span>
-            <span>{inlineFormat(lines[i].replace(/^\d+\.\s+/, ""))}</span>
+          <li key={i} className="flex gap-1.5 items-start">
+            <span className="shrink-0 text-[13px] mt-[2px] min-w-[20px]" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#E6D3A3" }}>{num}.</span>
+            <span style={{ color: "#A1A1AA" }}>{inlineFormat(lines[i].replace(/^\d+\.\s+/, ""))}</span>
           </li>
         );
         i++;
@@ -84,9 +78,8 @@ function renderMarkdown(text: string): React.ReactNode {
       continue;
     }
 
-    // Paragraph
     nodes.push(
-      <p key={i} className="leading-relaxed">
+      <p key={i} className="leading-relaxed" style={{ color: "#A1A1AA" }}>
         {inlineFormat(raw)}
       </p>
     );
@@ -96,19 +89,21 @@ function renderMarkdown(text: string): React.ReactNode {
   return <>{nodes}</>;
 }
 
-// Inline: **bold**, *italic*, `code`
 function inlineFormat(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
-  // Pattern: **bold**, *italic*, `code`
   const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`)/g;
   let last = 0;
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(text)) !== null) {
     if (match.index > last) parts.push(text.slice(last, match.index));
-    if (match[2]) parts.push(<strong key={match.index} className="font-semibold text-on-surface">{match[2]}</strong>);
+    if (match[2]) parts.push(<strong key={match.index} className="font-semibold" style={{ color: "#F5F5F5" }}>{match[2]}</strong>);
     else if (match[3]) parts.push(<em key={match.index} className="italic">{match[3]}</em>);
-    else if (match[4]) parts.push(<code key={match.index} className="bg-surface-container px-[4px] py-[1px] rounded text-[13px] font-data-mono text-primary-container">{match[4]}</code>);
+    else if (match[4]) parts.push(
+      <code key={match.index} className="px-[4px] py-[1px] rounded text-[12px]" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(230,211,163,0.08)", color: "#E6D3A3" }}>
+        {match[4]}
+      </code>
+    );
     last = match.index + match[0].length;
   }
   if (last < text.length) parts.push(text.slice(last));
@@ -118,49 +113,40 @@ function inlineFormat(text: string): React.ReactNode {
 // ─── Tab metadata ─────────────────────────────────────────────────────────────
 
 const TAB_META: Record<Tab, { label: string; subtitle: string }> = {
-  marketing:   { label: "Marketing Assistant",       subtitle: "Content, ads, campaigns, audience" },
-  competitors:  { label: "Competitor Analyst",        subtitle: "Positioning, gaps, similar venues" },
-  transform:    { label: "Transformation Advisor",    subtitle: "Segment targeting, fitness gaps" },
-  deep_risk:    { label: "Risk Analyst",              subtitle: "Churn signals, retention patterns" },
-  overview:     { label: "Venue Intelligence",        subtitle: "Health score, fitness, segments" },
-  audience:     { label: "Audience Analyst",          subtitle: "Spend, dwell, loyalty, platforms" },
+  marketing:   { label: "Marketing Assistant",     subtitle: "Content, ads, campaigns, audience" },
+  competitors:  { label: "Competitor Analyst",      subtitle: "Positioning, gaps, similar venues" },
+  transform:    { label: "Transformation Advisor",  subtitle: "Segment targeting, fitness gaps" },
+  deep_risk:    { label: "Risk Analyst",            subtitle: "Churn signals, retention patterns" },
+  overview:     { label: "Venue Intelligence",      subtitle: "Health score, fitness, segments" },
+  audience:     { label: "Audience Analyst",        subtitle: "Spend, dwell, loyalty, platforms" },
 };
 
-// ─── Component ───────────────────────────────────────────────────────────────
-
 const COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]";
-
 const STORAGE_KEY = (venueId: number) => `polynovea_chat_${venueId}`;
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
-  const [isOpen, setIsOpen]             = useState(false);
-  const [messages, setMessages]         = useState<Message[]>(() => {
+  const [isOpen, setIsOpen]                 = useState(false);
+  const [messages, setMessages]             = useState<Message[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY(venueId));
       return stored ? (JSON.parse(stored) as Message[]) : [];
     } catch { return []; }
   });
-  const [input, setInput]               = useState("");
-  const [isLoading, setIsLoading]       = useState(false);
+  const [input, setInput]                   = useState("");
+  const [isLoading, setIsLoading]           = useState(false);
   const [isDeliberating, setIsDeliberating] = useState(false);
-  const [error, setError]               = useState<string | null>(null);
-  const messagesEndRef                  = useRef<HTMLDivElement>(null);
-  const inputRef                        = useRef<HTMLInputElement>(null);
+  const [error, setError]                   = useState<string | null>(null);
+  const messagesEndRef                      = useRef<HTMLDivElement>(null);
+  const inputRef                            = useRef<HTMLInputElement>(null);
 
-  // Save to localStorage — called only on user send and response complete, not on every chunk
   const persistMessages = (msgs: Message[]) => {
-    try {
-      localStorage.setItem(STORAGE_KEY(venueId), JSON.stringify(msgs));
-    } catch { /* storage full — silently ignore */ }
+    try { localStorage.setItem(STORAGE_KEY(venueId), JSON.stringify(msgs)); } catch { /* ignore */ }
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
-  }, [isOpen]);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => { if (isOpen) setTimeout(() => inputRef.current?.focus(), 100); }, [isOpen]);
 
   const handleClearChat = () => {
     setMessages([]);
@@ -189,14 +175,12 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
 
     await streamChat(venueId, tab, userQuestion, {
       onChunk: (chunk) => {
-        // Council sentinel — show deliberating spinner, strip the marker
         if (!deliberatingDone && chunk.includes(COUNCIL_DELIBERATING)) {
           setIsDeliberating(true);
           deliberatingDone = true;
           chunk = chunk.replace(COUNCIL_DELIBERATING, "");
           if (!chunk) return;
         }
-        // Real content arriving — dismiss deliberating state
         if (isDeliberating || deliberatingDone) setIsDeliberating(false);
 
         currentResponse += chunk;
@@ -210,19 +194,11 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
           return msgs;
         });
       },
-      onError: (msg) => {
-        setIsDeliberating(false);
-        setError(msg);
-        setIsLoading(false);
-      },
+      onError: (msg) => { setIsDeliberating(false); setError(msg); setIsLoading(false); },
       onComplete: () => {
         setIsDeliberating(false);
         setIsLoading(false);
-        // Save to localStorage once — after full response, not on every chunk
-        setMessages((prev) => {
-          persistMessages(prev);
-          return prev;
-        });
+        setMessages((prev) => { persistMessages(prev); return prev; });
       },
     }, mode);
   };
@@ -235,10 +211,21 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 left-6 md:bottom-8 md:left-8 z-[60] bg-primary text-surface rounded-full p-3 md:p-4 shadow-lg hover:opacity-90 transition-opacity"
           title="Ask Polynovea"
+          className="fixed bottom-20 left-6 md:bottom-8 md:left-8 z-[60] flex items-center gap-2 px-4 py-3 rounded-full shadow-2xl transition-all"
+          style={{
+            background: "rgba(230,211,163,0.1)",
+            border: "1px solid rgba(230,211,163,0.25)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(230,211,163,0.05)",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(230,211,163,0.15)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(230,211,163,0.4)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(230,211,163,0.1)"; (e.currentTarget as HTMLElement).style.borderColor = "rgba(230,211,163,0.25)"; }}
         >
-          <span className="material-symbols-outlined text-[24px] md:text-[28px]">smart_toy</span>
+          <span className="material-symbols-outlined text-[22px]" style={{ color: "#E6D3A3" }}>smart_toy</span>
+          <span className="hidden md:inline text-[11px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#E6D3A3" }}>
+            Ask Polynovea
+          </span>
         </button>
       )}
 
@@ -247,98 +234,129 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
         className={`fixed inset-0 z-50 transition-opacity duration-300 ${isOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
         onClick={() => setIsOpen(false)}
       >
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(2px)" }} />
 
         <div
-          className={`absolute inset-y-0 right-0 md:bottom-4 md:right-6 md:top-4 md:rounded-xl w-full md:w-[760px] bg-surface border border-outline-variant shadow-2xl transition-transform duration-300 flex flex-col ${
-            isOpen ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`absolute inset-y-0 right-0 md:bottom-4 md:right-6 md:top-4 md:rounded-2xl w-full md:w-[760px] flex flex-col shadow-2xl transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+          style={{ background: "#0e0e11", border: "1px solid rgba(39,39,42,0.9)", overflow: "hidden" }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-lg py-md border-b border-outline-variant bg-surface-dim rounded-t-xl shrink-0">
-            <div>
-              <h3 className="text-[18px] font-bold text-on-surface">{label}</h3>
-              <p className="text-[14px] text-on-surface-variant mt-[2px]">{subtitle}</p>
+          <div
+            className="flex items-center justify-between px-5 py-4 shrink-0"
+            style={{ background: "rgba(18,18,24,0.97)", borderBottom: "1px solid rgba(39,39,42,0.7)" }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: "rgba(230,211,163,0.08)", border: "1px solid rgba(230,211,163,0.15)" }}
+              >
+                <span className="material-symbols-outlined text-[16px]" style={{ color: "#E6D3A3" }}>smart_toy</span>
+              </div>
+              <div>
+                <h3 className="text-[16px] font-bold" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#F5F5F5" }}>{label}</h3>
+                <p className="text-[12px] mt-[1px]" style={{ color: "#71717A" }}>{subtitle}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-3">
               {messages.length > 0 && !isLoading && (
                 <button
                   onClick={handleClearChat}
-                  className="text-[12px] text-on-surface-variant/60 hover:text-error transition-colors flex items-center gap-[3px]"
+                  className="text-[11px] flex items-center gap-1 transition-colors"
+                  style={{ color: "rgba(161,161,170,0.5)", fontFamily: "'JetBrains Mono', monospace" }}
                   title="Clear chat history"
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#FB7185")}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "rgba(161,161,170,0.5)")}
                 >
-                  <span className="material-symbols-outlined text-[14px]">delete_sweep</span>
+                  <span className="material-symbols-outlined text-[13px]">delete_sweep</span>
                   Clear
                 </button>
               )}
               <button
                 onClick={() => { setIsOpen(false); setInput(""); setError(null); }}
-                className="text-on-surface-variant hover:text-on-surface transition-colors"
+                className="transition-colors"
+                style={{ color: "#71717A" }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#F5F5F5")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "#71717A")}
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-[22px]">close</span>
               </button>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-lg py-md space-y-md bg-surface custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 custom-scrollbar" style={{ background: "#0a0a0a" }}>
             {messages.length === 0 && !isLoading && (
-              <div className="text-center text-on-surface-variant py-xl">
-                <span className="material-symbols-outlined text-[48px] text-on-surface-variant/40">smart_toy</span>
-                <p className="text-[17px] font-medium mt-sm">Ask anything about this venue.</p>
-                <p className="text-[14px] text-on-surface-variant/60 mt-xs">Powered by Polynovea's behavioral intelligence framework.</p>
+              <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{ background: "rgba(230,211,163,0.06)", border: "1px solid rgba(230,211,163,0.12)" }}
+                >
+                  <span className="material-symbols-outlined text-[28px]" style={{ color: "rgba(230,211,163,0.4)" }}>smart_toy</span>
+                </div>
+                <p className="text-[16px] font-bold" style={{ color: "#F5F5F5" }}>Ask anything about this venue.</p>
+                <p className="text-[13px]" style={{ color: "#71717A" }}>Powered by Polynovea&apos;s behavioral intelligence framework.</p>
               </div>
             )}
 
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[88%] px-md py-sm rounded-xl text-[15px] leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-primary text-surface rounded-br-sm font-body-sm"
-                      : "bg-surface-dim text-on-surface rounded-bl-sm border border-outline-variant"
-                  }`}
-                >
-                  {msg.role === "assistant"
-                    ? renderMarkdown(msg.content)
-                    : msg.content}
-                </div>
+                {msg.role === "user" ? (
+                  <div
+                    className="max-w-[82%] px-4 py-2.5 rounded-2xl rounded-br-sm text-[14px] leading-relaxed"
+                    style={{ background: "rgba(230,211,163,0.1)", border: "1px solid rgba(230,211,163,0.2)", color: "#F5F5F5" }}
+                  >
+                    {msg.content}
+                  </div>
+                ) : (
+                  <div
+                    className="max-w-[88%] px-4 py-3 rounded-2xl rounded-bl-sm text-[14px] leading-relaxed"
+                    style={{ background: "rgba(24,24,27,0.8)", border: "1px solid rgba(39,39,42,0.7)" }}
+                  >
+                    {renderMarkdown(msg.content)}
+                  </div>
+                )}
               </div>
             ))}
 
+            {/* Council deliberating */}
             {isDeliberating && (
               <div className="flex justify-start">
-                <div className="bg-surface-dim border border-[#7C3AED]/40 rounded-xl rounded-bl-sm px-md py-sm flex flex-col gap-xs max-w-[88%]">
-                  <div className="flex items-center gap-sm">
+                <div
+                  className="px-4 py-3 rounded-2xl rounded-bl-sm flex flex-col gap-2 max-w-[88%]"
+                  style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.25)" }}
+                >
+                  <div className="flex items-center gap-2">
                     <div className="flex gap-[3px]">
-                      <div className="w-1.5 h-1.5 bg-[#7C3AED] rounded-full animate-bounce [animation-delay:0ms]" />
-                      <div className="w-1.5 h-1.5 bg-[#7C3AED] rounded-full animate-bounce [animation-delay:120ms]" />
-                      <div className="w-1.5 h-1.5 bg-[#7C3AED] rounded-full animate-bounce [animation-delay:240ms]" />
+                      <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0ms]" style={{ background: "#7C3AED" }} />
+                      <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:120ms]" style={{ background: "#7C3AED" }} />
+                      <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:240ms]" style={{ background: "#7C3AED" }} />
                     </div>
-                    <span className="text-[12px] font-data-mono text-[#7C3AED] uppercase tracking-wider">
+                    <span className="text-[11px] font-bold uppercase tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#c4b5fd" }}>
                       Council deliberating
                     </span>
                   </div>
-                  <p className="text-[11px] text-on-surface-variant/60 font-body-sm">
-                    3 models analysing · debating · synthesising
-                  </p>
+                  <p className="text-[11px]" style={{ color: "#71717A" }}>3 models analysing · debating · synthesising</p>
                 </div>
               </div>
             )}
 
+            {/* Typing indicator */}
             {isLoading && !isDeliberating && messages[messages.length - 1]?.role === "user" && (
               <div className="flex justify-start">
-                <div className="bg-surface-dim border border-outline-variant rounded-xl rounded-bl-sm px-md py-sm flex items-center gap-xs">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0ms]" />
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:150ms]" />
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:300ms]" />
+                <div
+                  className="px-4 py-3 rounded-2xl rounded-bl-sm flex items-center gap-1.5"
+                  style={{ background: "rgba(24,24,27,0.8)", border: "1px solid rgba(39,39,42,0.7)" }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0ms]" style={{ background: "#E6D3A3" }} />
+                  <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:150ms]" style={{ background: "#E6D3A3" }} />
+                  <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:300ms]" style={{ background: "#E6D3A3" }} />
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="bg-error/10 border border-error/40 text-error px-md py-sm rounded-lg text-[14px]">
+              <div className="px-4 py-3 rounded-xl text-[13px]" style={{ background: "rgba(251,113,133,0.08)", border: "1px solid rgba(251,113,133,0.2)", color: "#FB7185" }}>
                 {error}
               </div>
             )}
@@ -346,42 +364,53 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <form onSubmit={(e) => handleSubmit(e, "fast")} className="px-lg py-md border-t border-outline-variant bg-surface-dim rounded-b-xl shrink-0">
-            <div className="flex gap-sm">
+          {/* Input bar */}
+          <form
+            onSubmit={(e) => handleSubmit(e, "fast")}
+            className="px-5 py-4 shrink-0"
+            style={{ background: "rgba(14,14,17,0.98)", borderTop: "1px solid rgba(39,39,42,0.7)" }}
+          >
+            <div className="flex gap-2">
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask a question…"
+                placeholder="Ask a question..."
                 disabled={isLoading}
-                className="flex-1 bg-surface border border-outline-variant rounded-lg px-md py-sm text-[16px] text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary disabled:opacity-50"
+                className="flex-1 rounded-xl px-4 py-3 text-[14px] focus:outline-none transition-all disabled:opacity-50"
+                style={{ background: "rgba(24,24,27,0.8)", border: "1px solid rgba(39,39,42,0.8)", color: "#F5F5F5", fontFamily: "'Inter', sans-serif" }}
+                onFocus={(e) => (e.target.style.borderColor = "rgba(230,211,163,0.4)")}
+                onBlur={(e) => (e.target.style.borderColor = "rgba(39,39,42,0.8)")}
               />
-              {/* Fast send */}
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="bg-primary text-surface rounded-lg px-md py-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+                className="rounded-xl px-4 py-3 transition-all disabled:opacity-40 flex items-center justify-center"
+                style={{ background: "rgba(230,211,163,0.1)", border: "1px solid rgba(230,211,163,0.25)", color: "#E6D3A3" }}
                 title="Quick answer"
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(230,211,163,0.18)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(230,211,163,0.1)"; }}
               >
-                <span className="material-symbols-outlined text-[24px]">send</span>
+                <span className="material-symbols-outlined text-[22px]">send</span>
               </button>
             </div>
 
-            {/* Council button */}
-            <div className="flex flex-col items-end mt-xs gap-[2px]">
+            <div className="flex flex-col items-end mt-2 gap-[2px]">
               <button
                 type="button"
                 onClick={(e) => handleSubmit(e, "council")}
                 disabled={!input.trim() || isLoading}
-                className="flex items-center gap-xs bg-surface border border-[#7C3AED]/50 text-[#7C3AED] rounded-lg px-sm py-[5px] text-[12px] font-label-sm hover:bg-[#7C3AED]/10 disabled:opacity-40 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all disabled:opacity-40"
+                style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.3)", color: "#c4b5fd" }}
                 title="Ask the Council of Models"
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.18)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)"; }}
               >
-                <span className="material-symbols-outlined text-[15px]">hub</span>
+                <span className="material-symbols-outlined text-[14px]">hub</span>
                 Ask the Council
               </button>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+              <span className="text-[10px]" style={{ color: "rgba(161,161,170,0.4)", fontFamily: "'JetBrains Mono', monospace" }}>
                 3 models · may take 15–20 sec
               </span>
             </div>

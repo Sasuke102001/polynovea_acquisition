@@ -13,6 +13,7 @@ import {
   type ClientVenueCard,
 } from "@/lib/api";
 import CompetitorDrawer from "@/components/CompetitorDrawer";
+import CinTabBar from "@/components/CinTabBar";
 
 const LIMIT = 3;
 
@@ -32,7 +33,10 @@ function deltaLabel(delta: number): string {
 
 function VenueTypeBadge({ label }: { label: string }) {
   return (
-    <span className="bg-primary-container/10 text-primary-container border border-primary-container/30 px-xs py-base text-[10px] font-label-sm uppercase tracking-wider rounded">
+    <span
+      className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded"
+      style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(230,211,163,0.08)", border: "1px solid rgba(230,211,163,0.18)", color: "#A1A1AA" }}
+    >
       {label}
     </span>
   );
@@ -40,7 +44,10 @@ function VenueTypeBadge({ label }: { label: string }) {
 
 function ArchetypeBadge({ label }: { label: string }) {
   return (
-    <span className="bg-secondary-container/20 text-secondary border border-secondary-container/40 px-xs py-base text-[10px] font-label-sm uppercase tracking-wider rounded">
+    <span
+      className="px-2 py-0.5 text-[9px] font-bold rounded"
+      style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.25)", color: "#c4b5fd" }}
+    >
       {label}
     </span>
   );
@@ -48,7 +55,10 @@ function ArchetypeBadge({ label }: { label: string }) {
 
 function SegmentBadge({ label }: { label: string }) {
   return (
-    <span className="bg-[#B45309]/20 text-[#FCD34D] border border-[#B45309]/40 px-xs py-base text-[10px] font-label-sm uppercase tracking-wider rounded">
+    <span
+      className="px-2 py-0.5 text-[9px] font-bold rounded uppercase tracking-widest"
+      style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.2)", color: "#F59E0B" }}
+    >
       {label}
     </span>
   );
@@ -95,11 +105,11 @@ function DeltaBarRow({ bar }: { bar: DeltaBar }) {
 function ClientColumn({ venue }: { venue: ClientVenueCard }) {
   const dims = clientDims(venue.fitness_scores);
   return (
-    <article className="bg-[#18181B] border border-[#27272A] rounded-lg p-md flex flex-col gap-md relative h-full">
-      <div className="absolute top-0 left-0 w-1 h-full bg-primary rounded-l-lg opacity-50" />
-      <div>
-        <h2 className="text-body-lg font-body-lg font-semibold text-primary">{venue.name}</h2>
-        <span className="text-on-surface-variant text-body-sm font-body-sm">{venue.area}</span>
+    <article className="cin-card rounded-xl p-5 flex flex-col gap-4 relative h-full">
+      <div className="absolute top-0 left-0 w-0.5 h-full rounded-l-xl" style={{ background: "#E6D3A3", boxShadow: "0 0 8px rgba(230,211,163,0.3)" }} />
+      <div className="pl-1">
+        <h2 className="text-base font-bold gold-glow" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif" }}>{venue.name}</h2>
+        <span className="text-xs" style={{ color: "#71717A" }}>{venue.area}</span>
       </div>
       <div className="flex flex-wrap gap-xs">
         {venue.types.slice(0, 3).map((t) => <VenueTypeBadge key={t} label={t} />)}
@@ -110,22 +120,22 @@ function ClientColumn({ venue }: { venue: ClientVenueCard }) {
       <div className="flex flex-wrap gap-xs mb-auto">
         {venue.top_segments.slice(0, 3).map((s) => <SegmentBadge key={s} label={s} />)}
       </div>
-      <div className="border-t border-[#27272a] pt-md flex flex-col gap-sm">
+      <div className="border-t pt-4 flex flex-col gap-3" style={{ borderColor: "rgba(39,39,42,0.6)" }}>
         <div className="flex justify-between items-center">
-          <span className="text-label-sm font-label-sm text-on-surface-variant uppercase">
+          <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}>
             Your Baseline
           </span>
-          <span className="text-label-sm font-label-sm text-on-surface-variant text-[10px]">Score</span>
+          <span className="text-[9px]" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}>Score</span>
         </div>
-        <div className="flex flex-col gap-md mt-sm">
+        <div className="flex flex-col gap-3">
           {dims.map((dim) => (
             <div key={dim.key}>
-              <div className="flex justify-between text-[12px] font-[500] font-body-sm text-[#8B8B9E] mb-xs">
+              <div className="flex justify-between text-[11px] mb-1" style={{ color: "#A1A1AA" }}>
                 <span>{dim.label}</span>
-                <span className="text-primary font-data-mono">{dim.score.toFixed(2)}</span>
+                <span className="font-mono" style={{ color: "#E6D3A3" }}>{dim.score.toFixed(2)}</span>
               </div>
-              <div className="h-2 w-full bg-[#121212] rounded-full overflow-hidden border border-[#27272a]">
-                <div className="h-full bg-primary" style={{ width: `${Math.round(dim.score * 100)}%` }} />
+              <div className="h-1.5 w-full rounded-full overflow-hidden" style={{ background: "rgba(39,39,42,0.8)" }}>
+                <div className="h-full rounded-full" style={{ width: `${Math.round(dim.score * 100)}%`, background: "linear-gradient(90deg, rgba(230,211,163,0.7), rgba(230,211,163,0.3))" }} />
               </div>
             </div>
           ))}
@@ -143,25 +153,23 @@ interface SimilarColumnProps {
 }
 
 function SimilarColumn({ venue, onSelect }: SimilarColumnProps) {
-  // All 7 dimensions, most differentiated first — Equal rows show what can be improved.
   const bars = topDeltaBars(venue.delta_bars, 7);
   return (
-    <article className="bg-[#18181B] border border-[#27272A] rounded-lg p-md flex flex-col gap-md h-full">
-      {/* Clickable header — opens deep-dive drawer */}
+    <article className="cin-card rounded-xl p-5 flex flex-col gap-4 h-full">
       <button
         onClick={() => onSelect(venue.id)}
         className="text-left group w-full"
         aria-label={`Analyse ${venue.name}`}
       >
         <div className="flex justify-between items-start">
-          <h2 className="text-body-lg font-body-lg font-semibold text-on-surface group-hover:text-primary transition-colors">
+          <h2 className="text-base font-bold transition-colors" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#F5F5F5" }}>
             {venue.name}
           </h2>
-          <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-[18px] transition-colors">
+          <span className="material-symbols-outlined text-[16px] transition-colors" style={{ color: "#71717A" }}>
             open_in_new
           </span>
         </div>
-        <span className="text-on-surface-variant text-body-sm font-body-sm">{venue.area}</span>
+        <span className="text-xs" style={{ color: "#71717A" }}>{venue.area}</span>
       </button>
       <div className="flex flex-wrap gap-xs">
         {venue.types.slice(0, 4).map((t) => <VenueTypeBadge key={t} label={t} />)}
@@ -172,7 +180,7 @@ function SimilarColumn({ venue, onSelect }: SimilarColumnProps) {
       <div className="flex flex-wrap gap-xs mb-auto">
         {venue.top_segments.slice(0, 3).map((s) => <SegmentBadge key={s} label={s} />)}
       </div>
-      <div className="border-t border-[#27272a] pt-md mt-auto flex flex-col gap-md">
+      <div className="border-t mt-auto pt-4 flex flex-col gap-4" style={{ borderColor: "rgba(39,39,42,0.6)" }}>
         {bars.map((bar) => <DeltaBarRow key={bar.dimension} bar={bar} />)}
       </div>
     </article>
@@ -248,55 +256,37 @@ export default function CompetitorsPage({
   const currentPage = Math.floor(offset / LIMIT) + 1;
 
   return (
-    <div className="p-margin flex flex-col gap-lg max-w-[1400px] w-full mx-auto">
+    <div className="p-6 md:p-8 flex flex-col gap-6 max-w-[1400px] w-full mx-auto">
       {/* ── Venue header ── */}
       {data && (
-        <div className="flex flex-col gap-xs border-b border-outline-variant pb-md">
-          <div className="flex items-baseline gap-sm flex-wrap">
-            <h2 className="text-headline-lg font-headline-lg text-primary font-bold">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-baseline gap-3 flex-wrap">
+            <h2
+              className="text-2xl md:text-3xl font-bold gold-glow"
+              style={{ fontFamily: "'Clash Display', 'Inter', sans-serif" }}
+            >
               {data.client_venue.name}
             </h2>
-            <span className="text-on-surface-variant text-body-md font-body-md">{data.client_venue.area}</span>
-            <span className="bg-surface-container px-sm py-xs border border-outline-variant rounded text-label-sm font-label-sm text-on-surface uppercase tracking-wider">
+            <span className="text-sm" style={{ color: "#71717A" }}>{data.client_venue.area}</span>
+            <span
+              className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded"
+              style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(39,39,42,0.6)", border: "1px solid rgba(39,39,42,0.8)", color: "#A1A1AA" }}
+            >
               {data.client_venue.city}
             </span>
           </div>
-          {/* Tab bar */}
-          <div className="flex gap-md border-b border-outline-variant mt-sm overflow-x-auto no-scrollbar">
-            {[
-              { label: "Overview",    href: `/venues/${id}` },
-              { label: "Competitors", href: `/venues/${id}/competitors` },
-              { label: "Transform",   href: `/venues/${id}/transform` },
-              { label: "Marketing",   href: `/venues/${id}/marketing` },
-              { label: "Campaign",    href: `/venues/${id}/campaign` },
-              { label: "Audience",    href: `/venues/${id}/audience` },
-            ].map((tab) => (
-              <Link
-                key={tab.label}
-                href={tab.href}
-                className={`pb-sm px-sm text-label-md font-label-md whitespace-nowrap transition-colors ${
-                  tab.label === "Competitors"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-on-surface-variant hover:text-primary"
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
-          </div>
+          <CinTabBar venueId={id} active="Competitors" />
         </div>
       )}
 
       {loading && (
-        <div className="text-center text-on-surface-variant py-xl">
-          <span className="material-symbols-outlined text-primary animate-spin inline-block">
-            progress_activity
-          </span>
+        <div className="flex items-center justify-center py-16">
+          <span className="material-symbols-outlined animate-spin text-[28px]" style={{ color: "#E6D3A3" }}>progress_activity</span>
         </div>
       )}
 
       {error && (
-        <div className="bg-error-container border border-error/30 rounded p-md text-on-error-container font-body-sm">
+        <div className="rounded-xl p-4 text-sm" style={{ background: "rgba(251,113,133,0.08)", border: "1px solid rgba(251,113,133,0.2)", color: "#FB7185" }}>
           {error}
         </div>
       )}
@@ -324,37 +314,37 @@ export default function CompetitorsPage({
 
           {/* ── Insight callout ── */}
           {data.insight_callout && (
-            <div className="bg-[#18181B] border border-[#27272a] border-l-2 border-l-primary-container rounded p-md flex items-start gap-md">
-              <span className="material-symbols-outlined text-primary-container mt-xs flex-shrink-0">
-                lightbulb
-              </span>
-              <p className="text-on-surface text-body-md font-body-md">{data.insight_callout}</p>
+            <div
+              className="rounded-xl p-4 flex items-start gap-3"
+              style={{ background: "rgba(230,211,163,0.06)", border: "1px solid rgba(230,211,163,0.15)", borderLeft: "2px solid rgba(230,211,163,0.5)" }}
+            >
+              <span className="material-symbols-outlined text-[16px] flex-shrink-0" style={{ color: "#E6D3A3" }}>lightbulb</span>
+              <p className="text-sm" style={{ color: "#A1A1AA" }}>{data.insight_callout}</p>
             </div>
           )}
 
           {/* ── Carousel navigation ── */}
-          <div className="flex justify-between items-center border-t border-[#27272a] pt-md">
+          <div className="flex justify-between items-center border-t pt-5" style={{ borderColor: "rgba(39,39,42,0.6)" }}>
             <button
               onClick={() => setOffset(Math.max(0, offset - LIMIT))}
               disabled={offset === 0}
-              className="text-on-surface-variant hover:text-on-surface transition-colors text-label-sm font-label-sm flex items-center gap-xs disabled:opacity-30"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-30"
+              style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}
             >
-              <span className="material-symbols-outlined text-[16px]">arrow_back</span> Prev
+              <span className="material-symbols-outlined text-[14px]">arrow_back</span> Prev
             </button>
-            <div className="text-on-surface-variant text-label-sm font-label-sm">
-              Viewing{" "}
-              <span className="text-on-surface font-bold">
-                {offset + 1}–{Math.min(offset + LIMIT, data.total_similar)}
-              </span>{" "}
-              of{" "}
-              <span className="font-data-mono text-data-mono">{data.total_similar}</span>
+            <div className="text-xs" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}>
+              <span style={{ color: "#F5F5F5" }}>{offset + 1}–{Math.min(offset + LIMIT, data.total_similar)}</span>
+              {" "}of{" "}
+              <span style={{ color: "#E6D3A3" }}>{data.total_similar}</span>
             </div>
             <button
               onClick={() => setOffset(offset + LIMIT)}
               disabled={currentPage >= totalPages}
-              className="text-on-surface-variant hover:text-on-surface transition-colors text-label-sm font-label-sm flex items-center gap-xs disabled:opacity-30"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-30"
+              style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}
             >
-              Next <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              Next <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
             </button>
           </div>
         </>

@@ -3,14 +3,14 @@ import { getMarketing, getAdBrief, type ChannelCard } from "@/lib/api";
 import AIChannelCard from "@/components/AIChannelCard";
 import WhatsAppGenerator from "@/components/WhatsAppGenerator";
 import AdBriefCard from "@/components/AdBriefCard";
-
-// ─── Shared small components ──────────────────────────────────────────────────
+import CinTabBar from "@/components/CinTabBar";
 
 function BenchmarkChip() {
   return (
     <span
-      className="inline-flex items-center text-[9px] font-data-mono uppercase tracking-wider px-[5px] py-[1px] rounded border border-outline-variant/60 text-on-surface-variant/60 bg-surface-container/40"
+      className="inline-flex items-center text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded"
       title="Industry benchmark — not Polynovea campaign data"
+      style={{ border: "1px solid rgba(39,39,42,0.6)", color: "#71717A", background: "rgba(39,39,42,0.3)" }}
     >
       BENCHMARK
     </span>
@@ -19,57 +19,51 @@ function BenchmarkChip() {
 
 function WhatsAppCard({ card, venueId, venueName }: { card: ChannelCard; venueId: number; venueName: string }) {
   return (
-    <div className="bg-brand-surface border border-brand-border rounded p-md flex flex-col gap-md relative">
-      <div className="absolute top-0 right-0 bg-[#7C3AED] text-white text-label-sm font-label-sm px-sm py-xs rounded-bl uppercase font-bold flex items-center gap-xs">
+    <div className="cin-card rounded-xl p-5 flex flex-col gap-4 relative">
+      <div
+        className="absolute top-0 right-0 px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-tr-xl rounded-bl-xl"
+        style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(124,58,237,0.8)", color: "#fff" }}
+      >
         PRIMARY
       </div>
-      <div className="flex justify-between items-start pr-xl">
+      <div className="flex justify-between items-start pr-20">
         <div>
-          <h3 className="text-headline-lg font-headline-lg text-on-surface font-bold">
+          <h3 className="text-sm font-bold" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#F5F5F5" }}>
             {card.channel_label}
           </h3>
-          <div className="flex items-center gap-xs mt-xs text-body-sm font-body-sm text-primary-container">
-            <span className="material-symbols-outlined text-sm">cycle</span>
-            Mechanism: {card.mechanism_label}
+          <div className="flex items-center gap-1.5 mt-1 text-xs" style={{ color: "#A1A1AA" }}>
+            <span className="material-symbols-outlined text-[13px]">cycle</span>
+            {card.mechanism_label}
           </div>
         </div>
         <div className="text-right">
-          <div className="flex items-center gap-xs justify-end text-label-sm font-label-sm text-on-surface-variant mb-xs">
+          <div className="flex items-center gap-1.5 justify-end text-[9px] mb-1" style={{ color: "#71717A" }}>
             Expected ROI <BenchmarkChip />
           </div>
-          <div className="text-data-mono font-data-mono text-signal-positive text-lg">
-            {card.roi_label}
-          </div>
+          <div className="text-lg font-mono font-bold sig-emerald">{card.roi_label}</div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-md items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
         <div>
-          <div className="flex justify-between items-center mb-xs">
-            <div className="text-label-sm font-label-sm text-on-surface-variant uppercase">Effectiveness</div>
-            <div className="text-data-mono font-data-mono text-on-surface">
-              {Math.round(card.effectiveness_score)}/10
-            </div>
+          <div className="flex justify-between items-center mb-2">
+            <div className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}>Effectiveness</div>
+            <div className="text-sm font-mono" style={{ color: "#F5F5F5" }}>{Math.round(card.effectiveness_score)}/10</div>
           </div>
-          <div className="h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-            <div className="h-full bg-[#7C3AED]" style={{ width: `${card.effectiveness_score * 10}%` }} />
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(39,39,42,0.8)" }}>
+            <div className="h-full rounded-full" style={{ width: `${card.effectiveness_score * 10}%`, background: "rgba(124,58,237,0.7)" }} />
           </div>
           {card.why_it_works && (
-            <p className="mt-sm text-body-sm font-body-sm text-on-surface-variant italic text-[12px]">
-              {card.why_it_works}
-            </p>
+            <p className="mt-3 text-[11px] italic" style={{ color: "#71717A" }}>{card.why_it_works}</p>
           )}
           {card.send_timing && (
-            <div className="mt-sm flex items-center gap-xs text-[11px] text-on-surface-variant/70 border-t border-brand-border pt-sm">
-              <span className="material-symbols-outlined text-sm text-primary-container">schedule_send</span>
-              <span>
-                <span className="font-bold text-primary-container">Best time to send:</span> {card.send_timing}
-              </span>
+            <div className="mt-3 flex items-center gap-1.5 text-[11px] border-t pt-3" style={{ borderColor: "rgba(39,39,42,0.6)", color: "#71717A" }}>
+              <span className="material-symbols-outlined text-[13px]" style={{ color: "#E6D3A3" }}>schedule_send</span>
+              <span><span className="font-bold" style={{ color: "#E6D3A3" }}>Best time to send:</span> {card.send_timing}</span>
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-xs">
-          <div className="text-[10px] font-data-mono uppercase tracking-widest text-[#E6D3A3]/70">
+        <div className="flex flex-col gap-2">
+          <div className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#9A8F6A" }}>
             POLYNOVEA MESSAGE GENERATOR
           </div>
           <WhatsAppGenerator venueId={venueId} venueName={venueName} />
@@ -79,63 +73,33 @@ function WhatsAppCard({ card, venueId, venueName }: { card: ChannelCard; venueId
   );
 }
 
-// ─── Nav ─────────────────────────────────────────────────────────────────────
-
-function VenueTabs({ venueId }: { venueId: string }) {
-  return (
-    <div className="flex gap-md border-b border-outline-variant mt-sm overflow-x-auto no-scrollbar">
-      {[
-        { label: "Overview",    href: `/venues/${venueId}` },
-        { label: "Competitors", href: `/venues/${venueId}/competitors` },
-        { label: "Transform",   href: `/venues/${venueId}/transform` },
-        { label: "Marketing",   href: `/venues/${venueId}/marketing` },
-        { label: "Campaign",    href: `/venues/${venueId}/campaign` },
-        { label: "Audience",    href: `/venues/${venueId}/audience` },
-      ].map((tab) => (
-        <Link
-          key={tab.label}
-          href={tab.href}
-          className={`pb-sm px-sm text-label-md font-label-md whitespace-nowrap transition-colors ${
-            tab.label === "Campaign"
-              ? "text-primary border-b-2 border-primary"
-              : "text-on-surface-variant hover:text-primary"
-          }`}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
 function NoTarget({ id }: { id: string }) {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <div className="px-margin py-lg border-b border-brand-border">
-        <VenueTabs venueId={id} />
+    <div className="flex flex-col min-h-screen">
+      <div className="px-6 pt-6">
+        <CinTabBar venueId={id} active="Campaign" />
       </div>
-      <div className="flex-1 flex flex-col items-center justify-center gap-md text-center p-margin">
-        <span className="material-symbols-outlined text-[56px] text-on-surface-variant/30">flag</span>
-        <h2 className="text-headline-md font-headline-md text-on-surface">No growth target set</h2>
-        <p className="text-body-md font-body-md text-on-surface-variant max-w-[360px] w-full">
+      <div className="flex-1 flex flex-col items-center justify-center gap-5 text-center p-8">
+        <span className="material-symbols-outlined text-[56px]" style={{ color: "#27272A" }}>flag</span>
+        <h2 className="text-xl font-bold" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#F5F5F5" }}>
+          No growth target set
+        </h2>
+        <p className="text-sm max-w-[360px]" style={{ color: "#71717A" }}>
           Go to Transform, pick a segment to grow into, and click{" "}
-          <span className="text-[#C4B5FD]">View Campaign Strategy</span> to build your plan here.
+          <span style={{ color: "#c4b5fd" }}>View Campaign Strategy</span> to build your plan here.
         </p>
         <Link
           href={`/venues/${id}/transform`}
-          className="flex items-center gap-xs text-label-sm font-label-sm text-[#7C3AED] border border-[#7C3AED]/50 px-md py-sm rounded hover:bg-[#7C3AED]/20 transition-colors uppercase mt-sm"
+          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded transition-colors"
+          style={{ fontFamily: "'JetBrains Mono', monospace", color: "#c4b5fd", border: "1px solid rgba(124,58,237,0.4)", background: "rgba(124,58,237,0.08)" }}
         >
-          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span className="material-symbols-outlined text-[14px]">arrow_back</span>
           Set target in Transform
         </Link>
       </div>
     </div>
   );
 }
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function CampaignPage({
   params,
@@ -158,7 +122,7 @@ export default async function CampaignPage({
     ]);
   } catch {
     return (
-      <div className="p-margin text-error font-body-sm">
+      <div className="p-8 text-xs font-mono" style={{ color: "#FB7185" }}>
         Failed to load campaign data. Make sure the backend is running on port 8000.
       </div>
     );
@@ -170,65 +134,58 @@ export default async function CampaignPage({
   const venueName = data.top_segments[0]?.segment_name ?? "this venue";
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      {/* Tab bar */}
-      <div className="px-margin py-lg border-b border-brand-border">
-        <VenueTabs venueId={id} />
+    <div className="flex flex-col min-h-screen">
+      <div className="px-6 pt-6">
+        <CinTabBar venueId={id} active="Campaign" />
       </div>
 
-      <main className="flex-1 overflow-y-auto custom-scrollbar p-margin lg:px-xl pb-24 bg-background">
-        <div className="max-w-[1400px] mx-auto space-y-8">
+      <main className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 pb-24">
+        <div className="max-w-[1400px] mx-auto space-y-8 cin-stagger">
 
           {/* ── Campaign header ── */}
-          <div className="flex items-start gap-md border border-[#7C3AED]/30 rounded-lg p-md bg-[#7C3AED]/5 flex-wrap">
-            <span className="material-symbols-outlined text-[#7C3AED] text-[24px] mt-[2px]">flag</span>
+          <div
+            className="flex items-start gap-4 rounded-xl p-5 flex-wrap"
+            style={{ background: "rgba(124,58,237,0.07)", border: "1px solid rgba(124,58,237,0.2)" }}
+          >
+            <span className="material-symbols-outlined text-[22px] mt-0.5" style={{ color: "#c4b5fd" }}>flag</span>
             <div className="flex-1 min-w-0">
-              <div className="text-[10px] font-data-mono uppercase tracking-wider text-[#7C3AED]/70 mb-xs">
+              <div className="text-[9px] font-bold uppercase tracking-widest mb-1" style={{ fontFamily: "'JetBrains Mono', monospace", color: "rgba(196,181,253,0.6)" }}>
                 GROWTH TARGET CAMPAIGN
               </div>
-              <h2 className="text-headline-lg font-headline-lg text-[#C4B5FD] font-bold">
+              <h2 className="text-xl font-bold" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#c4b5fd" }}>
                 {growthTarget.target_segment_name}
               </h2>
-              <p className="text-body-sm font-body-sm text-on-surface-variant">
-                {growthTarget.demographic_label}
-              </p>
+              <p className="text-xs mt-1" style={{ color: "#71717A" }}>{growthTarget.demographic_label}</p>
             </div>
             <Link
               href={`/venues/${id}/transform`}
-              className="sm:ml-auto text-[10px] text-on-surface-variant/60 hover:text-on-surface-variant transition-colors uppercase font-data-mono whitespace-nowrap"
+              className="text-[10px] uppercase font-mono transition-colors"
+              style={{ color: "rgba(196,181,253,0.5)" }}
             >
               Change target ↗
             </Link>
           </div>
 
           {/* ── Ad Brief ── */}
-          <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm flex-wrap">
-              <span className="bg-primary/20 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-primary/30">
-                AD BRIEF
-              </span>
-              <h2 className="text-headline-md font-headline-md text-primary font-bold">
-                BRIEF GENERATOR
-              </h2>
-              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
-                — archetype × channel × India creative rules
-              </span>
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(230,211,163,0.1)", border: "1px solid rgba(230,211,163,0.2)", color: "#E6D3A3" }}>AD BRIEF</span>
+              <h2 className="text-sm font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#E6D3A3" }}>BRIEF GENERATOR</h2>
+              <span className="hidden sm:inline text-[10px]" style={{ color: "#3F3F46" }}>— archetype × channel × India creative rules</span>
             </div>
-            <div className="bg-brand-surface border border-brand-border rounded-lg p-md md:p-lg">
+            <div className="cin-card rounded-xl p-5 md:p-6">
               <AdBriefCard venueId={parseInt(id)} initialBrief={brief} />
             </div>
           </section>
 
           {/* ── Acquisition ── */}
-          <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm flex-wrap">
-              <span className="bg-signal-positive/20 text-signal-positive text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-signal-positive/30">
-                NEW CUSTOMERS
-              </span>
-              <h2 className="text-headline-md font-headline-md text-signal-positive font-bold">ACQUISITION</h2>
-              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">— Polynovea executes</span>
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", color: "#10B981" }}>NEW CUSTOMERS</span>
+              <h2 className="text-sm font-bold uppercase tracking-widest sig-emerald" style={{ fontFamily: "'JetBrains Mono', monospace" }}>ACQUISITION</h2>
+              <span className="hidden sm:inline text-[10px]" style={{ color: "#3F3F46" }}>— Polynovea executes</span>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-md">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {[
                 { channel: "instagram_organic", title: "Instagram Content",    badge: "#1 RECOMMENDED" },
                 { channel: "instagram_ads",     title: "Meta & Instagram Ads", badge: "META & INSTA ADS" },
@@ -247,37 +204,23 @@ export default async function CampaignPage({
           </section>
 
           {/* ── Retention ── */}
-          <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm flex-wrap">
-              <span className="bg-[#7C3AED]/20 text-[#7C3AED] text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-[#7C3AED]/30">
-                EXISTING CUSTOMERS
-              </span>
-              <h2 className="text-headline-md font-headline-md text-[#7C3AED] font-bold">RETENTION</h2>
-              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
-                — Convert regulars into {growthTarget.target_segment_name} advocates
-              </span>
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", color: "#c4b5fd" }}>EXISTING CUSTOMERS</span>
+              <h2 className="text-sm font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#c4b5fd" }}>RETENTION</h2>
+              <span className="hidden sm:inline text-[10px]" style={{ color: "#3F3F46" }}>— Convert regulars into {growthTarget.target_segment_name} advocates</span>
             </div>
-            <WhatsAppCard
-              card={growthTarget.retention_channel}
-              venueId={parseInt(id)}
-              venueName={venueName}
-            />
+            <WhatsAppCard card={growthTarget.retention_channel} venueId={parseInt(id)} venueName={venueName} />
           </section>
 
           {/* ── Platform Consulting ── */}
-          <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm flex-wrap">
-              <span className="bg-outline-variant/20 text-on-surface-variant text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-outline-variant/40">
-                ADVISORY
-              </span>
-              <h2 className="text-headline-md font-headline-md text-on-surface-variant font-bold">
-                PLATFORM CONSULTING
-              </h2>
-              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
-                — Polynovea advises, venue executes
-              </span>
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded" style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(39,39,42,0.4)", border: "1px solid rgba(39,39,42,0.8)", color: "#A1A1AA" }}>ADVISORY</span>
+              <h2 className="text-sm font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#A1A1AA" }}>PLATFORM CONSULTING</h2>
+              <span className="hidden sm:inline text-[10px]" style={{ color: "#3F3F46" }}>— Polynovea advises, venue executes</span>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-md">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <AIChannelCard
                 venueId={parseInt(id)}
                 channel="instagram_consulting"
@@ -288,15 +231,14 @@ export default async function CampaignPage({
             </div>
           </section>
 
-          <footer className="pt-lg border-t border-brand-border text-center">
-            <p className="text-[11px] font-body-sm text-on-surface-variant/60 max-w-2xl mx-auto">
-              Campaign strategy tailored for <span className="text-[#C4B5FD]">{growthTarget.target_segment_name}</span>.
+          <footer className="pt-6 border-t text-center" style={{ borderColor: "rgba(39,39,42,0.5)" }}>
+            <p className="text-[11px] max-w-2xl mx-auto" style={{ color: "#3F3F46" }}>
+              Campaign strategy tailored for <span style={{ color: "#c4b5fd" }}>{growthTarget.target_segment_name}</span>.
               All acquisition campaigns created and run by Polynovea.
             </p>
           </footer>
         </div>
       </main>
-
     </div>
   );
 }

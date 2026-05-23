@@ -1,34 +1,6 @@
-import Link from "next/link";
 import { getAudience, getAllSegments } from "@/lib/api";
 import AudienceClient from "@/components/AudienceClient";
-
-function VenueTabs({ venueId }: { venueId: string }) {
-  const tabs = [
-    { label: "Overview",    href: `/venues/${venueId}` },
-    { label: "Competitors", href: `/venues/${venueId}/competitors` },
-    { label: "Transform",   href: `/venues/${venueId}/transform` },
-    { label: "Marketing",   href: `/venues/${venueId}/marketing` },
-    { label: "Campaign",    href: `/venues/${venueId}/campaign` },
-    { label: "Audience",    href: `/venues/${venueId}/audience` },
-  ];
-  return (
-    <div className="flex gap-md border-b border-outline-variant mt-sm overflow-x-auto no-scrollbar">
-      {tabs.map((tab) => (
-        <Link
-          key={tab.label}
-          href={tab.href}
-          className={`pb-sm px-sm text-label-md font-label-md whitespace-nowrap transition-colors ${
-            tab.label === "Audience"
-              ? "text-primary border-b-2 border-primary"
-              : "text-on-surface-variant hover:text-primary"
-          }`}
-        >
-          {tab.label}
-        </Link>
-      ))}
-    </div>
-  );
-}
+import CinTabBar from "@/components/CinTabBar";
 
 export default async function AudiencePage({
   params,
@@ -46,26 +18,28 @@ export default async function AudiencePage({
     ]);
   } catch {
     return (
-      <div className="p-margin text-error font-body-sm text-body-sm">
+      <div className="p-8 text-xs font-mono" style={{ color: "#FB7185" }}>
         Failed to load audience data. Make sure the backend is running on port 8000.
       </div>
     );
   }
 
   return (
-    <div className="p-margin flex flex-col gap-lg max-w-[1400px] w-full mx-auto">
-      {/* Venue header */}
-      <div className="flex flex-col gap-xs border-b border-outline-variant pb-md">
-        <div className="flex items-baseline gap-sm flex-wrap">
-          <h2 className="text-headline-lg font-headline-lg text-primary-container font-bold">
+    <div className="p-6 md:p-8 flex flex-col gap-6 max-w-[1400px] w-full mx-auto cin-stagger">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <h2
+            className="text-2xl md:text-3xl font-bold gold-glow"
+            style={{ fontFamily: "'Clash Display', 'Inter', sans-serif" }}
+          >
             {currentData.venue_name}
           </h2>
-          <div className="flex items-center gap-xs text-on-surface-variant">
-            <span className="material-symbols-outlined text-[16px]">location_on</span>
-            <span className="text-body-sm font-body-sm">{currentData.venue_area}</span>
+          <div className="flex items-center gap-1.5 text-xs" style={{ color: "#71717A" }}>
+            <span className="material-symbols-outlined text-[14px]">location_on</span>
+            {currentData.venue_area}
           </div>
         </div>
-        <VenueTabs venueId={id} />
+        <CinTabBar venueId={id} active="Audience" />
       </div>
 
       <AudienceClient currentData={currentData} allSegments={allSegments} />
