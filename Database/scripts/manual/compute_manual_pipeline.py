@@ -11,7 +11,8 @@ Runs 4 steps in order:
 This is the equivalent of running steps 027 + 012 but scoped to one venue,
 so it's fast and safe to re-run without touching the rest of the DB.
 
-Usage:
+Called automatically at the end of every manual_reviews_*.py script.
+Can also be run standalone:
     python compute_manual_pipeline.py --venue-id 12066
     python compute_manual_pipeline.py --venue-id 12066 --skip-blend
 """
