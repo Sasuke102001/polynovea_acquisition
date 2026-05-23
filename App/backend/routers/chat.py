@@ -571,7 +571,8 @@ async def stream_from_nvidia(
 
 
 async def log_chat_to_supabase(
-    venue_id: int, tab: str, question: str, context_snapshot: dict, response: str
+    venue_id: int, tab: str, question: str, context_snapshot: dict, response: str,
+    is_demo: bool = False, prospect_name: str | None = None,
 ) -> None:
     """Fire-and-forget: POST one row to Supabase REST API via httpx."""
     try:
@@ -582,9 +583,11 @@ async def log_chat_to_supabase(
             "question":         question,
             "context_snapshot": context_snapshot,
             "response":         response,
-            "model_version":    "kimi-v1",
+            "model_version":    "nvidia-v1",
             "source_type":      "ai_generated",
             "schema_version":   1,
+            "is_demo":          is_demo,
+            "prospect_name":    prospect_name,
         }
         async with httpx.AsyncClient(timeout=10) as client:
             await client.post(url, json=payload, headers=_supabase_headers())

@@ -235,22 +235,39 @@ async def _log_session(
     consensus: bool, duration_ms: int,
 ) -> None:
     """Fire-and-forget: store the full debate tree in Supabase."""
+    # Separate clean responses from error strings per model
+    def _model_entry(name: str) -> dict:
+        r1_val = r1.get(name, "")
+        r2_val = r2.get(name, "")
+        is_error = r1_val.startswith(f"[{name}")
+        return {
+            "r1":    None if is_error else r1_val,
+            "r2":    None if is_error else r2_val,
+            "error": r1_val if is_error else None,
+        }
+
+    models_errored = [
+        name for name in ("nemotron", "deepseek", "qwen")
+        if r1.get(name, "").startswith(f"[{name}")
+    ]
+
     try:
         base = os.getenv("SUPABASE_URL", "").rstrip("/")
         url  = f"{base}/rest/v1/venue_council_sessions"
         payload = {
-            "venue_id":         str(venue_id),
-            "tab":              tab,
-            "question":         question,
-            "nemotron_r1":      r1.get("nemotron", ""),
-            "deepseek_r1":      r1.get("deepseek", ""),
-            "qwen_r1":          r1.get("qwen", ""),
-            "nemotron_r2":      r2.get("nemotron", ""),
-            "deepseek_r2":      r2.get("deepseek", ""),
-            "qwen_r2":          r2.get("qwen", ""),
-            "synthesis":        synthesis,
+            "venue_id":        str(venue_id),
+            "tab":             tab,
+            "question":        question,
+            "debate_tree": {
+                "nemotron": _model_entry("nemotron"),
+                "deepseek":  _model_entry("deepseek"),
+                "qwen":      _model_entry("qwen"),
+            },
+            "models_errored":  models_errored,
+            "synthesis_model": "nemotron",
+            "synthesis":       synthesis,
             "consensus_reached": consensus,
-            "duration_ms":      duration_ms,
+            "duration_ms":     duration_ms,
         }
         async with httpx.AsyncClient(timeout=10) as client:
             await client.post(url, json=payload, headers=_supabase_headers())

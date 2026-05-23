@@ -1063,6 +1063,8 @@ async def _log_brief_to_supabase(
             "model_version":    "brief-generator-v1",
             "source_type":      "brief_generated",
             "schema_version":   1,
+            "is_demo":          False,
+            "prospect_name":    None,
         }
         headers = {
             "apikey":        supabase_key,
