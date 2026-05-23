@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { streamChat } from "@/lib/chat-api";
 
-// Structured prompts per channel — system prompt in chat.py provides all venue context
+// ─── Prompts ──────────────────────────────────────────────────────────────────
+
 const CHANNEL_PROMPTS: Record<string, string> = {
   instagram_organic: `Generate Instagram content direction for our next live music show at this venue.
 
@@ -68,12 +69,22 @@ const CHANNEL_ICONS: Record<string, string> = {
   zomato_swiggy:        "delivery_dining",
 };
 
+// Cinematic-toned accent per channel — muted enough to sit on #0e0e11
 const CHANNEL_ACCENT: Record<string, string> = {
-  instagram_organic:    "#E1306C",   // Instagram pink
-  instagram_ads:        "#1877F2",   // Meta blue
-  google_ads:           "#4285F4",   // Google blue
-  instagram_consulting: "#9CA3AF",   // Muted grey for advisory
-  zomato_swiggy:        "#E23744",   // Zomato red
+  instagram_organic:    "#E6D3A3",   // gold — owned channel
+  instagram_ads:        "#E6D3A3",   // gold — paid
+  google_ads:           "#E6D3A3",   // gold — search
+  instagram_consulting: "#A1A1AA",   // muted — advisory
+  zomato_swiggy:        "#A1A1AA",   // muted — advisory
+};
+
+// Badge label per channel
+const CHANNEL_BADGE_LABEL: Record<string, string> = {
+  instagram_organic:    "CONTENT",
+  instagram_ads:        "META & INSTA ADS",
+  google_ads:           "GOOGLE ADS",
+  instagram_consulting: "ADVISORY",
+  zomato_swiggy:        "PLATFORM ADVISORY",
 };
 
 interface Props {
@@ -82,7 +93,7 @@ interface Props {
   title: string;
   badge?: string | null;
   targetSegments?: string[];
-  targetSegment?: string;   // from Transform tab — overrides primary segment focus
+  targetSegment?: string;
 }
 
 export default function AIChannelCard({ venueId, channel, title, badge, targetSegments, targetSegment }: Props) {
@@ -90,9 +101,12 @@ export default function AIChannelCard({ venueId, channel, title, badge, targetSe
   const [loading, setLoading]     = useState(false);
   const [userBrief, setUserBrief] = useState("");
 
-  const basePrompt = CHANNEL_PROMPTS[channel];
-  const icon       = CHANNEL_ICONS[channel]  ?? "auto_awesome";
-  const accent     = CHANNEL_ACCENT[channel] ?? "#F59E0B";
+  const basePrompt    = CHANNEL_PROMPTS[channel];
+  const icon          = CHANNEL_ICONS[channel]  ?? "auto_awesome";
+  const accent        = CHANNEL_ACCENT[channel] ?? "#E6D3A3";
+  const isAdvisory    = channel === "instagram_consulting" || channel === "zomato_swiggy";
+  const channelBadge  = CHANNEL_BADGE_LABEL[channel];
+  const isTopRec      = badge === "#1 RECOMMENDED" || badge === "#1 for Growth";
 
   const generate = async () => {
     if (!basePrompt) return;
@@ -115,62 +129,77 @@ export default function AIChannelCard({ venueId, channel, title, badge, targetSe
     });
   };
 
-
-  const badgeBg   = badge === "#1 RECOMMENDED" ? "#F6E0B5" : "#1E293B";
-  const badgeText = badge === "#1 RECOMMENDED" ? "#241A00" : accent;
-
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-lg overflow-hidden flex flex-col relative">
-
-      {/* Badge */}
-      {badge && (
+    <div
+      className="cin-card rounded-xl overflow-hidden flex flex-col relative"
+      style={{ minHeight: 0 }}
+    >
+      {/* Channel type badge — top right */}
+      {channelBadge && (
         <div
-          className="absolute top-0 right-0 text-label-sm font-label-sm px-sm py-xs rounded-bl uppercase font-bold flex items-center gap-xs"
-          style={{ backgroundColor: badgeBg, color: badgeText }}
+          className="absolute top-0 right-0 text-[9px] font-bold px-2 py-1 rounded-bl uppercase tracking-wider flex items-center gap-1"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            background: isAdvisory ? "rgba(75,70,59,0.3)" : "rgba(230,211,163,0.1)",
+            border: `0 0 0 1px ${isAdvisory ? "rgba(75,70,59,0.5)" : "rgba(230,211,163,0.25)"}`,
+            color: isAdvisory ? "#A1A1AA" : "#E6D3A3",
+          }}
         >
-          <span className="material-symbols-outlined text-sm">auto_awesome</span>
+          <span className="material-symbols-outlined text-[11px]">auto_awesome</span>
+          {channelBadge}
+        </div>
+      )}
+
+      {/* #1 recommended badge */}
+      {badge && isTopRec && (
+        <div
+          className="absolute top-0 left-0 text-[9px] font-bold px-2 py-1 rounded-br uppercase tracking-wider flex items-center gap-1"
+          style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(230,211,163,0.15)", border: "0 0 0 1px rgba(230,211,163,0.3)", color: "#E6D3A3" }}
+        >
+          <span className="material-symbols-outlined text-[11px]">stars</span>
           {badge}
         </div>
       )}
 
       {/* Header */}
-      <div className="flex items-center gap-sm p-md pb-sm border-b border-brand-border pr-xl flex-wrap">
-        <span
-          className="material-symbols-outlined text-[20px]"
-          style={{ color: accent }}
-        >
-          {icon}
-        </span>
-        <h3 className="text-headline-lg font-headline-lg text-on-surface font-bold">{title}</h3>
+      <div
+        className="flex items-center gap-3 px-5 pt-5 pb-4 flex-wrap"
+        style={{ paddingTop: (badge && isTopRec) || channelBadge ? "2.5rem" : "1.25rem" }}
+      >
+        <span className="material-symbols-outlined text-[22px]" style={{ color: accent }}>{icon}</span>
+        <h3 className="text-xl font-bold flex-1 min-w-0" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif", color: "#F5F5F5" }}>
+          {title}
+        </h3>
         {targetSegment && (
-          <span className="text-[10px] font-data-mono uppercase tracking-widest px-xs py-[2px] rounded border border-[#7C3AED]/40 text-[#C4B5FD] bg-[#7C3AED]/10">
+          <span
+            className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded"
+            style={{ fontFamily: "'JetBrains Mono', monospace", border: "1px solid rgba(124,58,237,0.4)", color: "#c4b5fd", background: "rgba(124,58,237,0.1)" }}
+          >
             TARGET: {targetSegment}
           </span>
         )}
       </div>
 
-      {/* AI suggestion body */}
-      <div className="flex-1 p-md flex flex-col gap-sm">
+      {/* AI output */}
+      <div className="flex-1 px-5 pb-3 flex flex-col gap-3">
         {content && (
-          <div className="bg-background border border-brand-border rounded p-sm flex flex-col gap-xs">
-            <div className="flex items-center gap-xs mb-xs">
-              <span className="material-symbols-outlined text-sm" style={{ color: accent }}>
-                auto_awesome
-              </span>
-              <span
-                className="text-[10px] font-data-mono uppercase tracking-widest font-bold"
-                style={{ color: accent }}
-              >
+          <div
+            className="rounded-lg p-3 flex flex-col gap-2"
+            style={{ background: "rgba(10,10,10,0.6)", border: "1px solid rgba(39,39,42,0.7)" }}
+          >
+            <div className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[13px]" style={{ color: accent }}>auto_awesome</span>
+              <span className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: accent }}>
                 POLYNOVEA INSIGHT
               </span>
               {loading && (
                 <div
                   className="w-2 h-2 border rounded-full animate-spin ml-auto"
-                  style={{ borderColor: `${accent}40`, borderTopColor: accent }}
+                  style={{ borderColor: "rgba(230,211,163,0.2)", borderTopColor: "#E6D3A3" }}
                 />
               )}
             </div>
-            <p className="text-[13px] text-on-surface leading-[1.9] whitespace-pre-wrap font-body-sm">
+            <p className="text-[13px] leading-[1.85] whitespace-pre-wrap" style={{ color: "#A1A1AA" }}>
               {content}
             </p>
           </div>
@@ -178,9 +207,9 @@ export default function AIChannelCard({ venueId, channel, title, badge, targetSe
       </div>
 
       {/* Brief input */}
-      <div className="px-md pb-sm flex flex-col gap-[6px]">
-        <label className="text-[9px] font-data-mono uppercase tracking-widest text-on-surface-variant/50">
-          Your direction <span className="normal-case tracking-normal font-sans not-italic opacity-60">— optional</span>
+      <div className="px-5 pb-3 flex flex-col gap-1.5">
+        <label className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#71717A" }}>
+          Your direction <span className="normal-case tracking-normal font-sans opacity-60">— optional</span>
         </label>
         <textarea
           value={userBrief}
@@ -188,19 +217,22 @@ export default function AIChannelCard({ venueId, channel, title, badge, targetSe
           disabled={loading}
           placeholder={`e.g. "Meme format, 3 slides" · "Focus on weekend couples" · "Punchy 5-word hook only"`}
           rows={2}
-          className="w-full bg-background border border-brand-border rounded px-sm py-xs text-[12px] text-on-surface placeholder-on-surface-variant/35 resize-none focus:outline-none focus:border-primary/60 disabled:opacity-40 leading-relaxed"
+          className="w-full rounded-lg px-3 py-2 text-[12px] resize-none focus:outline-none transition-all disabled:opacity-40 leading-relaxed"
+          style={{ background: "rgba(24,24,27,0.7)", border: "1px solid rgba(39,39,42,0.7)", color: "#F5F5F5", fontFamily: "'Inter', sans-serif" }}
+          onFocus={(e) => (e.target.style.borderColor = "rgba(230,211,163,0.35)")}
+          onBlur={(e) => (e.target.style.borderColor = "rgba(39,39,42,0.7)")}
         />
       </div>
 
-      {/* Footer: segments + action */}
-      <div className="px-md pb-md flex items-center justify-between gap-sm flex-wrap">
+      {/* Footer: segments + generate button */}
+      <div className="px-5 pb-5 flex items-center justify-between gap-3 flex-wrap">
         {targetSegments && targetSegments.length > 0 && (
-          <div className="flex flex-wrap gap-xs">
+          <div className="flex flex-wrap gap-1.5">
             {targetSegments.map((seg) => (
               <span
                 key={seg}
-                className="text-label-sm font-label-sm px-sm py-xs rounded border"
-                style={{ color: accent, borderColor: `${accent}40`, backgroundColor: `${accent}10` }}
+                className="text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest"
+                style={{ fontFamily: "'JetBrains Mono', monospace", color: "#F59E0B", borderColor: "rgba(245,158,11,0.3)", border: "1px solid rgba(245,158,11,0.3)", background: "rgba(245,158,11,0.08)" }}
               >
                 {seg}
               </span>
@@ -210,18 +242,19 @@ export default function AIChannelCard({ venueId, channel, title, badge, targetSe
         <button
           onClick={generate}
           disabled={loading}
-          className="ml-auto flex items-center gap-xs border border-outline-variant text-on-surface-variant text-[12px] px-md py-xs rounded hover:bg-surface-container transition-colors disabled:opacity-40"
+          className="ml-auto flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg transition-all disabled:opacity-40"
+          style={{ fontFamily: "'JetBrains Mono', monospace", border: "1px solid rgba(39,39,42,0.8)", color: "#A1A1AA", background: "rgba(24,24,27,0.6)" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(230,211,163,0.3)"; (e.currentTarget as HTMLElement).style.color = "#E6D3A3"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(39,39,42,0.8)"; (e.currentTarget as HTMLElement).style.color = "#A1A1AA"; }}
         >
           {loading ? (
             <>
-              <div className="w-3 h-3 border-2 border-outline-variant border-t-on-surface-variant rounded-full animate-spin" />
+              <div className="w-3 h-3 border-2 rounded-full animate-spin" style={{ borderColor: "rgba(230,211,163,0.2)", borderTopColor: "#E6D3A3" }} />
               Generating…
             </>
           ) : (
             <>
-              <span className="material-symbols-outlined text-sm">
-                {content ? "refresh" : "auto_awesome"}
-              </span>
+              <span className="material-symbols-outlined text-[14px]">{content ? "refresh" : "auto_awesome"}</span>
               {content ? "Regenerate" : "Generate suggestion"}
             </>
           )}
