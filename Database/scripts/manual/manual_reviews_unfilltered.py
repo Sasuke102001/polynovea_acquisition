@@ -191,7 +191,7 @@ FITNESS_DETAILS = {
 
 VENUE_INSERT_SQL = """
     INSERT INTO venues (name, city, area, types)
-    VALUES (%(name)s, %(city)s, %(area)s, %(types)s)
+    VALUES (%(name)s, %(city)s, %(area)s, %(types)s::jsonb)
     ON CONFLICT DO NOTHING
     RETURNING id;
 """
@@ -250,7 +250,7 @@ def run():
         'name':  'Unfilltered',
         'city':  'Mumbai',
         'area':  'Vikhroli',
-        'types': ['cafe', 'restaurant'],
+        'types': json.dumps(['cafe', 'restaurant']),
     }
     print("Inserting venue: Unfilltered, Vikhroli, Mumbai...")
     cur.execute(VENUE_INSERT_SQL, venue_params)
