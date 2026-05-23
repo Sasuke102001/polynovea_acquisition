@@ -382,7 +382,35 @@ async def _fetch_similar_venues(
                 bucketed[3].append(vid)
 
     if not all_candidates:
-        return [], 0
+        # Last resort: precomputed venue_similarity — covers manually-added venues
+        # whose types are all generic (cafe, restaurant, bar) and have no demographic
+        # segment scores, so neither the type-waterfall nor the segment fallback fires.
+        sim_rows = await conn.fetch(
+            """
+            SELECT similar_venue_id
+            FROM   venue_similarity
+            WHERE  venue_id = $1
+            ORDER  BY similarity_score DESC
+            LIMIT  $2
+            """,
+            venue_id, _MAX_POOL,
+        )
+        if not sim_rows:
+            return [], 0
+        fb_ids = [r["similar_venue_id"] for r in sim_rows]
+        fb_venues = await conn.fetch(
+            "SELECT id, area, city, types FROM venues WHERE id = ANY($1::int[])",
+            fb_ids,
+        )
+        for r in fb_venues:
+            vid = r["id"]
+            all_candidates[vid] = {
+                "types":  list(r["types"] or []),
+                "area":   r["area"] or "",
+                "city":   r["city"] or "",
+                "bucket": 2,  # Partial Match — most honest label for cosine fallback
+            }
+            bucketed[2].append(vid)
 
     # ── Step 4: Fetch fitness for all candidates ──────────────────────────────
     all_ids = list(all_candidates.keys())
