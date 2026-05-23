@@ -435,6 +435,7 @@ def run(venue_id: int, skip_blend: bool = False, skip_bif: bool = False) -> None
             print(f"\n  [5/7] Extracting behavioral primitives (BIF)...")
             extract_primitives.run(venue_id)
 
+
             print(f"\n  [6/7] Computing intervention triggers...")
             compute_interventions.run(venue_id)
 

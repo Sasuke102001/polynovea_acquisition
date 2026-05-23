@@ -291,6 +291,52 @@ def run():
     print("Loading behavioral summary...")
     cur.execute(SUMMARY_SQL, params)
 
+    # ── Step 4: Store raw reviews in raw_venue_data ────────────────────────
+    print("Storing raw reviews in raw_venue_data...")
+    reviews_payload = {
+        "name":            "Unfilltered",
+        "area":            "Vikhroli",
+        "city":            "Mumbai",
+        "collection_date": "2026-05-23",
+        "review_count":    25,
+        "reviews": [
+            {"rating": 1, "text": "Cockroach and rat sighting during the meal. Completely unacceptable hygiene. Small portions for the price charged."},
+            {"rating": 5, "text": "Absolutely love the ambience here. Very serene, calm and aesthetic. Perfect for a quiet study session or catching up with a close friend."},
+            {"rating": 5, "text": "The mango matcha cloud is divine. Ambience is 5/5. Very cozy and peaceful space near R City mall."},
+            {"rating": 4, "text": "Good food overall but portions are on the smaller side. The vibe makes up for it. Would visit again for the drinks."},
+            {"rating": 1, "text": "50 rupees quantity, 500 rupees price. Not worth it at all. Overpriced for what you get."},
+            {"rating": 5, "text": "The hot chocolate here is rich and thick, unlike anywhere else. Loved the deep dish brown butter chocolate cookie too."},
+            {"rating": 1, "text": "Green spots inside the pancakes. Spoiled cream. Had stomach pains after eating. This is a serious food safety issue."},
+            {"rating": 5, "text": "Great place for solo work sessions. Quiet, good WiFi vibe, lovely matcha drinks. Staff are polite."},
+            {"rating": 5, "text": "Svanika the owner personally came and checked on us. Really appreciated the personal touch. The crispy cheesy corn jalapeno money bag was outstanding."},
+            {"rating": 5, "text": "Sujay Sir at the counter is extremely helpful and knowledgeable about the menu. Great experience overall. Will definitely return."},
+            {"rating": 4, "text": "Love the health-conscious menu. Bibimbap and green scene pizza are both really good. Nice calm environment."},
+            {"rating": 4, "text": "The soyful dumplings and Desi Firecracker pizza are must tries. Atmosphere is very aesthetic and Instagram-worthy."},
+            {"rating": 1, "text": "Ordered non-veg. They served veg by mistake. When we pointed it out the manager smirked and did not apologise. The owner was present and took no action. This is a religious dietary violation for our group."},
+            {"rating": 1, "text": "Same veg/non-veg mix-up happened to us on February 20th during an office lunch. Manager was dismissive. Group of colleagues deeply offended. Will never return."},
+            {"rating": 5, "text": "Perfect study spot. Calm, quiet, booths are comfortable. Spent 3 hours here and nobody bothered me. The Nutella mocha frappe is excellent."},
+            {"rating": 1, "text": "Came with a group of 8. Not a single person liked the coffee. Service was extremely slow. 25-30 minute wait for simple items."},
+            {"rating": 1, "text": "Spent Rs 2400 and most of the food was inedible. Half-cooked runny tiramisu french toast tasted like food poisoning. One member of our group left without eating. Undercooked risotto with no salt. Cappuccino ordered and never served."},
+            {"rating": 5, "text": "One of the few genuinely health-forward cafes in Vikhroli. The crispy paprika chicken strips are amazing. Love the aesthetic."},
+            {"rating": 4, "text": "Lovely quiet spot near R City. Good for a calm coffee break. Accessible location. Would return for the matcha drinks."},
+            {"rating": 1, "text": "Third time a veg/non-veg mix-up has been reported by people I know. This is a systemic operational failure. The ambience cannot compensate for this."},
+            {"rating": 5, "text": "Came for a solo lunch. The hummus and co plate was fresh and filling. Peaceful atmosphere. Staff were friendly and attentive."},
+            {"rating": 3, "text": "Zomato shows this place as temporarily closed while it is actually open. The photos on Google and Zomato are of some old restaurant called South Pavilion. Staff not trained on the current menu items."},
+            {"rating": 5, "text": "Gorgeous space. The hot chocolate is thick and rich like European hot chocolate. Very Instagrammable. Perfect for a date or quiet catch-up."},
+            {"rating": 2, "text": "Spaghetti came without chicken. Replaced with the same dish but with fried chicken placed on top. Waited 25-30 minutes. Svanika was there but seemed overwhelmed."},
+            {"rating": 5, "text": "The ambience alone is worth visiting. Very aesthetic, serene. Health-forward menu is a breath of fresh air in this area. Repeat visitor."},
+        ],
+    }
+    cur.execute(
+        """
+        INSERT INTO raw_venue_data
+            (venue_id, platform, data_type, raw_payload, collector_version, schema_version)
+        VALUES (%s, 'manual_reviews', 'review_batch', %s, 'manual-reviews-1.0', 1)
+        ON CONFLICT DO NOTHING
+        """,
+        (venue_id, json.dumps(reviews_payload)),
+    )
+
     conn.commit()
 
     # ── Verify ─────────────────────────────────────────────────────────────
