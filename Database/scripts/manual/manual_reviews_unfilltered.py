@@ -125,6 +125,10 @@ import sys
 
 import psycopg2
 
+# Auto-run pipeline after venue insert
+sys.path.insert(0, os.path.dirname(__file__))
+import compute_manual_pipeline
+
 sys.stdout.reconfigure(encoding='utf-8')
 
 DB_CONFIG = {
@@ -303,8 +307,9 @@ def run():
     cur.close()
     conn.close()
 
-    print(f"\nDone. venue_id={venue_id}")
-    print("Next step: run 027_blend_fitness.py to include in source='blended'")
+    print(f"\nDone loading venue data for venue_id={venue_id}")
+    print("Running pipeline (blend → similarity → demographics)...")
+    compute_manual_pipeline.run(venue_id)
 
 
 if __name__ == '__main__':

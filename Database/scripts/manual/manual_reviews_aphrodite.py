@@ -79,6 +79,9 @@ import os
 import sys
 import psycopg2
 
+sys.path.insert(0, os.path.dirname(__file__))
+import compute_manual_pipeline
+
 sys.stdout.reconfigure(encoding='utf-8')
 
 DB_CONFIG = {
@@ -192,7 +195,9 @@ def run():
     cur.execute(SUMMARY_SQL, params)
 
     conn.commit()
-    print("Done. Now run 027_blend_fitness.py to recompute source='blended' for this venue.")
+    print(f"Done loading venue data for venue_id={VENUE_ID}")
+    print("Running pipeline (blend → similarity → demographics)...")
+    compute_manual_pipeline.run(VENUE_ID)
 
     # Verify
     cur.execute(
