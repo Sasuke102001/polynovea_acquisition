@@ -15,6 +15,7 @@ Called automatically at the end of every manual_reviews_*.py script.
 Can also be run standalone:
     python compute_manual_pipeline.py --venue-id 12066
     python compute_manual_pipeline.py --venue-id 12066 --skip-blend
+    python compute_manual_pipeline.py --venue-id 12066 --skip-bif
 """
 
 import argparse
@@ -25,6 +26,12 @@ import sys
 
 import psycopg2
 import psycopg2.extras
+
+# BIF sub-scripts
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'bif'))
+import extract_primitives
+import compute_interventions
+import link_patterns
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -393,7 +400,7 @@ def step_demographics(cur, venue_id: int) -> None:
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
-def run(venue_id: int, skip_blend: bool = False) -> None:
+def run(venue_id: int, skip_blend: bool = False, skip_bif: bool = False) -> None:
     conn = psycopg2.connect(**DB_CONFIG)
     cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
@@ -420,21 +427,40 @@ def run(venue_id: int, skip_blend: bool = False) -> None:
         step_demographics(cur, venue_id)
 
         conn.commit()
+        cur.close()
+        conn.close()
+
+        # BIF steps — run outside the main connection (each opens its own)
+        if not skip_bif:
+            print(f"\n  [5/7] Extracting behavioral primitives (BIF)...")
+            extract_primitives.run(venue_id)
+
+            print(f"\n  [6/7] Computing intervention triggers...")
+            compute_interventions.run(venue_id)
+
+            print(f"\n  [7/7] Linking to behavioral patterns...")
+            link_patterns.run(venue_id)
+        else:
+            print("  [5-7/7] BIF steps skipped (--skip-bif flag)")
 
         print(f"\n{'='*60}")
         print(f"  COMPLETE — venue_id={venue_id} fully processed")
-        print(f"  - Competitors tab : ✓ (venue_similarity populated)")
-        print(f"  - Customer segments: ✓ (venue_demographic_scores populated)")
-        print(f"  - Fitness blend   : {'skipped' if skip_blend else '✓'}")
+        print(f"  - Fitness blend        : {'skipped' if skip_blend else '✓'}")
+        print(f"  - Competitors tab      : ✓ (venue_similarity populated)")
+        print(f"  - Customer segments    : ✓ (venue_demographic_scores populated)")
+        print(f"  - Primitive signals    : {'skipped' if skip_bif else '✓'}")
+        print(f"  - Intervention triggers: {'skipped' if skip_bif else '✓'}")
+        print(f"  - Pattern links        : {'skipped' if skip_bif else '✓'}")
         print(f"{'='*60}\n")
+        return  # already closed conn above
 
     except Exception as e:
-        conn.rollback()
+        try:
+            conn.rollback()
+        except Exception:
+            pass
         print(f"\n[ERROR] {e}")
         raise
-    finally:
-        cur.close()
-        conn.close()
 
 
 if __name__ == '__main__':
@@ -442,6 +468,7 @@ if __name__ == '__main__':
         description="Run full post-load pipeline for a manually added venue"
     )
     parser.add_argument('--venue-id',    type=int,  required=True,  help="venue_id of the manual venue")
-    parser.add_argument('--skip-blend',  action='store_true',        help="Skip the blend step (if fitness already blended)")
+    parser.add_argument('--skip-blend',  action='store_true', help="Skip the blend step (if fitness already blended)")
+    parser.add_argument('--skip-bif',    action='store_true', help="Skip BIF steps (primitives, interventions, patterns)")
     args = parser.parse_args()
-    run(args.venue_id, skip_blend=args.skip_blend)
+    run(args.venue_id, skip_blend=args.skip_blend, skip_bif=args.skip_bif)
