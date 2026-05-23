@@ -136,7 +136,7 @@ def run(venue_id: int):
             vector_source  = EXCLUDED.vector_source,
             last_computed  = CURRENT_TIMESTAMP
         """,
-        (venue_id, 'manual_reviews', json.dumps(target_vec), 'manual_review_analysis')
+        (venue_id, 'manual_reviews', target_vec, 'manual_review_analysis')
     )
     print("Inserted venue vector into venue_vectors")
 
