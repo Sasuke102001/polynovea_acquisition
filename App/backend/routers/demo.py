@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from typing import AsyncGenerator
 
 import jwt  # PyJWT
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -65,13 +65,23 @@ class GenerateResponse(BaseModel):
     demo_url: str
 
 
+def _check_admin(x_admin_key: str | None) -> None:
+    """Validate the admin key header. Raises 403 if wrong."""
+    required = os.getenv("ADMIN_KEY", "")
+    if required and x_admin_key != required:
+        raise HTTPException(status_code=403, detail="Invalid admin key.")
+
+
 @router.post("/generate", response_model=GenerateResponse)
-async def generate_token(req: GenerateRequest):
+async def generate_token(
+    req: GenerateRequest,
+    x_admin_key: str | None = Header(default=None),
+):
     """
     Generate a signed JWT demo token.
-    Internal use only — call from the CLI script (generate_demo_token.py) or admin panel.
-    Do not expose this endpoint publicly without an additional auth layer.
+    Requires X-Admin-Key header matching ADMIN_KEY env var.
     """
+    _check_admin(x_admin_key)
     now = int(time.time())
     payload = {
         "venue_id":      req.venue_id,
