@@ -7,14 +7,12 @@ Uses geo_google.all_components.sublocality_level_1 for area and
 all_components.locality for city — the two fields Google resolves
 most reliably from reverse geocoding.
 
+Join key: LOWER(TRIM(name)) + city_label
+(venues table uses name_normalized generated column; place_id was not
+populated from these files so place_id join yields near-zero matches)
+
 Usage (run on EC2 after copying the 4 refined JSON files):
     python fix_venue_areas.py --data-dir /path/to/google_places
-
-The --data-dir should contain:
-    navi-mumbai/step_1_venues_refined.json
-    mumbai-main/step_1_venues_refined.json
-    mumbai-sobo/step_1_venues_refined.json
-    thane/step_1_venues_refined.json
 
 Default data-dir (relative to this script):
     ../../data/raw/google_places
@@ -23,6 +21,7 @@ Default data-dir (relative to this script):
 import argparse
 import json
 import os
+import re
 import sys
 
 import psycopg2
@@ -39,16 +38,24 @@ DB_CONFIG = {
     'sslmode':  'require',
 }
 
-CITIES = ['navi-mumbai', 'mumbai-main', 'mumbai-sobo', 'thane']
+# City label as stored in the DB (matches CITY_LABEL in step_6 loader)
+CITY_LABEL: dict[str, str] = {
+    'navi-mumbai':  'Navi Mumbai',
+    'mumbai-main':  'Mumbai',
+    'mumbai-sobo':  'Mumbai',
+    'thane':        'Thane',
+}
+
+
+def name_normalized(name: str) -> str:
+    """Matches the DB generated column: LOWER(TRIM(name))"""
+    return name.strip().lower()
 
 
 def extract_area_city(venue: dict) -> tuple[str | None, str | None]:
     """
-    Pull area from sublocality_level_1, city from locality.
-    Both sourced from geo_google.all_components — the most reliable
-    Google reverse-geocoding fields.
-    Falls back to geo_google.resolved_locality for area if sublocality
-    is absent, then to the raw area field.
+    Pull area from sublocality_level_1, city from locality component.
+    Falls back gracefully if fields are absent.
     """
     geo_goog   = venue.get('geo_google', {})
     components = geo_goog.get('all_components', {})
@@ -67,35 +74,45 @@ def run(data_dir: str) -> None:
     conn = psycopg2.connect(**DB_CONFIG)
     cur  = conn.cursor()
 
-    total_venues  = 0
-    update_rows   = []   # (area, city, place_id)
-    skipped       = 0
+    total_queued = 0
+    skipped_files = 0
 
-    for city_slug in CITIES:
+    # Build update list: (area, city, name_norm, db_city_label)
+    # Join: WHERE name_normalized = %s AND city = %s
+    update_rows: list[tuple] = []
+
+    for city_slug, db_city in CITY_LABEL.items():
         path = os.path.join(data_dir, city_slug, 'step_1_venues_refined.json')
         if not os.path.exists(path):
             print(f"  SKIP {city_slug} — file not found: {path}")
-            skipped += 1
+            skipped_files += 1
             continue
 
         with open(path, encoding='utf-8') as f:
             venues = json.load(f)
 
-        city_updates = 0
+        city_queued = 0
         for v in venues:
-            place_id = v.get('place_id')
-            if not place_id:
+            name = v.get('name', '').strip()
+            if not name:
                 continue
 
             area, city = extract_area_city(v)
-            if area or city:
-                update_rows.append((area, city, place_id))
-                city_updates += 1
+            if not area:
+                continue
 
-        total_venues += len(venues)
-        print(f"  {city_slug}: {len(venues)} venues, {city_updates} rows queued")
+            update_rows.append((
+                area,
+                city or db_city,       # new city value
+                name_normalized(name), # match key 1
+                db_city,               # match key 2 (current DB value)
+            ))
+            city_queued += 1
 
-    if skipped == len(CITIES):
+        total_queued += city_queued
+        print(f"  {city_slug} ({db_city}): {len(venues)} venues, {city_queued} rows queued")
+
+    if skipped_files == len(CITY_LABEL):
         print("\nERROR: No refined JSON files found. Copy them to --data-dir first.")
         sys.exit(1)
 
@@ -103,21 +120,21 @@ def run(data_dir: str) -> None:
         print("\nNothing to update.")
         return
 
-    print(f"\nRunning bulk UPDATE for {len(update_rows)} venues...")
+    print(f"\nRunning bulk UPDATE for {total_queued} rows (join: name_normalized + city)...")
 
-    # Use execute_values for efficient batch update
     psycopg2.extras.execute_values(
         cur,
         """
         UPDATE venues AS v SET
             area       = u.area,
-            city       = COALESCE(u.city, v.city),
+            city       = u.city,
             updated_at = CURRENT_TIMESTAMP
-        FROM (VALUES %s) AS u(area, city, place_id)
-        WHERE v.place_id = u.place_id
+        FROM (VALUES %s) AS u(area, city, name_norm, db_city)
+        WHERE v.name_normalized = u.name_norm
+          AND v.city             = u.db_city
         """,
         update_rows,
-        template="(%s, %s, %s)",
+        template="(%s, %s, %s, %s)",
     )
 
     affected = cur.rowcount
@@ -125,8 +142,8 @@ def run(data_dir: str) -> None:
     cur.close()
     conn.close()
 
-    print(f"Done. {affected} venue rows updated in DB.")
-    print(f"({total_venues - affected} had no matching place_id in venues table — likely expected)")
+    print(f"Done. {affected} venue rows updated.")
+    print(f"({total_queued - affected} names had no match in DB — duplicates or missing venues)")
 
 
 if __name__ == '__main__':
