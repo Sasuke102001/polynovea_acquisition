@@ -705,7 +705,64 @@ def build_competitor_analysis_prompt(
     return system, user
 
 
+# ─── Demo teaser guardrail ────────────────────────────────────────────────────
+
+def _build_demo_guardrail(venue_name: str, prospect_name: str) -> str:
+    return f"""
+════════════════════════════════════════════════════════
+DEMO MODE — PROSPECT PREVIEW (applies immediately after Rule 1)
+════════════════════════════════════════════════════════
+You are giving {prospect_name} a curated preview of Polynovea's intelligence for {venue_name}.
+
+Response rules (non-negotiable):
+1. Every response must be 150–200 words maximum. Sharp and precise — not comprehensive.
+2. Lead with a specific, data-grounded insight. Name actual scores, segments, or signals.
+   Make it feel real and impressive, because it is.
+3. End every single response with this exact line on its own paragraph:
+   "— Want the full intelligence suite for {venue_name}? Book a strategy call: polynovea.com"
+4. If asked for the complete playbook, full channel strategy, all competitor data,
+   or "everything you know" — give 2 strong insights and close with:
+   "The complete picture is what a full Polynovea engagement unlocks."
+   Then the CTA line.
+5. Never say you are in demo mode. Never say anything is restricted or limited.
+   Just be naturally concise and always close with the CTA line.
+
+"""
+
+
 # ─── Public interface ─────────────────────────────────────────────────────────
+
+def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
+    """
+    System prompt for demo mode.
+    Same full venue data as the live app — teaser behaviour comes from the guardrail,
+    not from withholding data. Impressiveness requires real specificity.
+    """
+    venue_name = venue_context.get("venue_name", "this venue")
+    return (
+        _IDENTITY_GUARDRAIL
+        + _build_demo_guardrail(venue_name, prospect_name)
+        + build_venue_prompt(
+            tab="overview",
+            venue_name=venue_name,
+            venue_type=venue_context.get("venue_type", "Restaurant"),
+            area=venue_context.get("area", ""),
+            city=venue_context.get("city", ""),
+            top_segments=venue_context.get("top_segments", []),
+            top_fitness_dims=venue_context.get("top_fitness_dims", []),
+            top_competitors=venue_context.get("top_competitors", []),
+            seg_profiles=venue_context.get("seg_profiles"),
+            channel_effectiveness=venue_context.get("channel_effectiveness"),
+            campaign_templates=venue_context.get("campaign_templates"),
+            interventions=venue_context.get("interventions"),
+            behavioral_primitives=venue_context.get("behavioral_primitives"),
+            behavioral_patterns=venue_context.get("behavioral_patterns"),
+            dish_signals=venue_context.get("dish_signals"),
+            mechanisms=venue_context.get("mechanisms"),
+            drift_signals=venue_context.get("drift_signals"),
+        )
+    )
+
 
 def get_system_prompt(tab: str, venue_context: dict) -> str:
     return _IDENTITY_GUARDRAIL + build_venue_prompt(
