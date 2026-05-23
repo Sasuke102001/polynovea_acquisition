@@ -621,7 +621,7 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
             {"role": "user",   "content": user_message},
         ],
         temperature=0.2,
-        max_tokens=2000,
+        max_tokens=3500,
     )
 
     raw = (response.choices[0].message.content or "").strip()
@@ -632,14 +632,22 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
 
     # ── 1. Direct parse ───────────────────────────────────────────────────────
     try:
-        return _json.loads(raw)
+        parsed = _json.loads(raw)
+        # Model sometimes returns a bare array instead of the expected object —
+        # wrap it so callers always receive a dict
+        if isinstance(parsed, list):
+            return {"learn_from": parsed, "avoid": [], "strategic_brief": ""}
+        return parsed
     except _json.JSONDecodeError:
         pass
 
     # ── 2. Sanitise trailing commas, try again ────────────────────────────────
     sanitised = _sanitize_json(raw)
     try:
-        return _json.loads(sanitised)
+        parsed = _json.loads(sanitised)
+        if isinstance(parsed, list):
+            return {"learn_from": parsed, "avoid": [], "strategic_brief": ""}
+        return parsed
     except _json.JSONDecodeError:
         pass
 
@@ -651,7 +659,17 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
         except _json.JSONDecodeError:
             pass
 
-    # ── 4. Same on original raw (in case sanitise over-corrected) ─────────────
+    # ── 4. Extract first [...] array block (model returned bare array) ─────────
+    match = _re.search(r"\[[\s\S]*\]", sanitised)
+    if match:
+        try:
+            parsed = _json.loads(_sanitize_json(match.group()))
+            if isinstance(parsed, list):
+                return {"learn_from": parsed, "avoid": [], "strategic_brief": ""}
+        except _json.JSONDecodeError:
+            pass
+
+    # ── 5. Same on original raw (in case sanitise over-corrected) ─────────────
     match = _re.search(r"\{[\s\S]*\}", raw)
     if match:
         try:
