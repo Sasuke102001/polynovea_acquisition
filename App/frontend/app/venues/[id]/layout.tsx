@@ -33,7 +33,7 @@ export default async function VenueHubLayout({
               href={`/venues/${id}/deep`}
               className="text-label-md font-label-md text-primary hover:bg-surface-container-highest transition-colors px-sm py-xs border border-outline-variant rounded flex items-center gap-xs"
             >
-              DEEP ANALYSIS
+              <span className="hidden sm:inline">DEEP ANALYSIS</span>
               <span className="material-symbols-outlined text-[16px]">bolt</span>
             </Link>
           </div>
