@@ -225,7 +225,7 @@ def step_blend(cur, venue_id: int) -> dict[str, float]:
                AVG(retention_strength)     AS retention_strength,
                AVG(monetization_potential) AS monetization_potential
         FROM venue_fitness_dimensions
-        WHERE venue_id = %s AND source != 'blended'
+        WHERE venue_id = %s AND source NOT IN ('blended', 'manual_bif')
         """,
         (venue_id,),
     )

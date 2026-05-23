@@ -25,7 +25,7 @@ STEP6_PATH = Path(
     r"\Behavioural_Intelligence_Framework\Data\manual\step_6_output.json"
 )
 
-SOURCE           = "manual_reviews"
+SOURCE           = "manual_bif"
 PIPELINE_VERSION = "manual-bif-1.0"
 
 DB_CONFIG = {

@@ -65,7 +65,7 @@ FETCH_SQL = """
            fitness_for_destination_visit,
            operational_quality, retention_strength, monetization_potential
     FROM venue_fitness_dimensions
-    WHERE source != 'blended'
+    WHERE source NOT IN ('blended', 'manual_bif')
     ORDER BY venue_id, source
 """
 
