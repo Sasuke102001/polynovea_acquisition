@@ -248,15 +248,6 @@ export default function DemoChat({ token }: DemoChatProps) {
           </div>
         </div>
 
-        <a
-          href="https://polynovea.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-xs bg-primary text-surface text-[13px] font-label-sm px-md py-sm rounded-lg hover:opacity-90 transition-opacity shrink-0"
-        >
-          <span className="material-symbols-outlined text-[16px]">calendar_month</span>
-          Book a call
-        </a>
       </header>
 
       {/* ── Messages area ──────────────────────────────────────────────── */}
@@ -360,14 +351,6 @@ export default function DemoChat({ token }: DemoChatProps) {
             <p className="text-[11px] text-on-surface-variant/50">
               Powered by Polynovea's behavioral intelligence framework
             </p>
-            <a
-              href="https://polynovea.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="sm:hidden text-[12px] text-primary font-medium hover:underline"
-            >
-              Book a call →
-            </a>
           </div>
         </div>
       </footer>
