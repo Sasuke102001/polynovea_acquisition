@@ -190,15 +190,15 @@ FITNESS_DETAILS = {
 }
 
 VENUE_INSERT_SQL = """
-    INSERT INTO venues (name, city, area, types)
-    VALUES (%(name)s, %(city)s, %(area)s, %(types)s::jsonb)
-    ON CONFLICT DO NOTHING
+    INSERT INTO venues (place_id, name, city, area, types)
+    VALUES (%(place_id)s, %(name)s, %(city)s, %(area)s, %(types)s::jsonb)
+    ON CONFLICT (place_id) DO NOTHING
     RETURNING id;
 """
 
 VENUE_SELECT_SQL = """
     SELECT id FROM venues
-    WHERE name = %(name)s AND city = %(city)s AND area = %(area)s
+    WHERE place_id = %(place_id)s
     LIMIT 1;
 """
 
@@ -247,10 +247,11 @@ def run():
 
     # ── Step 1: Insert venue ────────────────────────────────────────────────
     venue_params = {
-        'name':  'Unfilltered',
-        'city':  'Mumbai',
-        'area':  'Vikhroli',
-        'types': json.dumps(['cafe', 'restaurant']),
+        'place_id': 'manual_unfilltered_vikhroli_001',
+        'name':     'Unfilltered',
+        'city':     'Mumbai',
+        'area':     'Vikhroli',
+        'types':    json.dumps(['cafe', 'restaurant']),
     }
     print("Inserting venue: Unfilltered, Vikhroli, Mumbai...")
     cur.execute(VENUE_INSERT_SQL, venue_params)
