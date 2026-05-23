@@ -359,14 +359,14 @@ export default async function MarketingPage({
 
           {/* ── Section 2: Ad Brief Generator ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-primary/20 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-primary/30">
                 AD BRIEF
               </span>
               <h2 className="text-headline-md font-headline-md text-primary font-bold">
                 BRIEF GENERATOR
               </h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
                 — archetype × channel × India creative rules
               </span>
             </div>
@@ -377,14 +377,14 @@ export default async function MarketingPage({
 
           {/* ── Section 3: Acquisition ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-signal-positive/20 text-signal-positive text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-signal-positive/30">
                 NEW CUSTOMERS
               </span>
               <h2 className="text-headline-md font-headline-md text-signal-positive font-bold">
                 ACQUISITION
               </h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
                 — Polynovea executes
               </span>
             </div>
@@ -410,7 +410,7 @@ export default async function MarketingPage({
 
           {/* ── Section 3: Retention ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-[#7C3AED]/20 text-[#7C3AED] text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-[#7C3AED]/30">
                 EXISTING CUSTOMERS
               </span>
@@ -429,14 +429,14 @@ export default async function MarketingPage({
           {/* ── Section 4: Platform Consulting ── */}
           {data.consulting_channels.length > 0 && (
             <section className="flex flex-col gap-md">
-              <div className="flex items-center gap-sm">
+              <div className="flex items-center gap-sm flex-wrap">
                 <span className="bg-outline-variant/20 text-on-surface-variant text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-outline-variant/40">
                   ADVISORY
                 </span>
                 <h2 className="text-headline-md font-headline-md text-on-surface-variant font-bold">
                   PLATFORM CONSULTING
                 </h2>
-                <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+                <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
                   — Polynovea advises, venue executes
                 </span>
               </div>

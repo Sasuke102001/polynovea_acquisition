@@ -180,9 +180,9 @@ export default async function CampaignPage({
         <div className="max-w-[1400px] mx-auto space-y-8">
 
           {/* ── Campaign header ── */}
-          <div className="flex items-start gap-md border border-[#7C3AED]/30 rounded-lg p-md bg-[#7C3AED]/5">
+          <div className="flex items-start gap-md border border-[#7C3AED]/30 rounded-lg p-md bg-[#7C3AED]/5 flex-wrap">
             <span className="material-symbols-outlined text-[#7C3AED] text-[24px] mt-[2px]">flag</span>
-            <div>
+            <div className="flex-1 min-w-0">
               <div className="text-[10px] font-data-mono uppercase tracking-wider text-[#7C3AED]/70 mb-xs">
                 GROWTH TARGET CAMPAIGN
               </div>
@@ -195,7 +195,7 @@ export default async function CampaignPage({
             </div>
             <Link
               href={`/venues/${id}/transform`}
-              className="ml-auto text-[10px] text-on-surface-variant/60 hover:text-on-surface-variant transition-colors uppercase font-data-mono whitespace-nowrap"
+              className="sm:ml-auto text-[10px] text-on-surface-variant/60 hover:text-on-surface-variant transition-colors uppercase font-data-mono whitespace-nowrap"
             >
               Change target ↗
             </Link>
@@ -203,14 +203,14 @@ export default async function CampaignPage({
 
           {/* ── Ad Brief ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-primary/20 text-primary text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-primary/30">
                 AD BRIEF
               </span>
               <h2 className="text-headline-md font-headline-md text-primary font-bold">
                 BRIEF GENERATOR
               </h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
                 — archetype × channel × India creative rules
               </span>
             </div>
@@ -221,12 +221,12 @@ export default async function CampaignPage({
 
           {/* ── Acquisition ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-signal-positive/20 text-signal-positive text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-signal-positive/30">
                 NEW CUSTOMERS
               </span>
               <h2 className="text-headline-md font-headline-md text-signal-positive font-bold">ACQUISITION</h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">— Polynovea executes</span>
+              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">— Polynovea executes</span>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-md">
               {[
@@ -248,12 +248,12 @@ export default async function CampaignPage({
 
           {/* ── Retention ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-[#7C3AED]/20 text-[#7C3AED] text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-[#7C3AED]/30">
                 EXISTING CUSTOMERS
               </span>
               <h2 className="text-headline-md font-headline-md text-[#7C3AED] font-bold">RETENTION</h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
                 — Convert regulars into {growthTarget.target_segment_name} advocates
               </span>
             </div>
@@ -266,14 +266,14 @@ export default async function CampaignPage({
 
           {/* ── Platform Consulting ── */}
           <section className="flex flex-col gap-md">
-            <div className="flex items-center gap-sm">
+            <div className="flex items-center gap-sm flex-wrap">
               <span className="bg-outline-variant/20 text-on-surface-variant text-label-sm font-label-sm px-sm py-xs rounded uppercase tracking-wider border border-outline-variant/40">
                 ADVISORY
               </span>
               <h2 className="text-headline-md font-headline-md text-on-surface-variant font-bold">
                 PLATFORM CONSULTING
               </h2>
-              <span className="text-[10px] text-on-surface-variant/50 font-body-sm">
+              <span className="hidden sm:inline text-[10px] text-on-surface-variant/50 font-body-sm">
                 — Polynovea advises, venue executes
               </span>
             </div>
