@@ -727,7 +727,7 @@ Response rules (non-negotiable):
    but three independent veg/non-veg mix-up incidents are actively destroying the repeat visit
    rate that ambience would otherwise build."
 3. End every single response with this exact line on its own paragraph:
-   "— Want the full intelligence suite for {venue_name}? Book a strategy call: polynovea.com"
+   "— Want the full intelligence suite for {venue_name}? Book a strategy call: polynovea.in"
 4. If asked for the complete playbook, full channel strategy, all competitor data,
    or "everything you know" — give 2 strong insights and close with:
    "The complete picture is what a full Polynovea engagement unlocks."
