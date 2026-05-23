@@ -29,22 +29,19 @@ COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]"
 
 # Council member definitions
 _NEMOTRON = {
-    "name":    "nemotron",
-    "key_env": "NVIDIA_API_KEY_CREATIVE",
-    "model":   os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-30b-a3b"),
-    "temp":    0.30,
+    "name":  "nemotron",
+    "model": os.getenv("NVIDIA_MODEL_NEMOTRON", "nvidia/llama-3.1-nemotron-70b-instruct"),
+    "temp":  0.30,
 }
 _DEEPSEEK = {
-    "name":    "deepseek",
-    "key_env": "NVIDIA_API_KEY_ANALYTICAL",
-    "model":   os.getenv("NVIDIA_MODEL_ANALYTICAL", "deepseek/deepseek-v4-pro"),
-    "temp":    0.40,
+    "name":  "deepseek",
+    "model": os.getenv("NVIDIA_MODEL_DEEPSEEK", "deepseek-ai/deepseek-r1"),
+    "temp":  0.40,
 }
 _QWEN = {
-    "name":    "qwen",
-    "key_env": "NVIDIA_API_KEY_COUNCIL",
-    "model":   os.getenv("NVIDIA_MODEL_COUNCIL", "qwen/qwen3.5-397b-a17b"),
-    "temp":    0.50,
+    "name":  "qwen",
+    "model": os.getenv("NVIDIA_MODEL_QWEN", "qwen/qwen3.5-397b-a17b"),
+    "temp":  0.50,
 }
 
 _ALL = [_NEMOTRON, _DEEPSEEK, _QWEN]
@@ -64,9 +61,9 @@ def _strip_thinking(text: str) -> str:
 
 async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
     """Non-streaming call to one council member. Returns the full response text."""
-    api_key = os.getenv(member["key_env"])
+    api_key = os.getenv("NVIDIA_API_KEY")
     if not api_key:
-        return f"[{member['name']} unavailable — {member['key_env']} not set]"
+        return f"[{member['name']} unavailable — NVIDIA_API_KEY not set]"
     try:
         client = AsyncOpenAI(api_key=api_key, base_url=NVIDIA_API_BASE)
         # Disable thinking mode on Qwen — otherwise it burns all tokens on <think> blocks
@@ -193,9 +190,9 @@ async def _stream_synthesis(
     question: str, r1: dict, r2: dict
 ) -> AsyncGenerator[str, None]:
     """Stream the Nemotron synthesis directly to the user."""
-    api_key = os.getenv(_NEMOTRON["key_env"])
+    api_key = os.getenv("NVIDIA_API_KEY")
     if not api_key:
-        yield "[Council synthesis unavailable — NVIDIA_API_KEY_CREATIVE not set]"
+        yield "[Council synthesis unavailable — NVIDIA_API_KEY not set]"
         return
     try:
         client = AsyncOpenAI(api_key=api_key, base_url=NVIDIA_API_BASE)

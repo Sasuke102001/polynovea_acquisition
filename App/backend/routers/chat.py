@@ -39,8 +39,8 @@ def _supabase_headers() -> dict:
 
 # Nvidia API config — single model for all tabs
 NVIDIA_API_BASE        = "https://integrate.api.nvidia.com/v1"
-NVIDIA_API_KEY_CREATIVE = os.getenv("NVIDIA_API_KEY_CREATIVE")
-NVIDIA_MODEL_CREATIVE   = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
+NVIDIA_API_KEY_CREATIVE = os.getenv("NVIDIA_API_KEY")
+NVIDIA_MODEL_CREATIVE   = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/llama-3.1-nemotron-70b-instruct")
 
 
 async def fetch_venue_context(venue_id: int, tab: str) -> dict:
@@ -534,7 +534,7 @@ async def stream_from_nvidia(
         temperature = 0.8 if tab in creative_tabs else 0.4
 
         if not api_key:
-            yield "[Error: NVIDIA_API_KEY_CREATIVE is not configured]"
+            yield "[Error: NVIDIA_API_KEY is not configured]"
             return
 
         client = AsyncOpenAI(
