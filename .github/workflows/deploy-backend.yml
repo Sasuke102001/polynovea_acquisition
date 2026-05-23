@@ -39,5 +39,7 @@ jobs:
 
             echo "── Restarting service ──"
             sudo systemctl restart polynovea
-            sleep 2
-            sudo systemctl status polynovea --no-pager
+            sleep 5
+            sudo systemctl is-active polynovea || (sudo journalctl -u polynovea -n 30 --no-pager && exit 1)
+            echo "── Service is active ──"
+            sudo systemctl status polynovea --no-pager || true
