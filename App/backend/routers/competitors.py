@@ -809,6 +809,7 @@ async def get_competitor_deep_dive(
                 "competitor_name": comp_v["name"],
                 "bucket_label":    _BUCKET_LABELS.get(bucket, "Match"),
                 "ai_used":         ai_used,
+                "model_version":   "nvidia-v1" if ai_used else None,
                 "learn_from": [
                     {"dimension": i.dimension, "delta": i.delta, "narrative": i.narrative}
                     for i in learn_from
@@ -818,6 +819,7 @@ async def get_competitor_deep_dive(
                     for i in avoid
                 ],
                 "strategic_brief": brief,
+                "is_demo":         False,
             }
             headers = {
                 "apikey":        supa_key,
