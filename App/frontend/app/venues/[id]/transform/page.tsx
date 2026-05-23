@@ -106,7 +106,7 @@ function SimilarCard({ venue, onSelect }: SimilarCardProps) {
           aria-label={`Analyse ${venue.name}`}
         >
           <div className="flex justify-between items-start pr-xl">
-            <h4 className="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors truncate">
+            <h4 className="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors line-clamp-2">
               {venue.name}
             </h4>
             <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary text-[16px] transition-colors flex-shrink-0 ml-xs">
