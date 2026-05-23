@@ -300,7 +300,7 @@ export default function AdminDemoPanel({
                 <label className="text-[11px] font-label-sm uppercase tracking-wide text-on-surface-variant">Prospect name</label>
                 <input
                   type="text"
-                  placeholder="e.g. Svanika, The Kapoor Group"
+                  placeholder="e.g. Rahul, The Sharma Group"
                   value={prospectName}
                   onChange={(e) => setProspectName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
