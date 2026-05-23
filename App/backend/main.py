@@ -27,7 +27,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_pool, close_pool
-from routers import venues, overview, competitors, transform, marketing, intelligence, risk, primitives_tab, benchmarks, trends_tab, audience, chat
+from routers import venues, overview, competitors, transform, marketing, intelligence, risk, primitives_tab, benchmarks, trends_tab, audience, chat, demo
 
 
 @asynccontextmanager
@@ -69,6 +69,7 @@ app.include_router(benchmarks.router,     prefix="/api/venues", tags=["benchmark
 app.include_router(trends_tab.router,     prefix="/api/venues", tags=["trends"])
 app.include_router(audience.router,       prefix="/api/venues", tags=["audience"])
 app.include_router(chat.router,           prefix="/api/venues", tags=["chat"])
+app.include_router(demo.router,           prefix="/api/demo",   tags=["demo"])
 
 
 @app.get("/health")
