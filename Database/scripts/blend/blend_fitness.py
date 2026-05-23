@@ -39,7 +39,7 @@ import psycopg2.extras
 sys.stdout.reconfigure(encoding='utf-8')
 
 DB_CONFIG = {
-    'host':     os.getenv('PG_HOST',     'your-db-instance.ap-south-1.rds.amazonaws.com'),
+    'host':     os.getenv('PG_HOST',     'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
     'dbname':   os.getenv('PG_DB',       'polynovea_module2'),
     'user':     os.getenv('PG_USER',     'your_user'),
