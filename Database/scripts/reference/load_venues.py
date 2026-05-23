@@ -49,10 +49,24 @@ INSERT_SQL = """
 
 
 def build_row(venue: dict, city: str) -> tuple:
-    loc      = venue.get('location', {})
-    geo_op   = venue.get('geo_operational', {})
-    geo_goog = venue.get('geo_google', {})
-    locality = geo_op.get('canonical_locality') or geo_op.get('raw_locality')
+    loc        = venue.get('location', {})
+    geo_op     = venue.get('geo_operational', {})
+    geo_goog   = venue.get('geo_google', {})
+    components = geo_goog.get('all_components', {})
+    locality   = geo_op.get('canonical_locality') or geo_op.get('raw_locality')
+
+    # Area: prefer sublocality_level_1 from Google's reverse-geocoding components —
+    # the most granular stable neighbourhood boundary (e.g. "Sanpada", "Vikhroli").
+    # Fall back to geo_google.resolved_locality, then raw area field.
+    area = (
+        components.get('sublocality_level_1')
+        or geo_goog.get('resolved_locality')
+        or venue.get('area')
+    )
+
+    # City: prefer locality component (e.g. "Navi Mumbai", "Mumbai") over the
+    # operational region slug — locality is what Google considers the actual city.
+    resolved_city = components.get('locality') or city
 
     discovered_raw = venue.get('discovered_at')
     discovered_at  = None
@@ -65,8 +79,8 @@ def build_row(venue: dict, city: str) -> tuple:
     return (
         venue['place_id'],
         venue['name'],
-        venue.get('area'),
-        city,
+        area,
+        resolved_city,
         json.dumps(venue.get('types', [])),
         loc.get('lat'),
         loc.get('lng'),
