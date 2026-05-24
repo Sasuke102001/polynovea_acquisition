@@ -56,6 +56,15 @@ SOURCES = [
         'name_field':  'name',      # step_3 uses 'name', not 'venue_name'
         'id_field':    'place_id',
     },
+    {
+        'name':        'google_reviews',
+        'base_path':   os.path.join(SCRIPTS_DIR, '..', '..', 'data', 'raw', 'google_reviews'),
+        'regions':     ['thane', 'navi-mumbai'],
+        'lookup_file': 'step_3_signals_extracted.json',
+        'lookup_key':  'venues',    # file has {"venues": [...]}
+        'name_field':  'name',
+        'id_field':    'place_id',
+    },
 ]
 
 
