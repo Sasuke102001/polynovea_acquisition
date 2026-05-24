@@ -197,7 +197,7 @@ venue_fitness_dimensions google=6,008   magicpin_upper=676     google_reviews=1,
 behavioral_summary       google=6,007   magicpin_upper=676     google_reviews=1,120   manual_reviews=2  blended=6,009
 venue_vectors            google=5,759   magicpin_upper=670     google_reviews=1,114   manual_reviews=1
 venue_similarity         google=216,048 magicpin_upper=16,890  google_reviews=27,913  manual_reviews=50
-intervention_triggers    google=27,996  magicpin_upper=2,704   google_reviews=4,480   manual_reviews=4
+intervention_triggers    google=27,996  magicpin_upper=2,704   google_reviews=6,720   manual_reviews=4
 ```
 
 **Blend coverage:**
@@ -227,6 +227,14 @@ Every table touched by `018_add_source_columns.py` has `source VARCHAR(50) NOT N
 
 ### `fitness_vector` column is in `venue_vectors`, NOT in `venue_fitness_dimensions`
 `venue_fitness_dimensions` stores the 5 scored dimensions (office_lunch, repeat_habit, social_dwell, group_energy, destination_visit) plus quality scores. `venue_vectors` stores the raw float vector used for cosine similarity. They are separate tables loaded by separate steps.
+
+### BIF `step_5_score.py` FITNESS_SIGNAL_MAP — canonical signal IDs only
+`step_5_score.py` in the BIF pipeline redefines `FITNESS_SIGNAL_MAP` locally, overriding the import from `config/primitives_loader.py`. The local map originally used dead signal IDs (`quick_service`, `authenticity_signal`, `status_display`, `multi_round_ordering`) that produced **zero fitness scores for 52% of google_reviews venues** (fixed 2026-05-25). After fix: 82% of venues have non-zero fitness. The canonical signal IDs that exist in google_reviews step_4 data are:
+- `repeat_habit`: `repeat_visits`, `convenient_location`, `fast_service`, `food_quality`
+- `group_energy`: `social_energy`, `group_spend_amplification`, `live_music`
+- `destination_visit`: `great_view`, `authentic_taste`, `pride`, `premium_pricing`, `wonder_ambience`, `destination_driven_retention`
+
+If re-running BIF for a new source, always verify signal IDs against the step_4 cluster output before running step_5.
 
 ---
 
