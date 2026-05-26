@@ -28,6 +28,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_pool, close_pool
 from routers import venues, overview, competitors, transform, marketing, intelligence, risk, primitives_tab, benchmarks, trends_tab, audience, chat, demo
+from routers.providers import nvidia_key_count, mistral_available, mistral_model
+from routers.council import _NEMOTRON, _DEEPSEEK, _MISTRAL_OR_QWEN
 
 
 @asynccontextmanager
@@ -75,5 +77,23 @@ app.include_router(demo.router,           prefix="/api/demo",   tags=["demo"])
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "polynovea-acquisition-api"}
+
+
+@app.get("/api/providers")
+async def providers():
+    return {
+        "nvidia": {
+            "keys_active": nvidia_key_count(),
+            "models": {
+                "nemotron": _NEMOTRON["model"],
+                "deepseek":  _DEEPSEEK["model"],
+                "council_third": _MISTRAL_OR_QWEN["model"],
+            },
+        },
+        "mistral": {
+            "configured": mistral_available(),
+            "model": mistral_model() if mistral_available() else None,
+        },
+    }
 
 
