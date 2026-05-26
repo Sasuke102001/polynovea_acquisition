@@ -886,6 +886,7 @@ def _detect_anti_patterns(archetype_key: str, channel: str, segment_id: str) -> 
 async def get_ad_brief(
     venue_id: int,
     channel:  str = Query(default=None),
+    segment:  str = Query(default=None),
 ):
     pool = get_pool()
 
@@ -898,18 +899,20 @@ async def get_ad_brief(
             "SELECT name, area FROM venues WHERE id = $1", venue_id
         )
 
-        seg_row = await conn.fetchrow(
-            """
-            SELECT segment_id, alignment_score
-            FROM   venue_demographic_scores
-            WHERE  venue_id = $1
-            ORDER  BY segment_rank
-            LIMIT  1
-            """,
-            venue_id,
-        )
-
-        primary_seg_id = seg_row["segment_id"] if seg_row else "office_workers"
+        if segment and segment in SEGMENT_LABELS:
+            primary_seg_id = segment
+        else:
+            seg_row = await conn.fetchrow(
+                """
+                SELECT segment_id, alignment_score
+                FROM   venue_demographic_scores
+                WHERE  venue_id = $1
+                ORDER  BY segment_rank
+                LIMIT  1
+                """,
+                venue_id,
+            )
+            primary_seg_id = seg_row["segment_id"] if seg_row else "office_workers"
 
         arc_row = await conn.fetchrow(
             """
@@ -1111,6 +1114,7 @@ async def generate_brief_content(
     venue_id:  int,
     request:   BriefGenerateRequest,
     channel:   str = Query(default=None),
+    segment:   str = Query(default=None),
 ):
     pool = get_pool()
 
@@ -1121,16 +1125,19 @@ async def generate_brief_content(
         if not venue_row:
             raise HTTPException(status_code=404, detail="Venue not found")
 
-        seg_row = await conn.fetchrow(
-            """
-            SELECT segment_id FROM venue_demographic_scores
-            WHERE  venue_id = $1
-            ORDER  BY segment_rank
-            LIMIT  1
-            """,
-            venue_id,
-        )
-        primary_seg_id = seg_row["segment_id"] if seg_row else "office_workers"
+        if segment and segment in SEGMENT_LABELS:
+            primary_seg_id = segment
+        else:
+            seg_row = await conn.fetchrow(
+                """
+                SELECT segment_id FROM venue_demographic_scores
+                WHERE  venue_id = $1
+                ORDER  BY segment_rank
+                LIMIT  1
+                """,
+                venue_id,
+            )
+            primary_seg_id = seg_row["segment_id"] if seg_row else "office_workers"
 
         arc_row = await conn.fetchrow(
             """

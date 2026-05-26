@@ -360,7 +360,7 @@ export default async function MarketingPage({
               </span>
             </div>
             <div className="cin-card rounded-xl p-5 md:p-6">
-              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} />
+              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} segments={data.top_segments} />
             </div>
           </section>
 

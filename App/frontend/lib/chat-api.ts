@@ -17,11 +17,14 @@ export async function streamBriefContent(
   channel: string,
   direction: string,
   options: ChatStreamOptions,
+  segment?: string,
 ): Promise<void> {
   let response: Response;
   try {
+    const qs = new URLSearchParams({ channel });
+    if (segment) qs.set("segment", segment);
     response = await fetch(
-      `${API_BASE}/api/venues/${venueId}/marketing/brief/generate?channel=${channel}`,
+      `${API_BASE}/api/venues/${venueId}/marketing/brief/generate?${qs.toString()}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

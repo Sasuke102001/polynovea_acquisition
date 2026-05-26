@@ -641,9 +641,11 @@ export async function getCompetitorDeepDive(
 export async function getAdBrief(
   venueId: string | number,
   channel?: string,
+  segment?: string,
 ): Promise<AdBrief> {
   const params = new URLSearchParams();
   if (channel) params.set("channel", channel);
+  if (segment) params.set("segment", segment);
   const qs = params.toString();
   const res = await fetch(
     `${API_BASE}/api/venues/${venueId}/marketing/brief${qs ? `?${qs}` : ""}`,
