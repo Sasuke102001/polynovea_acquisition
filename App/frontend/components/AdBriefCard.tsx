@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { getAdBrief, type AdBrief } from "@/lib/api";
+import { getAdBrief, type AdBrief, type MarketingSegmentCard } from "@/lib/api";
 import { streamBriefContent } from "@/lib/chat-api";
 
 const CHANNELS = [
@@ -42,16 +42,18 @@ const subCard: React.CSSProperties = {
 interface Props {
   venueId: number;
   initialBrief: AdBrief;
+  segments: MarketingSegmentCard[];
 }
 
-export default function AdBriefCard({ venueId, initialBrief }: Props) {
-  const [brief, setBrief]           = useState<AdBrief>(initialBrief);
-  const [loading, setLoading]       = useState(false);
-  const [active, setActive]         = useState(initialBrief.channel);
-  const [direction, setDirection]   = useState("");
-  const [content, setContent]       = useState("");
-  const [generating, setGenerating] = useState(false);
-  const [copied, setCopied]         = useState(false);
+export default function AdBriefCard({ venueId, initialBrief, segments }: Props) {
+  const [brief, setBrief]               = useState<AdBrief>(initialBrief);
+  const [loading, setLoading]           = useState(false);
+  const [active, setActive]             = useState(initialBrief.channel);
+  const [activeSegment, setActiveSegment] = useState(segments[0]?.segment_id ?? "");
+  const [direction, setDirection]       = useState("");
+  const [content, setContent]           = useState("");
+  const [generating, setGenerating]     = useState(false);
+  const [copied, setCopied]             = useState(false);
 
   async function switchChannel(ch: string) {
     if (ch === active) return;
@@ -59,7 +61,20 @@ export default function AdBriefCard({ venueId, initialBrief }: Props) {
     setContent("");
     setLoading(true);
     try {
-      const next = await getAdBrief(venueId, ch);
+      const next = await getAdBrief(venueId, ch, activeSegment);
+      setBrief(next);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function switchSegment(segId: string) {
+    if (segId === activeSegment) return;
+    setActiveSegment(segId);
+    setContent("");
+    setLoading(true);
+    try {
+      const next = await getAdBrief(venueId, active, segId);
       setBrief(next);
     } finally {
       setLoading(false);
@@ -75,11 +90,36 @@ export default function AdBriefCard({ venueId, initialBrief }: Props) {
       onChunk:    (chunk) => { result += chunk; setContent(result); },
       onError:    ()      => setGenerating(false),
       onComplete: ()      => setGenerating(false),
-    });
+    }, activeSegment);
   }
 
   return (
     <div className={`flex flex-col gap-4 transition-opacity ${loading ? "opacity-50" : ""}`}>
+
+      {/* Segment selector */}
+      {segments.length > 1 && (
+        <div className="flex flex-wrap gap-1.5 pb-3 border-b" style={{ borderColor: "rgba(39,39,42,0.5)" }}>
+          <span className="text-[9px] font-bold uppercase tracking-widest self-center mr-1" style={{ ...mono, color: "#71717A" }}>Target:</span>
+          {segments.map((seg) => (
+            <button
+              key={seg.segment_id}
+              onClick={() => switchSegment(seg.segment_id)}
+              className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded transition-all"
+              style={activeSegment === seg.segment_id
+                ? { ...mono, background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.4)", color: "#c4b5fd" }
+                : { ...mono, background: "rgba(24,24,27,0.6)", border: "1px solid rgba(39,39,42,0.7)", color: "#71717A" }
+              }
+              onMouseEnter={(e) => { if (activeSegment !== seg.segment_id) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.25)"; (e.currentTarget as HTMLElement).style.color = "#A1A1AA"; } }}
+              onMouseLeave={(e) => { if (activeSegment !== seg.segment_id) { (e.currentTarget as HTMLElement).style.borderColor = "rgba(39,39,42,0.7)"; (e.currentTarget as HTMLElement).style.color = "#71717A"; } }}
+            >
+              {seg.segment_name}
+              <span className="text-[9px]" style={{ color: activeSegment === seg.segment_id ? "rgba(196,181,253,0.6)" : "rgba(113,113,122,0.7)" }}>
+                {seg.alignment_pct}%
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Channel selector */}
       <div className="flex flex-wrap gap-1.5">
