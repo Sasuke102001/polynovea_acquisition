@@ -10,6 +10,15 @@ interface Message {
   content: string;
 }
 
+type CouncilPhase = "idle" | "r1" | "r2" | "synthesis";
+
+interface CouncilEvent {
+  round: "r1" | "r2";
+  model: string;
+  meta: string;
+  text: string;
+}
+
 type Tab = "marketing" | "competitors" | "transform" | "deep_risk" | "overview" | "audience";
 
 interface ChatDrawerProps {
@@ -122,6 +131,113 @@ const TAB_META: Record<Tab, { label: string; subtitle: string }> = {
 };
 
 const COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]";
+const COUNCIL_SYNTHESIS    = "[COUNCIL:SYNTHESIS]";
+const COUNCIL_PHASE_RE     = /\[COUNCIL:PHASE:(r[12]):([^:]+):([^\]]+)\]([^\n]*)\n/;
+
+const MODEL_META: Record<string, { label: string; color: string }> = {
+  nemotron: { label: "NEMOTRON",    color: "#a78bfa" },
+  deepseek: { label: "DEEPSEEK V4", color: "#67e8f9" },
+  mistral:  { label: "MISTRAL",     color: "#fcd34d" },
+  qwen:     { label: "QWEN",        color: "#fcd34d" },
+};
+
+function metaColor(round: string, meta: string): string {
+  if (round === "r1") {
+    if (meta === "HIGH")   return "#86efac";
+    if (meta === "MEDIUM") return "#fcd34d";
+    return "#f87171";
+  }
+  if (meta === "NONE")  return "#86efac";
+  if (meta === "MINOR") return "#fcd34d";
+  return "#f87171";
+}
+
+function CouncilChamber({ events, phase }: { events: CouncilEvent[]; phase: CouncilPhase }) {
+  const r1 = events.filter(e => e.round === "r1");
+  const r2 = events.filter(e => e.round === "r2");
+
+  const phaseLabel =
+    phase === "synthesis" ? "Synthesising..." :
+    phase === "r2"        ? "Round 2 — Debate" :
+    phase === "r1"        ? "Round 1 — Analysis" :
+                            "Council deliberating";
+
+  return (
+    <div
+      className="px-4 py-3 rounded-2xl rounded-bl-sm flex flex-col gap-3 max-w-[92%]"
+      style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.25)" }}
+    >
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <div className="flex gap-[3px]">
+          <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0ms]"   style={{ background: "#7C3AED" }} />
+          <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:120ms]" style={{ background: "#7C3AED" }} />
+          <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:240ms]" style={{ background: "#7C3AED" }} />
+        </div>
+        <span className="text-[11px] font-bold uppercase tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#c4b5fd" }}>
+          {phaseLabel}
+        </span>
+      </div>
+
+      {/* Round 1 */}
+      {r1.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="text-[9px] uppercase tracking-widest font-bold" style={{ color: "rgba(167,139,250,0.45)", fontFamily: "'JetBrains Mono', monospace" }}>
+            Round 1 — Independent Analysis
+          </span>
+          {r1.map((ev, i) => <CouncilRow key={i} event={ev} />)}
+        </div>
+      )}
+
+      {/* Round 2 */}
+      {r2.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="text-[9px] uppercase tracking-widest font-bold" style={{ color: "rgba(167,139,250,0.45)", fontFamily: "'JetBrains Mono', monospace" }}>
+            Round 2 — Cross-review
+          </span>
+          {r2.map((ev, i) => <CouncilRow key={i} event={ev} />)}
+        </div>
+      )}
+
+      {/* Synthesis indicator */}
+      {phase === "synthesis" && (
+        <p className="text-[11px]" style={{ color: "#71717A", fontFamily: "'JetBrains Mono', monospace" }}>
+          ▶ Synthesising final answer...
+        </p>
+      )}
+
+      {/* Initial loading hint */}
+      {r1.length === 0 && phase === "idle" && (
+        <p className="text-[11px]" style={{ color: "#71717A" }}>3 models analysing independently...</p>
+      )}
+    </div>
+  );
+}
+
+function CouncilRow({ event }: { event: CouncilEvent }) {
+  const disp  = MODEL_META[event.model] ?? { label: event.model.toUpperCase(), color: "#a1a1aa" };
+  const mCol  = metaColor(event.round, event.meta);
+  return (
+    <div className="flex gap-2 items-start">
+      <span
+        className="shrink-0 text-[9px] font-bold px-1.5 py-[2px] rounded"
+        style={{ fontFamily: "'JetBrains Mono', monospace", color: disp.color, background: `${disp.color}18`, border: `1px solid ${disp.color}35` }}
+      >
+        {disp.label}
+      </span>
+      <span
+        className="shrink-0 text-[9px] font-bold px-1.5 py-[2px] rounded"
+        style={{ color: mCol, background: `${mCol}18`, fontFamily: "'JetBrains Mono', monospace" }}
+      >
+        {event.meta}
+      </span>
+      <span className="text-[12px] leading-relaxed" style={{ color: "#A1A1AA" }}>
+        {event.text}
+      </span>
+    </div>
+  );
+}
+
 const STORAGE_KEY = (venueId: number) => `polynovea_chat_${venueId}`;
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -137,6 +253,8 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
   const [input, setInput]                   = useState("");
   const [isLoading, setIsLoading]           = useState(false);
   const [isDeliberating, setIsDeliberating] = useState(false);
+  const [councilEvents, setCouncilEvents]   = useState<CouncilEvent[]>([]);
+  const [councilPhase, setCouncilPhase]     = useState<CouncilPhase>("idle");
   const [error, setError]                   = useState<string | null>(null);
   const messagesEndRef                      = useRef<HTMLDivElement>(null);
   const inputRef                            = useRef<HTMLInputElement>(null);
@@ -170,29 +288,83 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
     persistMessages(withUserMsg(messages));
     setIsLoading(true);
 
+    if (mode === "council") {
+      setCouncilEvents([]);
+      setCouncilPhase("idle");
+    }
+
     let currentResponse = "";
     let deliberatingDone = false;
+    let synthesisDone    = false;
+    let councilBuf       = "";
+
+    const appendToResponse = (text: string) => {
+      currentResponse += text;
+      setMessages((prev) => {
+        const msgs = [...prev];
+        if (msgs[msgs.length - 1]?.role === "assistant") {
+          msgs[msgs.length - 1] = { role: "assistant", content: currentResponse };
+        } else {
+          msgs.push({ role: "assistant", content: currentResponse });
+        }
+        return msgs;
+      });
+    };
+
+    const parseCouncilEvents = (buf: string): string => {
+      let remaining = buf;
+      const batch: CouncilEvent[] = [];
+      let match: RegExpExecArray | null;
+      while ((match = COUNCIL_PHASE_RE.exec(remaining)) !== null) {
+        batch.push({
+          round: match[1] as "r1" | "r2",
+          model: match[2],
+          meta:  match[3],
+          text:  match[4].trim(),
+        });
+        remaining = remaining.slice(match.index + match[0].length);
+      }
+      if (batch.length > 0) {
+        setCouncilEvents(prev => [...prev, ...batch]);
+        setCouncilPhase(batch[batch.length - 1].round);
+      }
+      return remaining;
+    };
 
     await streamChat(venueId, tab, userQuestion, {
       onChunk: (chunk) => {
+        // Detect DELIBERATING sentinel
         if (!deliberatingDone && chunk.includes(COUNCIL_DELIBERATING)) {
           setIsDeliberating(true);
           deliberatingDone = true;
           chunk = chunk.replace(COUNCIL_DELIBERATING, "");
           if (!chunk) return;
         }
-        if (isDeliberating || deliberatingDone) setIsDeliberating(false);
 
-        currentResponse += chunk;
-        setMessages((prev) => {
-          const msgs = [...prev];
-          if (msgs[msgs.length - 1]?.role === "assistant") {
-            msgs[msgs.length - 1] = { role: "assistant", content: currentResponse };
-          } else {
-            msgs.push({ role: "assistant", content: currentResponse });
-          }
-          return msgs;
-        });
+        // Fast mode or synthesis already streaming — append directly
+        if (!deliberatingDone || synthesisDone) {
+          if (deliberatingDone) setIsDeliberating(false);
+          appendToResponse(chunk);
+          return;
+        }
+
+        // Council mode — buffer and parse events
+        councilBuf += chunk;
+
+        // Check for synthesis sentinel
+        const synthIdx = councilBuf.indexOf(COUNCIL_SYNTHESIS);
+        if (synthIdx !== -1) {
+          parseCouncilEvents(councilBuf.slice(0, synthIdx));
+          synthesisDone = true;
+          setCouncilPhase("synthesis");
+          setIsDeliberating(false);
+          const tail = councilBuf.slice(synthIdx + COUNCIL_SYNTHESIS.length + 1); // +1 for \n
+          councilBuf = "";
+          if (tail.trim()) appendToResponse(tail);
+          return;
+        }
+
+        councilBuf = parseCouncilEvents(councilBuf);
       },
       onError: (msg) => { setIsDeliberating(false); setError(msg); setIsLoading(false); },
       onComplete: () => {
@@ -319,25 +491,10 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
               </div>
             ))}
 
-            {/* Council deliberating */}
+            {/* Council chamber — live debate view */}
             {isDeliberating && (
               <div className="flex justify-start">
-                <div
-                  className="px-4 py-3 rounded-2xl rounded-bl-sm flex flex-col gap-2 max-w-[88%]"
-                  style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.25)" }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-[3px]">
-                      <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:0ms]" style={{ background: "#7C3AED" }} />
-                      <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:120ms]" style={{ background: "#7C3AED" }} />
-                      <div className="w-1.5 h-1.5 rounded-full animate-bounce [animation-delay:240ms]" style={{ background: "#7C3AED" }} />
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#c4b5fd" }}>
-                      Council deliberating
-                    </span>
-                  </div>
-                  <p className="text-[11px]" style={{ color: "#71717A" }}>3 models analysing · debating · synthesising</p>
-                </div>
+                <CouncilChamber events={councilEvents} phase={councilPhase} />
               </div>
             )}
 

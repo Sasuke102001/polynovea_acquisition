@@ -7,6 +7,11 @@ Architecture:
   Round 2  — Each model reviews the other two's answers (parallel, ~5s)
   Round 3  — Nemotron synthesises into one answer or two labelled perspectives (streamed live)
 
+Council members:
+  - Nemotron  (NVIDIA NIM) — synthesiser + analyst
+  - DeepSeek  (NVIDIA NIM) — reasoning specialist
+  - Mistral   (Mistral API if MISTRAL_API_KEY set, else falls back to NVIDIA Qwen)
+
 The full debate tree is stored in Supabase as proprietary training data.
 The user sees only the final synthesised answer.
 """
@@ -18,7 +23,8 @@ import time
 from typing import AsyncGenerator
 
 import httpx
-from openai import AsyncOpenAI
+
+from routers.providers import get_nvidia_client, get_mistral_client, mistral_available
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -32,19 +38,26 @@ _NEMOTRON = {
     "name":  "nemotron",
     "model": os.getenv("NVIDIA_MODEL_NEMOTRON", "meta/llama-3.3-70b-instruct"),
     "temp":  0.30,
+    "provider": "nvidia",
 }
 _DEEPSEEK = {
     "name":  "deepseek",
     "model": os.getenv("NVIDIA_MODEL_DEEPSEEK", "deepseek-ai/deepseek-r1"),
     "temp":  0.40,
+    "provider": "nvidia",
 }
-_QWEN = {
-    "name":  "qwen",
-    "model": os.getenv("NVIDIA_MODEL_QWEN", "qwen/qwen2.5-72b-instruct"),
-    "temp":  0.50,
+# Third seat: Mistral if configured, otherwise Qwen on NVIDIA NIM.
+# Mistral Large is stronger at structured reasoning than Qwen 72B and avoids
+# the thinking-mode token drain that slowed Qwen responses.
+_MISTRAL_OR_QWEN = {
+    "name":     "mistral" if mistral_available() else "qwen",
+    "model":    os.getenv("MISTRAL_MODEL", "mistral-large-latest") if mistral_available()
+                else os.getenv("NVIDIA_MODEL_QWEN", "qwen/qwen2.5-72b-instruct"),
+    "temp":     0.50,
+    "provider": "mistral" if mistral_available() else "nvidia",
 }
 
-_ALL = [_NEMOTRON, _DEEPSEEK, _QWEN]
+_ALL = [_NEMOTRON, _DEEPSEEK, _MISTRAL_OR_QWEN]
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -61,19 +74,22 @@ def _strip_thinking(text: str) -> str:
 
 async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
     """Non-streaming call to one council member. Returns the full response text."""
-    api_key = os.getenv("NVIDIA_API_KEY")
-    if not api_key:
-        return f"[{member['name']} unavailable — NVIDIA_API_KEY not set]"
+    provider = member.get("provider", "nvidia")
     try:
-        client = AsyncOpenAI(api_key=api_key, base_url=NVIDIA_API_BASE)
-        # Disable thinking mode on Qwen — otherwise it burns all tokens on <think> blocks
-        extra = {"chat_template_kwargs": {"enable_thinking": False}} if member["name"] == "qwen" else {}
-        resp = await client.chat.completions.create(
-            model=member["model"],
+        if provider == "mistral":
+            pc = get_mistral_client()
+            if not pc:
+                return f"[{member['name']} unavailable — MISTRAL_API_KEY not set]"
+        else:
+            pc = get_nvidia_client(member["model"])
+            if not pc:
+                return f"[{member['name']} unavailable — NVIDIA_API_KEY not set]"
+
+        resp = await pc.client.chat.completions.create(
+            model=pc.model,
             messages=messages,
             temperature=member["temp"],
             max_tokens=max_tokens,
-            extra_body=extra if extra else None,
         )
         return _strip_thinking(resp.choices[0].message.content or "")
     except Exception as exc:
@@ -165,7 +181,35 @@ End your response on its own line with exactly one of:
 Do not mention the council, the debate process, or how you reached the answer. Just give the answer."""
 
 
+def _extract_r1(text: str) -> tuple[str, str]:
+    """Extract (position, confidence) from a Round 1 response."""
+    position = ""
+    confidence = "MEDIUM"
+    for line in text.split("\n"):
+        l = line.strip()
+        if l.startswith("POSITION:"):
+            position = l[9:].strip()
+        elif l.startswith("CONFIDENCE:"):
+            confidence = l[11:].strip()
+    return position, confidence
+
+
+def _extract_r2(text: str) -> tuple[str, str]:
+    """Extract (refined_position, change) from a Round 2 response."""
+    refined = ""
+    change = "MINOR"
+    for line in text.split("\n"):
+        l = line.strip()
+        if l.startswith("REFINED_POSITION:"):
+            refined = l[17:].strip()
+        elif l.startswith("CHANGE_FROM_R1:"):
+            change = l[15:].strip()
+    return refined, change
+
+
 def _synthesis_user_message(question: str, r1: dict, r2: dict) -> str:
+    third     = _MISTRAL_OR_QWEN["name"]
+    third_lbl = third.upper()
     return f"""QUESTION:
 {question}
 
@@ -179,9 +223,9 @@ DEEPSEEK:
 Round 1: {r1['deepseek']}
 After debate: {r2['deepseek']}
 
-QWEN:
-Round 1: {r1['qwen']}
-After debate: {r2['qwen']}
+{third_lbl}:
+Round 1: {r1.get(third, '')}
+After debate: {r2.get(third, '')}
 
 Synthesise the best answer now."""
 
@@ -190,14 +234,13 @@ async def _stream_synthesis(
     question: str, r1: dict, r2: dict
 ) -> AsyncGenerator[str, None]:
     """Stream the Nemotron synthesis directly to the user."""
-    api_key = os.getenv("NVIDIA_API_KEY")
-    if not api_key:
+    pc = get_nvidia_client(_NEMOTRON["model"])
+    if not pc:
         yield "[Council synthesis unavailable — NVIDIA_API_KEY not set]"
         return
     try:
-        client = AsyncOpenAI(api_key=api_key, base_url=NVIDIA_API_BASE)
-        stream = await client.chat.completions.create(
-            model=_NEMOTRON["model"],
+        stream = await pc.client.chat.completions.create(
+            model=pc.model,
             messages=[
                 {"role": "system", "content": _SYNTHESIS_SYSTEM},
                 {"role": "user",   "content": _synthesis_user_message(question, r1, r2)},
@@ -243,8 +286,9 @@ async def _log_session(
             "error": r1_val if is_error else None,
         }
 
+    third_key = _MISTRAL_OR_QWEN["name"]
     models_errored = [
-        name for name in ("nemotron", "deepseek", "qwen")
+        name for name in ("nemotron", "deepseek", third_key)
         if r1.get(name, "").startswith(f"[{name}")
     ]
 
@@ -258,7 +302,7 @@ async def _log_session(
             "debate_tree": {
                 "nemotron": _model_entry("nemotron"),
                 "deepseek":  _model_entry("deepseek"),
-                "qwen":      _model_entry("qwen"),
+                third_key:   _model_entry(third_key),
             },
             "models_errored":  models_errored,
             "synthesis_model": "nemotron",
@@ -282,17 +326,31 @@ async def run_council(
 ) -> AsyncGenerator[str, None]:
     """
     Full council pipeline. Yields:
-      1. COUNCIL_DELIBERATING sentinel (frontend shows spinner)
-      2. Synthesised answer chunks (streamed live from Nemotron)
+      1. COUNCIL_DELIBERATING sentinel
+      2. [COUNCIL:PHASE:r1:{model}:{confidence}]{position}\\n  — one per model after Round 1
+      3. [COUNCIL:PHASE:r2:{model}:{change}]{refined_position}\\n — one per model after Round 2
+      4. [COUNCIL:SYNTHESIS]\\n sentinel
+      5. Synthesised answer chunks streamed live from Nemotron
     """
-    # Signal frontend to show deliberating state
     yield COUNCIL_DELIBERATING
 
     t0 = time.monotonic()
 
-    # Round 1 then Round 2 (sequential — R2 needs R1 results)
     r1 = await _round1(system_prompt, question)
+
+    for m in _ALL:
+        pos, conf = _extract_r1(r1.get(m["name"], ""))
+        if pos:
+            yield f"[COUNCIL:PHASE:r1:{m['name']}:{conf}]{pos}\n"
+
     r2 = await _round2(system_prompt, question, r1)
+
+    for m in _ALL:
+        refined, change = _extract_r2(r2.get(m["name"], ""))
+        if refined:
+            yield f"[COUNCIL:PHASE:r2:{m['name']}:{change}]{refined}\n"
+
+    yield "[COUNCIL:SYNTHESIS]\n"
 
     # Round 3 — stream live to user while collecting for logging
     synthesis_chunks: list[str] = []
