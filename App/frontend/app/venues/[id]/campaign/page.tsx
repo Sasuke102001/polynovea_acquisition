@@ -174,7 +174,7 @@ export default async function CampaignPage({
               <span className="hidden sm:inline text-[10px]" style={{ color: "#3F3F46" }}>— archetype × channel × India creative rules</span>
             </div>
             <div className="cin-card rounded-xl p-5 md:p-6">
-              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} />
+              <AdBriefCard venueId={parseInt(id)} initialBrief={brief} segments={data.top_segments} />
             </div>
           </section>
 
