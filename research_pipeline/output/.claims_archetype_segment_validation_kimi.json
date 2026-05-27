@@ -1,0 +1,41 @@
+[
+  {
+    "segment": "office_workers",
+    "channel": "instagram_organic",
+    "claim": "Utilize Instagram for discovery, as 36% of young professionals discover venues through social media, and 53% choose venues by word of mouth.",
+    "confidence": 0.8,
+    "india_verdict": "INFERRED",
+    "why_it_works": "Social proof and social networks drive discovery and decision-making for this segment.",
+    "dont": [
+      "Never rely solely on algorithmic exploration for discovery"
+    ],
+    "source_file": "archetype_segment_validation_kimi.md",
+    "extracted_at": "2026-05-26T19:24:18.628165+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Leverage WhatsApp groups for word-of-mouth and social proof, as 53% of young professionals choose venues based on recommendations from friends and family.",
+    "confidence": 0.85,
+    "india_verdict": "INFERRED",
+    "why_it_works": "Social facilitation and social proof drive spending and decision-making for this segment.",
+    "dont": [
+      "Avoid using WhatsApp for promotional broadcasts without opt-in"
+    ],
+    "source_file": "archetype_segment_validation_kimi.md",
+    "extracted_at": "2026-05-26T19:24:18.628179+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "zomato_swiggy",
+    "claim": "Optimize Zomato and Swiggy listings for discovery, as young professionals use these platforms for venue discovery and exploration.",
+    "confidence": 0.75,
+    "india_verdict": "INFERRED",
+    "why_it_works": "Convenience and social exposure drive discovery and decision-making for this segment.",
+    "dont": [
+      "Never neglect to claim and optimize listings on these platforms"
+    ],
+    "source_file": "archetype_segment_validation_kimi.md",
+    "extracted_at": "2026-05-26T19:24:18.628185+00:00"
+  }
+]

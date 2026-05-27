@@ -1,0 +1,152 @@
+[
+  {
+    "archetype": "habit_former",
+    "tone": "Familiar and efficient, with a focus on value and convenience",
+    "emotional_driver": "habit_formation + value_expectation",
+    "hook_formula": "Quick and easy lunch options, with a focus on familiar favorites and value deals",
+    "cta_style": "Clear and direct, with a focus on convenience and speed",
+    "visual_direction": "Simple and straightforward, with a focus on showcasing food and value offers",
+    "india_adjustment": "Emphasize value and convenience, with a focus on quick and easy lunch options",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing alcohol or expensive options",
+      "Don't use complex or confusing language",
+      "Never prioritize luxury or fine dining"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.7,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:27:04.701407+00:00"
+  },
+  {
+    "archetype": "power_regular",
+    "tone": "Professional and efficient, with a focus on convenience and value",
+    "emotional_driver": "convenience_expectation + value_expectation",
+    "hook_formula": "Quick and easy lunch options, with a focus on convenience and value",
+    "cta_style": "Clear and direct, with a focus on speed and efficiency",
+    "visual_direction": "Simple and straightforward, with a focus on showcasing food and value offers",
+    "india_adjustment": "Emphasize convenience and value, with a focus on quick and easy lunch options",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing alcohol or expensive options",
+      "Don't use complex or confusing language",
+      "Never prioritize luxury or fine dining"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.6,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:27:04.701420+00:00"
+  },
+  {
+    "archetype": "party_seeker",
+    "tone": "Vibrant, energetic — a night to remember with friends",
+    "emotional_driver": "social_proof + fomo",
+    "hook_formula": "Kickstart your weekend with friends at the hottest bar in town. Live music, craft cocktails, and unforgettable moments.",
+    "cta_style": "Join the party, book your table now!",
+    "visual_direction": "Vibrant colors, lively atmosphere, photo-worthy drinks, and group-sized items",
+    "india_adjustment": "Urban millennials in India prioritize experience over price, with a focus on social media-worthy moments",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid dull or quiet ambiance visuals",
+      "Never use language that implies a low-energy night"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.8,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:27:15.730713+00:00"
+  },
+  {
+    "archetype": "social_butterfly",
+    "tone": "Sociable, lively — where friends and fun come together",
+    "emotional_driver": "social_proof + peer_influence",
+    "hook_formula": "Gather your friends and experience the ultimate social night. Shareable drinks, group-sized items, and unforgettable memories.",
+    "cta_style": "Bring your friends, book now, and let's get this party started!",
+    "visual_direction": "Group photos, lively atmosphere, and shareable food and drinks",
+    "india_adjustment": "In India, social media influence plays a significant role in discovering new party spots and trying photo-worthy drinks",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid solo or couple-focused visuals",
+      "Never use language that implies a low-social night"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.8,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:27:15.730725+00:00"
+  },
+  {
+    "archetype": "premium_prioritizer",
+    "tone": "Sophisticated, high-end experience with a focus on quality and exclusivity",
+    "emotional_driver": "social_status + luxury_seekings",
+    "hook_formula": "Exclusive experience + premium offerings. Savor the finest, indulge in luxury.",
+    "cta_style": "Elegant, refined, and inviting, emphasizing the unique experience",
+    "visual_direction": "High-end ambiance, premium products, and exquisite plating",
+    "india_adjustment": "India's growing middle class and increasing demand for premium experiences drive the growth of fine-dining and high-end bars",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid cheap or low-quality visuals",
+      "Never use overly promotional language"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.75,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:27:45.043926+00:00"
+  },
+  {
+    "archetype": "comfort_dweller",
+    "tone": "Familiar and safe environment, focus on family-friendly atmosphere",
+    "emotional_driver": "environmental_expectation + habit_formation + family_bonding",
+    "hook_formula": "Family traditions and comfort food, kids' favorites and value for money",
+    "cta_style": "Soft, non-pressuring, emphasizing value and convenience for the whole family",
+    "visual_direction": "Warm and inviting atmosphere, kids' menus, and family platters",
+    "india_adjustment": "Family values and kid-friendliness are crucial in Indian market, with a focus on value for money",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use loud or crowded visuals",
+      "Avoid premium or high-end language",
+      "Never show alcohol as a primary focus"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.8,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:27:45.043940+00:00"
+  },
+  {
+    "archetype": "quiet_discoverer",
+    "tone": "Introspective, personal experience — focus on individual enjoyment",
+    "emotional_driver": "self_indulgence + me_time",
+    "hook_formula": "Personalized experience + comfort food. Your own space, your own time.",
+    "cta_style": "Inviting, non-intrusive. Discover your new favorite spot.",
+    "visual_direction": "Cozy atmosphere, soft lighting, solo diners in a quiet corner",
+    "india_adjustment": "Moderate price sensitivity, focus on per-item price and perceived value",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid loud or crowded visuals",
+      "Never use high-pressure sales language"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.6,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md"
+    ],
+    "extracted_at": "2026-05-26T20:28:48.978271+00:00"
+  }
+]

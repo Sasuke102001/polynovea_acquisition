@@ -1,0 +1,331 @@
+[
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "Offer table booking and deals on Zomato/Swiggy Dineout to attract couples looking for a convenient and discounted 'date night' experience",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples seek convenience and value for their regular date nights, and Zomato/Swiggy Dineout provides an easy way to discover and book venues with deals",
+    "dont": [
+      "Never charge extra for table booking",
+      "Avoid poor customer reviews on Zomato"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:06:22.860030+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "instagram_organic",
+    "claim": "Post high-quality images of desserts and romantic ambiance on Instagram to attract couples looking for a new date spot",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples are visually driven and seek inspiration for new date spots on Instagram, where they can discover venues with appealing ambiance and dishes",
+    "dont": [
+      "Never post low-quality images",
+      "Avoid over-promotional content"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:06:22.860039+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "google_ads",
+    "claim": "Target couples searching for 'date night ideas' or 'anniversary restaurants' on Google with ads highlighting the venue's romantic ambiance and special offers",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples actively search for date night ideas and anniversary restaurants on Google, and targeted ads can help venues reach this audience",
+    "dont": [
+      "Never target overly broad keywords",
+      "Avoid ads with low relevance to the search query"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:06:22.860042+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "zomato_swiggy",
+    "claim": "Use 'kid-friendly' filters and tags on Zomato/Swiggy to increase discovery and attract families, as they use these platforms for discovery with specific filters",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families prioritize kid-friendly environments and use specific filters to find suitable venues, driving discovery through these platforms",
+    "dont": [
+      "Never use generic tags or descriptions that do not highlight kid-friendly features"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:06:40.573310+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Target families with Google Ads emphasizing convenience, kid-friendly menus, and amenities like high chairs and parking to attract them based on practical information needs",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families seek convenience and practical information, making Google Ads a suitable channel for highlighting these aspects",
+    "dont": [
+      "Avoid targeting with alcohol-related keywords or late-night dining, as these are less relevant to families"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:06:40.573319+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "google_ads",
+    "claim": "Utilize Google Ads for research-focused campaigns, targeting keywords related to fine dining, wine pairings, and exclusive experiences to reach premium diners",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium diners conduct research before making a decision, and Google Ads can provide targeted and relevant results to influence their choice",
+    "dont": [
+      "Avoid using generic keywords or ad copy that may not resonate with premium diners' specific interests and expectations"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:03.609040+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "zomato_swiggy",
+    "claim": "Offer premium bookings and exclusive experiences through Zomato Gold/Pro to attract high-end diners, but avoid delivery options that may diminish the experience",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium diners value exclusivity and convenience, which Zomato Gold/Pro can provide, but may be deterred by delivery options that compromise the fine dining experience",
+    "dont": [
+      "Do not offer delivery options that may compromise the premium dining experience, and instead focus on exclusive bookings and in-venue experiences"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:03.609049+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "zomato_swiggy",
+    "claim": "Claiming and optimizing your Zomato profile can increase discovery and attract solo diners, who are experimental and have a high discovery rate",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners are active Zomato reviewers and use the platform for discovery, making it an effective channel for reaching this segment",
+    "dont": [
+      "Never neglect to claim and optimize your Zomato profile",
+      "Avoid poor photo quality and incomplete menus"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:26.390960+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "instagram_organic",
+    "claim": "Using high-quality food photos and behind-the-scenes kitchen content on Instagram can attract solo diners, who use the platform for visual validation",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners are drawn to visually appealing content and use Instagram to discover new places and validate their choices",
+    "dont": [
+      "Never post low-quality or poorly lit photos",
+      "Avoid excessive promotional content"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:26.390969+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "instagram_organic",
+    "claim": "Highlight health-conscious options, zero-proof cocktails, and 'guilt-free' desserts on Instagram to attract working women, as 59% of Gen Z and 50% of Millennials are interested in NA options and 'wellness' positioning of premium items",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Identity signaling and social proof drive decision-making, with Instagram being the primary discovery platform",
+    "dont": [
+      "Never post low-quality food images",
+      "Avoid promotional content without highlighting health benefits or 'guilt-free' options"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:37.791959+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "zomato_swiggy",
+    "claim": "Ensure high ratings and positive reviews on Zomato, highlighting safety and ambiance, as working women use the platform for safety and review validation",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Social proof and environmental expectation drive decision-making, with Zomato being a key platform for validation",
+    "dont": [
+      "Never neglect responding to negative reviews",
+      "Avoid low-quality profile images or incomplete menu information"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:37.791971+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "google_ads",
+    "claim": "Target working women with Google Ads highlighting 'wellness' positioning, zero-proof cocktails, and 'guilt-free' desserts, as they value health-conscious options and are likely to search for venues online",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Identity signaling and environmental expectation drive decision-making, with Google being a key platform for discovery",
+    "dont": [
+      "Never target ads without highlighting health benefits or unique selling points",
+      "Avoid broad targeting without focusing on working women demographics"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:07:37.791977+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Post high-quality, Instagrammable drink presentations to create FOMO and drive sales, as this archetype is driven by social occasion and identity signaling",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Visual presentation of unique drinks triggers FOMO and social proof, driving group decision-making and spend behavior",
+    "dont": [
+      "Don't post low-quality images",
+      "Avoid overposting, as it may lead to decreased engagement"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:14.230516+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "instagram_organic",
+    "claim": "Utilize Instagram to create a sense of scarcity and exclusivity, highlighting limited-time offers and premium cocktails to drive spend behavior",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Scarcity and exclusivity trigger identity signaling and social proof, driving couples to spend more on unique experiences",
+    "dont": [
+      "Don't overemphasize group activities",
+      "Avoid targeting individual decision-making"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:14.230525+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "zomato_swiggy",
+    "claim": "Optimize Zomato and Swiggy listings to highlight premium offerings, high-quality images, and exclusive deals to attract high-spending customers",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium customers are driven by identity signaling and social proof, and optimized listings on food delivery platforms can drive discovery and spend behavior",
+    "dont": [
+      "Don't compromise on image quality",
+      "Avoid low-rated or poorly reviewed listings"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:14.230528+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_organic",
+    "claim": "High-quality, Instagrammable food and ambiance presentations drive spend behavior and conversion, with a 25-30% dessert/add-on attachment rate and high alcohol affinity",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Identity signaling and social proof drive decision-making, with Instagram-worthy presentation and limited-edition collaboration menus triggering spend",
+    "dont": [
+      "Never prioritize food quality over ambiance and presentation",
+      "Avoid non-photogenic or non-Instagrammable menu items"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:19.877758+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "instagram_organic",
+    "claim": "Instagram discovery is a primary trigger for occasion-driven spend, with 'new opening' spend modification at +80% and regular scene spend at +40%",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Social occasion and identity drivers lead to high peer influence and convergence on photogenic, trending items",
+    "dont": [
+      "Never neglect the importance of ambiance and scene in marketing",
+      "Avoid targeting individual decision-making rather than group consensus"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:19.877767+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "Use quiet and romantic filters on Zomato to attract couples looking for a calm dining experience, as they seek quiet venues and have high switching costs",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples prioritize environmental expectation and social proof, and Zomato's filters help them find a suitable venue",
+    "dont": [
+      "Don't prioritize loud or party-oriented venues",
+      "Avoid high-pressure sales or loud promotions"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:51.443842+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "google_ads",
+    "claim": "Target couples searching for noise-level reviews on Google, highlighting your venue's quiet and calm atmosphere to attract them",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples value environmental expectation and social proof, and Google reviews help them find a venue that meets their expectations",
+    "dont": [
+      "Don't ignore online reviews or noise-level feedback",
+      "Avoid targeting loud or party-oriented keywords"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:08:51.443852+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "zomato_swiggy",
+    "claim": "Utilize Zomato for discovery and reviews to attract solo diners who are driven by culinary exploration and have a high discovery rate",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners are motivated by discovery and use Zomato for reviews and discovery, making it an effective channel for attracting this segment",
+    "dont": [
+      "Do not rely solely on Instagram for marketing to solo diners as they have minimal usage"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:09:31.414312+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "google_ads",
+    "claim": "Use Google Ads to target solo diners who are researching new cuisines and chefs, and have a high intent to discover new culinary experiences",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners are driven by discovery and use Google for research, making Google Ads an effective channel for targeting this segment",
+    "dont": [
+      "Avoid using peer influence or social media campaigns as solo diners are not influenced by peers"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:09:31.414322+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_organic",
+    "claim": "Create engaging content showcasing trending desserts and viral drinks to attract premium customers, with a high average check of +50-90% above baseline",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "FOMO and identity drive premium customers to try trending items, and Instagram is the primary platform for discovery",
+    "dont": [
+      "Never use generic upsell framing",
+      "Avoid promoting non-trending items"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:09:52.785167+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "zomato_swiggy",
+    "claim": "Use Zomato for validation and to showcase trending items, with a high dessert/add-on attachment rate of 35-42%",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium customers use Zomato to validate their dining choices and discover new trending items",
+    "dont": [
+      "Never neglect to update Zomato listings with current trending items",
+      "Avoid low-quality food images"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:09:52.785177+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "zomato_swiggy",
+    "claim": "Office workers primarily use Zomato for pre-visit validation and booking, so prioritize Zomato listings and reviews for this segment",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Convenience and habit drive office workers' reliance on Zomato for discovery and booking",
+    "dont": [
+      "Ignore Google Maps as a discovery platform for office workers"
+    ],
+    "source_file": "behavioral_intelligence_module.md",
+    "extracted_at": "2026-05-26T20:10:13.670450+00:00"
+  }
+]

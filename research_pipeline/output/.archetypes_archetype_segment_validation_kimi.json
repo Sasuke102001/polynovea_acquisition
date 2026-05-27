@@ -1,0 +1,213 @@
+[
+  {
+    "archetype": "habit_former",
+    "tone": "Convenient, routine — your regular spot where you know what to expect",
+    "emotional_driver": "habit_formation + reciprocity",
+    "hook_formula": "Your usual table is waiting. Come back and enjoy your favorite dishes, on us, as a thank you for your loyalty.",
+    "cta_style": "Soft, non-pressuring. We're here for you, whenever you need your routine fix.",
+    "visual_direction": "Familiar, consistent visuals showcasing the convenience and reliability of the venue",
+    "india_adjustment": "Indian office workers show routine dining patterns driven by convenience and time scarcity, making habit formation a key driver",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use messages or visuals that might disrupt the routine or make it seem less convenient"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.88,
+    "source_files": [
+      "A concise executive summary.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180549+00:00"
+  },
+  {
+    "archetype": "social_butterfly",
+    "tone": "Socially-driven, vibrant, and lively atmosphere, with a focus on moderate spend and frequent visits",
+    "emotional_driver": "social_proof + novelty_seeking",
+    "hook_formula": "Exciting events, new experiences, and social sharing opportunities to create a buzz around the venue",
+    "cta_style": "Inviting and inclusive, encouraging customers to join the social scene",
+    "visual_direction": "Vibrant colors, lively atmosphere, and visually appealing dishes to create a shareable experience",
+    "india_adjustment": "High-potential validated archetype for the Indian urban context, with a focus on socially-driven and frequency-oriented dining",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid dull or boring visuals",
+      "Never use solitary or quiet atmosphere"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "A concise executive summary.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180574+00:00"
+  },
+  {
+    "archetype": "party_seeker",
+    "tone": "Social, vibrant, and lively — appealing to the desire for group dining and social interaction",
+    "emotional_driver": "social_proof + group_identity",
+    "hook_formula": "High-energy atmosphere, group outings, and social sharing opportunities",
+    "cta_style": "Inviting and inclusive, emphasizing the fun of group dining",
+    "visual_direction": "Vibrant colors, group photos, and lively ambiance",
+    "india_adjustment": "Indian middle-class shows strong social dining motivation, with 'food as identity' driving group outings",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use solitary or quiet visuals",
+      "Avoid emphasizing solo activities"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.85,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:26:33.122838+00:00"
+  },
+  {
+    "archetype": "lifestyle_regular",
+    "tone": "Healthy, balanced, and values-driven — a venue that aligns with your lifestyle",
+    "emotional_driver": "values_alignment + wellness",
+    "hook_formula": "Find a venue that fits your lifestyle, where you can be yourself and feel good",
+    "cta_style": "Join our community, where like-minded people come together",
+    "visual_direction": "Natural decor, healthy food options, and wellness-focused activities to create a balanced atmosphere",
+    "india_adjustment": "In India, lifestyle regulars often look for venues with a strong focus on health and wellness, so highlighting these aspects can be beneficial",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid overly indulgent or unhealthy visuals",
+      "Never use language that implies a lack of values alignment"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.83,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:20.897180+00:00"
+  },
+  {
+    "archetype": "comfort_dweller",
+    "tone": "Safety, no surprises — familiar environment is the draw, not the food",
+    "emotional_driver": "environmental_expectation + habit_formation",
+    "hook_formula": "Environment confidence + consistency. Quiet corner, your usual, nobody rushes you.",
+    "cta_style": "Soft, non-pressuring. Your regular table is waiting.",
+    "visual_direction": "Quiet corner, soft lighting, consistent plating, clean visible hygiene",
+    "india_adjustment": "Post-pandemic 61% prefer familiar environments; safety signal essential especially for women",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never FOMO or urgency language",
+      "Avoid crowd or noise visuals",
+      "Never show experimental dishes"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.88,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:29.802028+00:00"
+  },
+  {
+    "archetype": "premium_prioritizer",
+    "tone": "Sophisticated, high-end experience with independent choices",
+    "emotional_driver": "social_status + exclusivity",
+    "hook_formula": "Exclusive experience + high-end quality. Personalized service and unique offerings.",
+    "cta_style": "Upscale, inviting to a premium experience",
+    "visual_direction": "High-end ambiance, sophisticated decor, and premium products",
+    "india_adjustment": "High spenders in India may prioritize exclusivity and status, with a preference for private word-of-mouth over public social media",
+    "india_verdict": "HYPOTHESIS",
+    "dont": [
+      "Avoid peer pressure or conformity language",
+      "Never use low-end or casual visuals"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.6,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:52.329713+00:00"
+  },
+  {
+    "archetype": "quiet_discoverer",
+    "tone": "Curious, adventurous, and open-minded — appealing to the desire for novelty and exploration",
+    "emotional_driver": "novelty_seeking + variety_driven",
+    "hook_formula": "New experiences, unique flavors, and exploration opportunities",
+    "cta_style": "Inviting and encouraging, emphasizing the thrill of discovery",
+    "visual_direction": "Vibrant colors, new and exciting settings, and diverse menu options",
+    "india_adjustment": "Indian urban diners show increasing cuisine experimentation, with 20% more cuisines explored annually",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use familiar or routine visuals",
+      "Avoid emphasizing comfort or convenience"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.85,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:57.784053+00:00"
+  },
+  {
+    "archetype": "trusted_regular",
+    "tone": "Familiar, convenient, and reliable — emphasizing the comfort of routine and loyalty",
+    "emotional_driver": "habit_formation + convenience",
+    "hook_formula": "Consistency, familiarity, and ease of repeat visits",
+    "cta_style": "Soft, non-pressuring, and welcoming, emphasizing the benefits of loyalty",
+    "visual_direction": "Warm colors, familiar settings, and predictable menu options",
+    "india_adjustment": "Mumbai data shows frequent diners exhibit routine behavior, with high loyalty and predictable spend",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use unexpected or experimental visuals",
+      "Avoid emphasizing change or novelty"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.9,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:29:20.710283+00:00"
+  },
+  {
+    "archetype": "trend_hunter",
+    "tone": "Exclusive, high-status experience — for those who want to be seen and experience the latest trends",
+    "emotional_driver": "identity_signaling + scarcity",
+    "hook_formula": "Be one of the select few who get to experience the newest, most exclusive offerings. Limited time only.",
+    "cta_style": "Exclusive, urgent. Don't miss your chance to be part of the elite group that gets to experience this first.",
+    "visual_direction": "High-end, luxurious visuals showcasing the exclusivity and scarcity of the experience",
+    "india_adjustment": "Urban Indian middle-class uses dining out as a status marker, making identity signaling crucial for this archetype",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use visuals or messages that might make the experience seem common or easily accessible"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.82,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:29:20.710298+00:00"
+  },
+  {
+    "archetype": "scene_seeker",
+    "tone": "Exploratory, adventurous, and open to new experiences — a venue that offers something unique",
+    "emotional_driver": "novelty + exploration",
+    "hook_formula": "Discover a new world, explore the unknown, and experience the unconventional",
+    "cta_style": "Come and explore, be one of the first to discover",
+    "visual_direction": "Unconventional decor, unique lighting, and eclectic music to create an exploratory atmosphere",
+    "india_adjustment": "In India, scene seekers often look for venues with a mix of traditional and modern elements, so highlighting these aspects can be beneficial",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid overly familiar or traditional visuals",
+      "Never use language that implies routine or predictability"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.78,
+    "source_files": [
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:32:12.535004+00:00"
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "segment": "families",
+    "channel": "email",
+    "claim": "Send marketing emails on Monday at 7 AM to achieve the best performance for restaurant email campaigns",
+    "confidence": 0.6,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "Habitual decision-making is driven by routine, and Monday mornings may be a time when families plan their weekly activities, including dining out",
+    "dont": [
+      "Send emails without personalization or irrelevant offers",
+      "Ignore list quality and geography when sending emails"
+    ],
+    "source_file": "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+    "extracted_at": "2026-05-26T19:34:15.580784+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "email",
+    "claim": "Send marketing emails on Thursday morning to achieve high opens and clicks",
+    "confidence": 0.5,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "Office workers are likely to be planning their weekend activities, including dining out, on Thursday mornings",
+    "dont": [
+      "Send emails with low-quality content or too many promotional messages",
+      "Neglect to segment email lists by demographics or preferences"
+    ],
+    "source_file": "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+    "extracted_at": "2026-05-26T19:34:15.580794+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_organic",
+    "claim": "Collaborate with influencers to create viral content, as it can lead to a significant increase in reservations and attract high-end customers seeking exclusive experiences.",
+    "confidence": 0.8,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "Identity signaling drives premium customers' desire for exclusivity and social proof, making them more likely to visit trendy and viral venues.",
+    "dont": [
+      "Do not overdo promotional content",
+      "Avoid collaborations with influencers who do not align with the venue's brand and target audience"
+    ],
+    "source_file": "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+    "extracted_at": "2026-05-26T19:35:05.312279+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_ads",
+    "claim": "Utilize targeted ads on Instagram to reach high-end customers and create a sense of exclusivity around the venue, potentially leading to increased reservations and premium pricing lift.",
+    "confidence": 0.7,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "Targeted ads on Instagram can effectively reach premium customers and create a sense of FOMO and exclusivity, driving their desire to visit the venue.",
+    "dont": [
+      "Do not use overly promotional language in ads",
+      "Avoid targeting too broad of an audience, reducing the ad's effectiveness"
+    ],
+    "source_file": "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+    "extracted_at": "2026-05-26T19:35:05.312288+00:00"
+  }
+]

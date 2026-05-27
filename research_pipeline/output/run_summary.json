@@ -1,0 +1,9 @@
+{
+  "run_at": "2026-05-27T05:51:40.295465+00:00",
+  "model": "meta/llama-3.3-70b-instruct",
+  "research_files": 19,
+  "claims_extracted": 93,
+  "archetypes_extracted": 11,
+  "contradictions_found": 0,
+  "rag_chunks": 104
+}

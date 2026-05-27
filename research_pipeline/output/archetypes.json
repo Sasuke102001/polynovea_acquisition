@@ -1,0 +1,274 @@
+{
+  "habit_former": {
+    "archetype": "habit_former",
+    "tone": "Familiarity and consistency are key, emphasizing the comfort of routine and reduced cognitive load.",
+    "emotional_driver": "habit_formation + reduced_uncertainty",
+    "hook_formula": "Temporal anchoring and ritualized behavior initiation, such as 'Friday nights at our venue'.",
+    "cta_style": "Soft, inviting repeat customers to continue their routine with a sense of exclusivity.",
+    "visual_direction": "Consistent branding, familiar settings, and predictable experiences.",
+    "india_adjustment": "In the Indian context, emphasizing family and social bonding over familiar venues can enhance habit formation.",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing novelty or experimentation",
+      "Never use urgency or scarcity tactics"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.92,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "A concise executive summary.md",
+      "archetype_segment_validation_kimi.md",
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "behavioral_intelligence_module.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180549+00:00"
+  },
+  "power_regular": {
+    "archetype": "power_regular",
+    "tone": "Confident and assertive, emphasizing power and control",
+    "emotional_driver": "power_seekings + exclusivity",
+    "hook_formula": "Experience the power, indulge in exclusivity",
+    "cta_style": "Encouraging assertiveness and control",
+    "visual_direction": "Bold decor, dramatic lighting, commanding atmosphere",
+    "india_adjustment": "Highlight the venue's commitment to exclusivity and customer power",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing weakness or submission",
+      "Never use overly submissive or apologetic visuals"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.83,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "A concise executive summary.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180569+00:00"
+  },
+  "social_butterfly": {
+    "archetype": "social_butterfly",
+    "tone": "Socially-driven, vibrant, and lively atmosphere, with a focus on moderate spend and frequent visits",
+    "emotional_driver": "social_proof + novelty_seeking",
+    "hook_formula": "Exciting events, new experiences, and social sharing opportunities to create a buzz around the venue",
+    "cta_style": "Inviting and inclusive, encouraging customers to join the social scene",
+    "visual_direction": "Vibrant colors, lively atmosphere, and visually appealing dishes to create a shareable experience",
+    "india_adjustment": "High-potential validated archetype for the Indian urban context, with a focus on socially-driven and frequency-oriented dining",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid dull or boring visuals",
+      "Never use solitary or quiet atmosphere"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "archetype_segment_validation_kimi.md",
+      "A concise executive summary.md",
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "behavioral_intelligence_module.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180574+00:00"
+  },
+  "party_seeker": {
+    "archetype": "party_seeker",
+    "tone": "Vibrant, energetic, and social — emphasizing the fun and exclusivity of the experience",
+    "emotional_driver": "FOMO + social_proof + identity_signaling",
+    "hook_formula": "Create a sense of urgency and exclusivity with limited-time offers or premium experiences, highlighting the social aspect and potential for memorable moments",
+    "cta_style": "Encouraging and inclusive, focusing on group experiences and shared fun",
+    "visual_direction": "Vibrant, lively visuals showcasing groups having fun, premium drinks, and an energetic atmosphere",
+    "india_adjustment": "Given the high preference for social occasions and group outings in India, emphasizing the venue's ability to host memorable nights out with friends is crucial",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing solo activities or quiet nights",
+      "Never downplay the importance of alcohol in the experience",
+      "Don't neglect the role of social media in promoting the venue"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "MARKETING_ENGINE_FRAMEWORK.md",
+      "archetype_segment_validation_kimi.md",
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "behavioral_intelligence_module.md"
+    ],
+    "extracted_at": "2026-05-26T19:26:33.122838+00:00"
+  },
+  "lifestyle_regular": {
+    "archetype": "lifestyle_regular",
+    "tone": "Values-driven, wellness-focused, and balanced in approach — a conscious indulgence",
+    "emotional_driver": "identity_signaling + environmental_expectation + social_proof",
+    "hook_formula": "Highlight values alignment, origin story, and community validation to create an emotional connection",
+    "cta_style": "Inviting and informative, emphasizing the values and story behind the offerings",
+    "visual_direction": "Use high-quality, aesthetic visuals showcasing local, organic, and sustainable ingredients, as well as the story behind the food",
+    "india_adjustment": "Emphasize the importance of local sourcing, organic ingredients, and sustainable practices, which are increasingly valued in the Indian market",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid generic or pushy marketing language",
+      "Don't prioritize convenience over values alignment",
+      "Never compromise on the quality and transparency of ingredients"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.92,
+    "source_files": [
+      "archetype_segment_validation_kimi.md",
+      "behavioral_intelligence_module.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:20.897180+00:00"
+  },
+  "comfort_dweller": {
+    "archetype": "comfort_dweller",
+    "tone": "Safety, no surprises — familiar environment is the draw, not the food",
+    "emotional_driver": "environmental_expectation + habit_formation",
+    "hook_formula": "Environment confidence + consistency. Quiet corner, your usual, nobody rushes you.",
+    "cta_style": "Soft, non-pressuring. Your regular table is waiting.",
+    "visual_direction": "Quiet corner, soft lighting, consistent plating, clean visible hygiene",
+    "india_adjustment": "Post-pandemic 61% prefer familiar environments; safety signal essential especially for women",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never FOMO or urgency language",
+      "Avoid crowd or noise visuals",
+      "Never show experimental dishes"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.88,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "I need current, India-specific market intelligence.md",
+      "archetype_segment_validation_kimi.md",
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "behavioral_intelligence_module.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:29.802028+00:00"
+  },
+  "premium_prioritizer": {
+    "archetype": "premium_prioritizer",
+    "tone": "Exclusive, high-end experience with a sense of scarcity and prestige",
+    "emotional_driver": "social_proof + exclusivity",
+    "hook_formula": "Emphasize the exclusive nature and limited availability of the experience, highlighting the prestige of being part of a select group",
+    "cta_style": "Encourage reservations or bookings with a sense of urgency, emphasizing the limited spots available",
+    "visual_direction": "High-end visuals, luxurious decor, and prominent displays of exclusivity and prestige",
+    "india_adjustment": "In India, the desire for exclusivity and prestige is particularly strong among the young and affluent, with a growing demand for luxury experiences",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid mass-market language or visuals",
+      "Never compromise on the exclusivity and prestige of the experience"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "archetype_segment_validation_kimi.md",
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "behavioral_intelligence_module.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:52.329713+00:00"
+  },
+  "quiet_discoverer": {
+    "archetype": "quiet_discoverer",
+    "tone": "Intelligent and exploratory, with a focus on culinary discovery and education",
+    "emotional_driver": "fomo + environmental_expectation + habit_formation",
+    "hook_formula": "Introduce a new, exclusive culinary experience with a limited-time offer or a unique chef's creation, highlighting the educational aspect of the dish",
+    "cta_style": "Inviting and informative, with a focus on discovery and exploration",
+    "visual_direction": "High-quality food images, chef interviews, and behind-the-scenes kitchen footage, with a clean and minimalist aesthetic",
+    "india_adjustment": "Indian quiet discoverers are likely to be active on Zomato and Google, with a focus on detailed reviews and food forums, so highlighting online reputation and user-generated content can be effective",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid loud or crowded visuals",
+      "Never use high-pressure sales tactics or scarcity language",
+      "Don't focus on quantity of food or drinks, but rather on quality and exclusivity"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "I am building a venue intelligence system for F&am.md",
+      "archetype_segment_validation_kimi.md",
+      "behavioral_intelligence_module.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:57.784053+00:00"
+  },
+  "trusted_regular": {
+    "archetype": "trusted_regular",
+    "tone": "Familiar, personalized experience — recognition and consistency are key",
+    "emotional_driver": "habit_formation + social_proof + identity_signaling",
+    "hook_formula": "Staff recognition and personalized greeting, highlighting new menu items or insider access",
+    "cta_style": "Trust-based, staff-recommended upsell, emphasizing the 'usual' and new discoveries",
+    "visual_direction": "Familiar, consistent environment, with staff interactions and personalized service visuals",
+    "india_adjustment": "High repeat tendency and word-of-mouth multiplier, leveraging staff recognition and insider access",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid generic or impersonal messaging",
+      "Never neglect staff training on recognizing and greeting regulars",
+      "Don't overemphasize occasion-driven marketing"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.92,
+    "source_files": [
+      "archetype_segment_validation_kimi.md",
+      "behavioral_intelligence_module.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:29:20.710283+00:00"
+  },
+  "trend_hunter": {
+    "archetype": "trend_hunter",
+    "tone": "Vibrant, trendy, and exclusive — creating a sense of FOMO and urgency",
+    "emotional_driver": "fomo + social_proof + identity_signaling",
+    "hook_formula": "Introduce the latest viral item or trending experience, creating a sense of scarcity and exclusivity",
+    "cta_style": "Urgent, limited-time offers that encourage immediate action",
+    "visual_direction": "Visually appealing, high-quality images and videos showcasing the trending items and experiences",
+    "india_adjustment": "Leverage social media influencers and user-generated content to create buzz around new openings and viral items",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid generic or traditional marketing approaches",
+      "Never use low-quality visuals or outdated content"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+      "archetype_segment_validation_kimi.md",
+      "behavioral_intelligence_module.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:29:20.710298+00:00"
+  },
+  "scene_seeker": {
+    "archetype": "scene_seeker",
+    "tone": "Immersive, Instagrammable experiences that match or exceed expectations, with a focus on the venue's unique vibe and aesthetic.",
+    "emotional_driver": "social_proof + aesthetic_expectation",
+    "hook_formula": "Sneak peek into the venue's breathtaking atmosphere, with a hint of what's in store for the visitor.",
+    "cta_style": "Inviting, with a touch of exclusivity, such as 'Experience the ultimate vibe' or 'Be part of the scene'.",
+    "visual_direction": "High-quality, visually appealing images and videos showcasing the venue's interior, atmosphere, and unique features, with a focus on lighting, decor, and overall aesthetic.",
+    "india_adjustment": "Indian consumers, especially the younger demographic, are highly active on social media and crave unique, shareable experiences, making it essential to deliver on the promised aesthetic and vibe.",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Downplay the venue's atmosphere or aesthetic",
+      "Use low-quality or misleading visuals",
+      "Ignore the importance of social media in shaping customer expectations"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "archetype_segment_validation_kimi.md",
+      "behavioral_intelligence_module.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:32:12.535004+00:00"
+  }
+}

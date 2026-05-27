@@ -1,0 +1,426 @@
+[
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Send lunch broadcasts between 11:30 AM and 12:30 PM to office workers, as this is the pre-lunch decision window with highest open rates, averaging 98% open rate (TRAI, 2020)",
+    "confidence": 0.9,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Time scarcity drives habitual decision-making, and WhatsApp's high open rate beats other channels",
+    "dont": [
+      "Never send before 9 AM or after 9 PM",
+      "Avoid promotional broadcasts without opt-in"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:31:28.088529+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram Reels to target college kids, as they have a higher engagement rate (3.5%) compared to static posts (2.5%) (Meta, 2022)",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Reels' short-form, visually-appealing content resonates with younger audiences",
+    "dont": [
+      "Post too frequently, as it may lead to audience fatigue"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:31:28.088538+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "Promoted listings on Zomato and Swiggy can deliver an ROI of 3.5x for couples, as they are more likely to try new restaurants and are influenced by online reviews (Zomato, 2020)",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples value discovery and are willing to try new experiences, making them receptive to promoted listings",
+    "dont": [
+      "Ignore the importance of high-quality food images and detailed menu information"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:31:28.088542+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Target families with Google Ads, particularly for 'restaurant near me' queries, which have a conversion rate of 25% (Google, 2022)",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families often search for convenient, nearby dining options, making Google Ads an effective channel",
+    "dont": [
+      "Neglect to include family-friendly amenities and services in ad copy"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:31:28.088545+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_ads",
+    "claim": "Use Instagram Ads to target premium diners, with a CPM of ₹150-₹250 and a ROAS of 2.5x (Meta, 2022)",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium diners are active on Instagram and respond to high-end visuals and exclusive offers",
+    "dont": [
+      "Use low-quality ad creative or neglect to target specific interests and behaviors"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:31:28.088547+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "zomato_swiggy",
+    "claim": "Use Zomato and Swiggy for search, ratings, and reviews to target office workers for dining out, as they have high urban app penetration for ordering and dining out",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Convenience and ease of use drive office workers to rely on Zomato and Swiggy for dining out decisions",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:09.862165+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "google_ads",
+    "claim": "Optimize Google Maps and Google Reviews for 'near me' searches and ratings to target office workers looking for lunch options near their offices",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Office workers rely on Google Maps for discovery and Google Reviews for social validation when making dining out decisions",
+    "dont": [
+      "Ignore mobile optimization for Google Maps and Google Reviews"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:09.862175+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "instagram_organic",
+    "claim": "Leverage Instagram's visual feed to showcase food and restaurant experiences, as urban professionals are influenced by Instagram-first food brands",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Visual storytelling on Instagram drives engagement and influences dining out decisions among office workers",
+    "dont": [
+      "Post low-quality or irrelevant content on Instagram"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:09.862178+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Use WhatsApp for sharing links, offers, and small-group recommendations to target office workers, as it has a large user base in India and is used by restaurant chains for menus and offers",
+    "confidence": 0.5,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "WhatsApp's large user base and group sharing features make it a potential channel for targeting office workers",
+    "dont": [
+      "Send unsolicited or spam messages on WhatsApp"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:09.862181+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "zomato_swiggy",
+    "claim": "Use Zomato and Swiggy to target college students with price filtering, ratings, and photos, as they are the default apps for this demographic, and consider offering discounts and promotions to attract price-sensitive students",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "College students rely heavily on social proof and visual discovery, and Zomato and Swiggy provide a platform for them to discover and evaluate restaurants based on price, ratings, and photos",
+    "dont": [
+      "Never underestimate the importance of price sensitivity for college students",
+      "Avoid not having a presence on Zomato and Swiggy"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:22.006761+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Utilize Instagram for visual discovery, as college students are likely to discover and engage with food content on the platform, and create an 'Instagram-first food brand' to appeal to this demographic",
+    "confidence": 0.9,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Instagram's visual nature allows for easy discovery and engagement, and college students are likely to be influenced by the platform's content",
+    "dont": [
+      "Never post low-quality or unappealing content on Instagram",
+      "Avoid not having a strong Instagram presence"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:22.006770+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "whatsapp",
+    "claim": "Leverage WhatsApp groups to coordinate plans and share venue suggestions, as college students use the platform to discuss and decide on restaurants and plans",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "WhatsApp groups provide a convenient and private space for college students to discuss and decide on plans, and restaurants can leverage this by sharing suggestions and promotions",
+    "dont": [
+      "Never spam or send unsolicited messages on WhatsApp",
+      "Avoid not having a WhatsApp presence or not engaging with customers on the platform"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:22.006774+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "Couples use Zomato and Swiggy Dineout to find 'date-friendly' places with filters, photos, and ratings, with Swiggy reporting 2.35 million 'just the two of us' reservations nationally.",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples rely on social proof and visual cues to make decisions about date venues, and Zomato and Swiggy provide these features.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:29.447584+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "instagram_organic",
+    "claim": "Couples use Instagram for heavy visual discovery of restaurants, emphasizing ambience and 'Instagram-worthy' places.",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples are drawn to visually appealing content on Instagram, which influences their decisions about where to dine.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:29.447593+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "google_ads",
+    "claim": "Couples use Google Maps to discover restaurants, especially in unfamiliar localities, and Google Reviews to cross-check ambiance and service comments.",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples rely on Google's search and review features to make informed decisions about restaurants, particularly when exploring new areas.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:29.447596+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "whatsapp",
+    "claim": "Some couples use WhatsApp to coordinate bookings and take advantage of offers, with some restaurants accepting WhatsApp reservations.",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples value the convenience and direct communication that WhatsApp provides for making reservations and coordinating plans.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:29.447598+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "zomato_swiggy",
+    "claim": "Using filters for family-friendly, veg, and kid-friendly options on Zomato and Swiggy can increase engagement and conversions, especially in metros.",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families prioritize convenience and suitability when making dining decisions, and these filters cater to their specific needs.",
+    "dont": [
+      "Ignore the importance of veg and kid-friendly options",
+      "Fail to optimize restaurant listings for family-friendly searches"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:59.543891+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Targeting families with Google Ads that highlight distance and parking information can improve decision-making, especially for families with kids or older adults.",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families value convenience and practicality, and Google Ads can provide them with relevant information to inform their decisions.",
+    "dont": [
+      "Neglect to include distance and parking details in ad copy",
+      "Fail to target families with kids or older adults specifically"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:59.543900+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Highlighting service and cleanliness in Google Reviews can increase trust and conversions among families.",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families prioritize the well-being and safety of their members, and positive reviews can reassure them of a restaurant's quality.",
+    "dont": [
+      "Ignore the importance of service and cleanliness in reviews",
+      "Fail to encourage customers to leave reviews on Google"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:59.543905+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "instagram_organic",
+    "claim": "Sharing kid-friendly buffet options and other family-friendly content on Instagram can increase discovery and engagement among families.",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families are active on Instagram and can be influenced by visually appealing content that showcases family-friendly options.",
+    "dont": [
+      "Neglect to post kid-friendly content",
+      "Fail to use relevant hashtags to increase discoverability"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:59.543907+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "whatsapp",
+    "claim": "Encouraging family groups to share suggestions and photos of kid-friendly restaurants on WhatsApp can increase word-of-mouth referrals and conversions.",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families trust recommendations from their social networks, and WhatsApp can facilitate these conversations.",
+    "dont": [
+      "Ignore the importance of word-of-mouth referrals",
+      "Fail to encourage customers to share their experiences on WhatsApp"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:32:59.543910+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram for trend spotting and sharing experiences, as premium diners rely heavily on this platform for discovering new venues and chef-driven concepts.",
+    "confidence": 0.9,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium diners are heavy social media users who share experiences and look for new trends, making Instagram an ideal platform for reaching them.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:33:15.997053+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "zomato_swiggy",
+    "claim": "List your premium dining venue on Zomato to leverage ratings and photos for discovery, and consider participating in premium dining festivals and discount events on Swiggy Dineout.",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium diners rely on ratings and photos for discovery, and Zomato and Swiggy Dineout provide a platform for them to find and engage with premium dining venues.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:33:15.997062+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "whatsapp",
+    "claim": "Use WhatsApp for direct reservation with hotels and for high-trust micro-word-of-mouth in closed groups, as premium diners sometimes use this platform for personalized communication.",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "WhatsApp provides a personalized and trusted platform for premium diners to communicate with hotels and share recommendations with their closed groups.",
+    "dont": [],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:33:15.997065+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "zomato_swiggy",
+    "claim": "Optimize your Zomato and Swiggy listings for solo diners searching for 'quick bite near me' and highlight safety and ambience features to attract them.",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners prioritize convenience, safety, and ambiance when choosing a dining spot, and Zomato and Swiggy are key platforms for discovery.",
+    "dont": [
+      "Don't neglect to include high-quality photos and detailed descriptions of your restaurant's atmosphere and safety features."
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:33:56.076261+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "google_ads",
+    "claim": "Target solo diners on Google Maps with ads highlighting location convenience and solo-friendly amenities to attract them for exploration and dining.",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners often rely on Google Maps for discovery and navigation, and targeted ads can help your restaurant stand out as a convenient and appealing option.",
+    "dont": [
+      "Don't focus solely on group-friendly features or neglect to optimize your Google My Business listing for solo diners."
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:33:56.076270+00:00"
+  },
+  {
+    "segment": "solo_diners",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram to showcase your café, brunch spot, or co-working friendly place, highlighting ambiance and solo-friendly features to attract solo diners.",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Solo diners are active on Instagram and often use it to discover new dining spots, with a focus on ambiance and aesthetic appeal.",
+    "dont": [
+      "Don't post low-quality photos or neglect to use relevant hashtags to increase visibility for solo diners."
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:33:56.076273+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "zomato_swiggy",
+    "claim": "List venues on Zomato and Swiggy to attract working women looking for safe and comfortable places for lunch near their office",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Working women prioritize safety and convenience when choosing a venue for lunch, and Zomato and Swiggy provide a platform for them to discover and review venues",
+    "dont": [
+      "Don't neglect to highlight safety features and comfortable ambiance in venue listings"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:34:23.374285+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "google_ads",
+    "claim": "Use Google Ads to target working women searching for venues near their office or in areas with high female workforce participation",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Working women use Google to search for venues and check safety and location, making targeted Google Ads an effective way to reach them",
+    "dont": [
+      "Don't use overly promotional language in ads, instead focus on highlighting venue features and safety"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:34:23.374293+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram to showcase lifestyle-driven content and attract working women who are interested in discovering new venues and experiences",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Working women use Instagram to discover new venues and experiences, and lifestyle-driven content resonates with their interests and values",
+    "dont": [
+      "Don't post low-quality or irrelevant content, instead focus on showcasing high-quality visuals and venue experiences"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:34:23.374296+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "whatsapp",
+    "claim": "Use WhatsApp to facilitate close-circle word-of-mouth and plan coordination among working women, by encouraging them to share venue recommendations with friends and colleagues",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Working women use WhatsApp to coordinate plans and share recommendations with close friends and colleagues, making it an effective channel for word-of-mouth marketing",
+    "dont": [
+      "Don't spam or send unsolicited messages, instead focus on encouraging organic sharing and recommendation"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:34:23.374299+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Send targeted WhatsApp broadcasts to achieve high open rates and click-through rates, with reports indicating 90-98 percent open rates and 40-60 percent CTR",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "WhatsApp's high open rates and click-through rates are driven by its personal and direct nature, making it an effective channel for targeted marketing",
+    "dont": [
+      "Never send promotional broadcasts without opt-in",
+      "Avoid sending broadcasts outside of reasonable hours"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:34:55.354074+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "whatsapp",
+    "claim": "Utilize WhatsApp broadcasts to reach college kids, with open rates above 90 percent and CTR around 40-50 percent, by sending targeted and engaging content",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "College kids are active on WhatsApp and respond well to personalized and relevant content, making it an effective channel for marketing",
+    "dont": [
+      "Avoid using overly formal or promotional tone",
+      "Never send broadcasts without segmenting the audience"
+    ],
+    "source_file": "I need current, India-specific market intelligence.md",
+    "extracted_at": "2026-05-26T20:34:55.354083+00:00"
+  }
+]
