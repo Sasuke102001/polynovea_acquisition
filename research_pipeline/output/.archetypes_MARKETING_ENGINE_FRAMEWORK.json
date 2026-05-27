@@ -1,0 +1,23 @@
+[
+  {
+    "archetype": "party_seeker",
+    "tone": "High-energy, urgent, and exciting — creating a sense of FOMO",
+    "emotional_driver": "social_proof + fomo",
+    "hook_formula": "Scarcity and time pressure, emphasizing the limited availability of spots",
+    "cta_style": "Direct and urgent, encouraging immediate action",
+    "visual_direction": "Vibrant visuals, such as DJ announcements, crowd photos, or cocktail shots, with text overlays highlighting the scarcity and countdown",
+    "india_adjustment": "Leverage WhatsApp and Instagram Stories for event-driven marketing, considering the high open rates and effectiveness of FOMO campaigns in the Indian market",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid using low-energy visuals or tone",
+      "Never use language that implies abundance or plenty of time"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.6,
+    "source_files": [
+      "MARKETING_ENGINE_FRAMEWORK.md"
+    ],
+    "extracted_at": "2026-05-26T21:19:21.579367+00:00"
+  }
+]

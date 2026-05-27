@@ -1,0 +1,240 @@
+[
+  {
+    "archetype": "scene_seeker",
+    "tone": "Immersive, Instagrammable experiences that match or exceed expectations, with a focus on the venue's unique vibe and aesthetic.",
+    "emotional_driver": "social_proof + aesthetic_expectation",
+    "hook_formula": "Sneak peek into the venue's breathtaking atmosphere, with a hint of what's in store for the visitor.",
+    "cta_style": "Inviting, with a touch of exclusivity, such as 'Experience the ultimate vibe' or 'Be part of the scene'.",
+    "visual_direction": "High-quality, visually appealing images and videos showcasing the venue's interior, atmosphere, and unique features, with a focus on lighting, decor, and overall aesthetic.",
+    "india_adjustment": "Indian consumers, especially the younger demographic, are highly active on social media and crave unique, shareable experiences, making it essential to deliver on the promised aesthetic and vibe.",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Downplay the venue's atmosphere or aesthetic",
+      "Use low-quality or misleading visuals",
+      "Ignore the importance of social media in shaping customer expectations"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:32:12.535004+00:00"
+  },
+  {
+    "archetype": "premium_prioritizer",
+    "tone": "Exclusive, high-end experience with a sense of scarcity and prestige",
+    "emotional_driver": "social_proof + exclusivity",
+    "hook_formula": "Emphasize the exclusive nature and limited availability of the experience, highlighting the prestige of being part of a select group",
+    "cta_style": "Encourage reservations or bookings with a sense of urgency, emphasizing the limited spots available",
+    "visual_direction": "High-end visuals, luxurious decor, and prominent displays of exclusivity and prestige",
+    "india_adjustment": "In India, the desire for exclusivity and prestige is particularly strong among the young and affluent, with a growing demand for luxury experiences",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid mass-market language or visuals",
+      "Never compromise on the exclusivity and prestige of the experience"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.92,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:52.329713+00:00"
+  },
+  {
+    "archetype": "trend_hunter",
+    "tone": "Exclusive, limited-time offers create a sense of urgency and high status",
+    "emotional_driver": "scarcity + social_proof + loss_aversion",
+    "hook_formula": "Quantified scarcity and time-sensitive exclusivity create a compelling offer, e.g., 'Only 500 spots available for a limited time'",
+    "cta_style": "Encouraging users to join a waitlist or sign up for exclusive access",
+    "visual_direction": "High-end visuals, limited-time offer graphics, and VIP tier branding",
+    "india_adjustment": "In India, social status and exclusivity are highly valued, so emphasizing VIP tiers and limited-time offers can be particularly effective",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid making the offer seem too easily accessible",
+      "Never downplay the exclusivity and scarcity aspects"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.85,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:57:49.094256+00:00"
+  },
+  {
+    "archetype": "social_butterfly",
+    "tone": "Welcoming, lively atmosphere — a place to connect with friends and like-minded people",
+    "emotional_driver": "social_connection + belonging",
+    "hook_formula": "Vibrant social scene + appealing music. Join the fun and meet new people",
+    "cta_style": "Friendly, with a sense of invitation to join the community",
+    "visual_direction": "Colorful, lively visuals showcasing the social atmosphere and diverse crowd",
+    "india_adjustment": "In Indian culture, social butterflies are drawn to venues that offer a sense of community and belonging",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid dark or intimidating visuals",
+      "Never use overly formal language"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.8,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:57:49.094268+00:00"
+  },
+  {
+    "archetype": "habit_former",
+    "tone": "Familiarity and consistency are key, emphasizing the comfort of routine and reduced cognitive load.",
+    "emotional_driver": "habit_formation + reduced_uncertainty",
+    "hook_formula": "Temporal anchoring and ritualized behavior initiation, such as 'Friday nights at our venue'.",
+    "cta_style": "Soft, inviting repeat customers to continue their routine with a sense of exclusivity.",
+    "visual_direction": "Consistent branding, familiar settings, and predictable experiences.",
+    "india_adjustment": "In the Indian context, emphasizing family and social bonding over familiar venues can enhance habit formation.",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing novelty or experimentation",
+      "Never use urgency or scarcity tactics"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.92,
+    "source_files": [
+      "A concise executive summary.md",
+      "behavioral_acquisition_mechanisms_hospitality.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180549+00:00"
+  },
+  {
+    "archetype": "trusted_regular",
+    "tone": "Trustworthy and reliable, emphasizing consistency and familiarity",
+    "emotional_driver": "trust_formation + habit_formation",
+    "hook_formula": "Come back to what you trust, experience the familiar",
+    "cta_style": "Soft, non-pressuring, encouraging repeat visits",
+    "visual_direction": "Cozy decor, warm lighting, inviting atmosphere",
+    "india_adjustment": "Emphasize the venue's commitment to consistency and customer trust",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing novelty or surprise",
+      "Never use harsh or jarring visuals"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.84,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T20:03:19.390972+00:00"
+  },
+  {
+    "archetype": "party_seeker",
+    "tone": "Energetic and lively, emphasizing the crowd and social experience",
+    "emotional_driver": "social_proof + fomo",
+    "hook_formula": "Join the crowd, be part of the scene, don't miss out",
+    "cta_style": "Urgent, encouraging immediate action to join the party",
+    "visual_direction": "Crowded venues, bright lights, energetic atmosphere",
+    "india_adjustment": "Emphasize safety and security in crowded areas, especially for women",
+    "india_verdict": "ADJUST",
+    "dont": [
+      "Avoid emphasizing solitude or quiet environments",
+      "Never use slow or calming music"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.72,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T20:05:45.397411+00:00"
+  },
+  {
+    "archetype": "lifestyle_regular",
+    "tone": "Practical and convenient, emphasizing ease and routine",
+    "emotional_driver": "convenience_seekings + habit_formation",
+    "hook_formula": "Make it part of your routine, experience the convenience",
+    "cta_style": "Encouraging regular visits and habit formation",
+    "visual_direction": "Clean decor, simple lighting, straightforward atmosphere",
+    "india_adjustment": "Highlight the venue's commitment to convenience and customer ease",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing luxury or exclusivity",
+      "Never use overly complex or confusing visuals"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.78,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T20:05:45.397436+00:00"
+  },
+  {
+    "archetype": "quiet_discoverer",
+    "tone": "Introspective and curious, emphasizing discovery and exploration",
+    "emotional_driver": "novelty_seeking + environmental_expectation",
+    "hook_formula": "Discover something new, experience the unknown",
+    "cta_style": "Encouraging exploration and discovery",
+    "visual_direction": "Minimal decor, soft lighting, intimate atmosphere",
+    "india_adjustment": "Emphasize the venue's commitment to uniqueness and customer discovery",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing crowds or noise",
+      "Never use harsh or overwhelming visuals"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.8,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T20:05:45.397439+00:00"
+  },
+  {
+    "archetype": "power_regular",
+    "tone": "Confident and assertive, emphasizing power and control",
+    "emotional_driver": "power_seekings + exclusivity",
+    "hook_formula": "Experience the power, indulge in exclusivity",
+    "cta_style": "Encouraging assertiveness and control",
+    "visual_direction": "Bold decor, dramatic lighting, commanding atmosphere",
+    "india_adjustment": "Highlight the venue's commitment to exclusivity and customer power",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing weakness or submission",
+      "Never use overly submissive or apologetic visuals"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": true,
+    "confidence": 0.83,
+    "source_files": [
+      "A concise executive summary.md",
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180569+00:00"
+  },
+  {
+    "archetype": "comfort_dweller",
+    "tone": "Comforting and familiar, emphasizing relaxation and ease",
+    "emotional_driver": "environmental_expectation + habit_formation",
+    "hook_formula": "Come back to what you know, experience the comfort",
+    "cta_style": "Soft, non-pressuring, encouraging repeat visits",
+    "visual_direction": "Cozy decor, warm lighting, inviting atmosphere",
+    "india_adjustment": "Emphasize the venue's commitment to comfort and customer ease",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid emphasizing novelty or surprise",
+      "Never use harsh or jarring visuals"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.86,
+    "source_files": [
+      "behavioral_acquisition_mechanisms_hospitality.md"
+    ],
+    "extracted_at": "2026-05-26T20:05:45.397449+00:00"
+  }
+]

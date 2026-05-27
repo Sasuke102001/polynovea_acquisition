@@ -1,0 +1,24 @@
+[
+  {
+    "archetype": "comfort_dweller",
+    "tone": "Emphasize safety and comfort in a familiar environment, catering to the needs of working women in urban India",
+    "emotional_driver": "environmental_expectation + safety",
+    "hook_formula": "Highlight the safe and comfortable ambiance, perfect for a working woman's dining experience",
+    "cta_style": "Soft, non-pressuring, and inviting, focusing on the convenience and reliability of the dining experience",
+    "visual_direction": "Quiet, well-lit, and clean atmosphere, showcasing women enjoying their meals in a comfortable setting",
+    "india_adjustment": "Emphasize safety features, especially for women, as it is a key concern in urban India",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use loud or crowded visuals",
+      "Avoid using high-pressure sales language",
+      "Never compromise on showcasing cleanliness and hygiene"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.8,
+    "source_files": [
+      "I need current, India-specific market intelligence.md"
+    ],
+    "extracted_at": "2026-05-26T20:42:11.607604+00:00"
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "archetype": "habit_former",
+    "tone": "Familiar and consistent tone to encourage repeat visits",
+    "emotional_driver": "habit_formation + loyalty",
+    "hook_formula": "Exclusive offers for regular customers, highlighting the benefits of repeat visits",
+    "cta_style": "Soft, non-pressuring call-to-action to encourage repeat business",
+    "visual_direction": "Consistent branding, familiar environments, and loyalty program visuals",
+    "india_adjustment": "Target 60-70% retention, with top performers at 75-80% and global averages at ~55%",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use FOMO or urgency language",
+      "Avoid experimental or new offerings"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": true,
+    "confidence": 0.6,
+    "source_files": [
+      "A concise executive summary.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180549+00:00"
+  },
+  {
+    "archetype": "power_regular",
+    "tone": "Exclusive and high-end tone to attract high-value customers",
+    "emotional_driver": "social_proof + identity",
+    "hook_formula": "High-end offerings, exclusive deals, and premium services to attract high-value customers",
+    "cta_style": "Direct and exclusive call-to-action to encourage high-end bookings",
+    "visual_direction": "High-end visuals, premium branding, and exclusive environments",
+    "india_adjustment": "Use Instagram and short-form video to drive discovery for 18-35 year olds",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use low-end or budget language",
+      "Avoid crowded or noisy visuals"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.5,
+    "source_files": [
+      "A concise executive summary.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180569+00:00"
+  },
+  {
+    "archetype": "social_butterfly",
+    "tone": "Fun and social tone to attract young and social customers",
+    "emotional_driver": "social_proof + fomo",
+    "hook_formula": "Trending events, live music, and social activities to attract young and social customers",
+    "cta_style": "Fun and social call-to-action to encourage group bookings and events",
+    "visual_direction": "Vibrant and social visuals, trending events, and live music",
+    "india_adjustment": "Use TikTok/Reels to drive discovery and increase weekend footfall",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Never use boring or static language",
+      "Avoid empty or quiet visuals"
+    ],
+    "language_rec": "Hinglish",
+    "trust_first": false,
+    "confidence": 0.55,
+    "source_files": [
+      "A concise executive summary.md"
+    ],
+    "extracted_at": "2026-05-26T19:23:35.180574+00:00"
+  }
+]

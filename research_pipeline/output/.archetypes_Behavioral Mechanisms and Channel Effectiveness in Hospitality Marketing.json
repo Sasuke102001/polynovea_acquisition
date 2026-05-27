@@ -1,0 +1,67 @@
+[
+  {
+    "archetype": "trend_hunter",
+    "tone": "Exclusive, high-end experience with a touch of novelty and social status",
+    "emotional_driver": "social_proof + identity_signaling",
+    "hook_formula": "VIP access, members-only offers, and exclusive events to create a sense of FOMO and prestige",
+    "cta_style": "Limited-time offer, exclusive invitation to create a sense of urgency and scarcity",
+    "visual_direction": "High-end visuals, trendy and modern decor, influencer partnerships, and user-generated content",
+    "india_adjustment": "Influencer marketing is highly effective in India, especially on Instagram and TikTok, with a focus on exclusivity and social status",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid mass-market language and visuals",
+      "Never use discount-focused messaging"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.85,
+    "source_files": [
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:29:20.710298+00:00"
+  },
+  {
+    "archetype": "premium_prioritizer",
+    "tone": "High-end experience, premium quality, and exclusive service",
+    "emotional_driver": "identity_signaling + quality_expectation",
+    "hook_formula": "Emphasize premium ingredients, exclusive events, and personalized service to create a sense of luxury and sophistication",
+    "cta_style": "Exclusive invitation, limited-time offer to create a sense of urgency and prestige",
+    "visual_direction": "High-end visuals, premium decor, and sophisticated ambiance",
+    "india_adjustment": "Premiumization is a growing trend in India, with a focus on high-end experiences and exclusive service",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid mass-market language and visuals",
+      "Never use discount-focused messaging"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.8,
+    "source_files": [
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md",
+      "archetype_segment_validation_kimi.md"
+    ],
+    "extracted_at": "2026-05-26T19:27:52.329713+00:00"
+  },
+  {
+    "archetype": "social_butterfly",
+    "tone": "Trendy, social, and exclusive experience with a touch of novelty and excitement",
+    "emotional_driver": "social_proof + novelty-seeking",
+    "hook_formula": "Viral videos, influencer partnerships, and exclusive events to create a sense of FOMO and social status",
+    "cta_style": "Limited-time offer, exclusive invitation to create a sense of urgency and scarcity",
+    "visual_direction": "Trendy and modern decor, user-generated content, and social media influencers",
+    "india_adjustment": "Social media influencers are highly effective in India, especially on Instagram and TikTok, with a focus on exclusivity and social status",
+    "india_verdict": "CONFIRMED",
+    "dont": [
+      "Avoid mass-market language and visuals",
+      "Never use discount-focused messaging"
+    ],
+    "language_rec": "English-ok",
+    "trust_first": false,
+    "confidence": 0.78,
+    "source_files": [
+      "Behavioral Mechanisms and Channel Effectiveness in Hospitality Marketing.md"
+    ],
+    "extracted_at": "2026-05-26T19:39:40.373232+00:00"
+  }
+]

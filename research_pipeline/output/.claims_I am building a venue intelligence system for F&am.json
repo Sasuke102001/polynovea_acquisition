@@ -1,0 +1,212 @@
+[
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Utilize Instagram Reels to showcase photo-worthy drinks and group-sized items, as social media influence can boost upsell of these items, especially among young adults",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Social media influence drives discovery and peer-driven ordering, especially among young adults",
+    "dont": [
+      "Do not post low-quality images or videos",
+      "Avoid using too much text in Reels"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:21:35.453263+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "zomato_swiggy",
+    "claim": "Optimize Zomato and Swiggy listings to highlight bar-oriented nights-out, premium cocktails, and group-sized items, as urban millennials spend 10-13% of total food expenditure on dining out",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Young adults are higher spenders on beverages than on food, and Zomato and Swiggy listings can influence their dining-out decisions",
+    "dont": [
+      "Do not neglect to update listings regularly",
+      "Avoid using inaccurate or misleading information"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:21:35.453273+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "instagram_organic",
+    "claim": "Office workers in Mumbai are actively searching for lunch options on Instagram, with popular hashtags like #mumbaioffice lunchoptions",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Visual discovery drives impulse decisions; Instagram's high engagement rates make it an ideal platform for reaching office workers",
+    "dont": [
+      "Don't post low-quality food images",
+      "Avoid using irrelevant hashtags"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:22.233133+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_ads",
+    "claim": "Targeting college kids on Instagram with ads featuring trendy food items and promotions can increase brand awareness and drive sales",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Social proof and influencer marketing influence college kids' purchasing decisions; Instagram ads provide a targeted and engaging way to reach this demographic",
+    "dont": [
+      "Don't use outdated or irrelevant ad creative",
+      "Avoid targeting college kids during exam seasons"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:22.233141+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "whatsapp",
+    "claim": "Working women in India are more likely to engage with WhatsApp messages from restaurants that offer convenient and healthy meal options",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Convenience and health consciousness drive working women's food choices; WhatsApp's personal and intimate nature makes it an effective channel for reaching this demographic",
+    "dont": [
+      "Don't send spammy or promotional messages",
+      "Avoid using overly formal or masculine tone"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:22.233146+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "Couples in India are more likely to discover and try new restaurants through food delivery platforms like Zomato and Swiggy",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Convenience and discovery drive couples' dining decisions; food delivery platforms provide a seamless and engaging way to discover new restaurants",
+    "dont": [
+      "Don't have a poor online reputation",
+      "Avoid not having a presence on these platforms"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:22.233149+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Families in India are more likely to search for kid-friendly restaurants and cafes on Google, making targeted Google Ads a effective way to reach this demographic",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Convenience and safety drive families' dining decisions; Google Ads provide a targeted and relevant way to reach families searching for kid-friendly options",
+    "dont": [
+      "Don't use irrelevant or misleading ad copy",
+      "Avoid not having a kid-friendly menu or atmosphere"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:22.233153+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Send lunch broadcasts between 11:30 AM and 12:30 PM to office workers, as this is the pre-lunch decision window with the highest open rates",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Time scarcity drives habitual decision-making, and WhatsApp's high open rate beats other channels",
+    "dont": [
+      "Never send before 9 AM or after 9 PM",
+      "Avoid promotional broadcasts without opt-in"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:39.900796+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Utilize Instagram's visual features to showcase food and beverages, as college kids are highly influenced by social media and visuals",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "College kids are active on social media and are more likely to engage with visually appealing content",
+    "dont": [
+      "Post low-quality images or videos",
+      "Ignore engagement and comments from followers"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:39.900806+00:00"
+  },
+  {
+    "segment": "working_women",
+    "channel": "email",
+    "claim": "Send targeted email campaigns to working women, offering discounts and promotions on food and beverages, as they are more likely to respond to personalized offers",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Working women are busy and appreciate personalized offers that cater to their needs and preferences",
+    "dont": [
+      "Send generic or spammy emails",
+      "Ignore email open and click-through rates"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:39.900810+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "List your restaurant on Zomato and Swiggy, and offer special deals and discounts for couples, as they are more likely to order food online and look for romantic dining experiences",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples are more likely to order food online and look for convenient and romantic dining experiences",
+    "dont": [
+      "Ignore online reviews and ratings",
+      "Fail to offer special deals and discounts for couples"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:39.900813+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Utilize Google Ads to target families searching for kid-friendly restaurants and cafes, as they are more likely to search online for family-friendly dining options",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families are more likely to search online for family-friendly dining options and are influenced by online reviews and ratings",
+    "dont": [
+      "Ignore keyword research and ad targeting",
+      "Fail to highlight kid-friendly features and menu options"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:23:39.900815+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram to promote visually appealing food content to college kids, as they are more likely to engage with food-related posts during their breaks",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "College kids are active on Instagram and are influenced by visually appealing content, which can drive engagement and sales",
+    "dont": [
+      "Post too frequently, as it can lead to fatigue",
+      "Use low-quality images or videos"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:24:01.272521+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "zomato_swiggy",
+    "claim": "List your restaurant on Zomato and Swiggy to target couples, as they often use these platforms to discover new dining options for dates",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples use food delivery and discovery platforms to find new experiences, and a strong online presence can drive sales and loyalty",
+    "dont": [
+      "Ignore online reviews and ratings, as they can impact reputation",
+      "Fail to offer special deals or discounts for couples"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:24:01.272530+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "google_ads",
+    "claim": "Use Google Ads to target families searching for kid-friendly restaurants or family dining options, as they often search online for recommendations",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families use search engines to find suitable dining options, and targeted ads can drive traffic and sales",
+    "dont": [
+      "Use irrelevant keywords or ad copy",
+      "Fail to highlight kid-friendly features or menu options"
+    ],
+    "source_file": "I am building a venue intelligence system for F&am.md",
+    "extracted_at": "2026-05-26T20:24:01.272534+00:00"
+  }
+]

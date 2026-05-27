@@ -1,0 +1,194 @@
+[
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Send lunch broadcasts between 11:30 AM and 12:30 PM to leverage the pre-lunch decision window with highest open rates",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Time scarcity drives habitual decision-making; WhatsApp's high open rate beats all other channels",
+    "dont": [
+      "Never send before 9 AM or after 9 PM",
+      "Avoid promotional broadcasts without opt-in"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:07.991331+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram Reels to drive discovery and increase weekend footfall, with a potential uplift of 30%",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Short-form video content resonates with younger audiences, increasing engagement and driving footfall",
+    "dont": [
+      "Don't overpost, risking audience fatigue",
+      "Avoid low-quality or irrelevant content"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:07.991343+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "zomato_swiggy",
+    "claim": "Invest in sponsored/featured placement on Zomato/Swiggy to increase orders and discovery, with a potential uplift of 25-60% during peaks",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "High visibility on food delivery platforms drives user choices, increasing orders and revenue",
+    "dont": [
+      "Don't neglect high-quality food images and accurate menu information",
+      "Avoid poor customer reviews and low ratings"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:07.991348+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "email",
+    "claim": "Use email marketing for loyalty programs, offering exclusive deals and promotions to increase engagement and retention",
+    "confidence": 0.5,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "Personalized email content can foster loyalty and drive repeat visits, especially among couples seeking exclusive experiences",
+    "dont": [
+      "Don't send generic or spammy emails, risking audience fatigue",
+      "Avoid neglecting email list segmentation and personalization"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:07.991351+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "google_ads",
+    "claim": "Invest in targeted Google Ads to reach high-end customers, increasing brand visibility and driving conversions",
+    "confidence": 0.4,
+    "india_verdict": "NOT_STATED",
+    "why_it_works": "Targeted online advertising can effectively reach affluent audiences, driving conversions and revenue",
+    "dont": [
+      "Don't neglect ad copy quality and relevance",
+      "Avoid poor landing page experiences and low-quality website design"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:07.991355+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram for discovery and setting expectations, as younger cohorts (18-35) discover via Instagram and respond well to FOMO and influencer cues",
+    "confidence": 0.6,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Younger cohorts are active on Instagram and respond well to visual content and influencer cues",
+    "dont": [
+      "Don't use Instagram for direct offers or confirmations, as WhatsApp is more effective for these purposes"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:36.729764+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Prioritize WhatsApp for retention and habit formation, implementing weekly or biweekly targeted broadcasts, transactional confirmations, and loyalty nudges",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "WhatsApp has high open rates and vendor reports of strong ROI, making it effective for retention and habit formation",
+    "dont": [
+      "Don't send promotional broadcasts without opt-in, and avoid sending messages before 9 AM or after 9 PM"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:36.729775+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "instagram_ads",
+    "claim": "Use influencer/VIP positioning to generate high demand in metros, as this can create a sense of exclusivity and prestige",
+    "confidence": 0.4,
+    "india_verdict": "UNCONFIRMED",
+    "why_it_works": "Influencer/VIP positioning can create a sense of exclusivity and prestige, appealing to premium customers",
+    "dont": [
+      "Don't overuse influencer/VIP positioning, as this can come across as insincere or try-hard"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:36.729781+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "zomato_swiggy",
+    "claim": "Combine Zomato/Site optimization + social proof, investing in maintaining high ratings and sponsored slots during peak hours",
+    "confidence": 0.7,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "High ratings and sponsored slots on Zomato/Swiggy can increase discovery and conversions, especially for families looking for reliable options",
+    "dont": [
+      "Don't neglect to maintain high ratings, as this can negatively impact discovery and conversions"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:36.729785+00:00"
+  },
+  {
+    "segment": "office_workers",
+    "channel": "whatsapp",
+    "claim": "Send lunch broadcasts between 11:30 AM and 12:30 PM to office workers, as this is the pre-lunch decision window with the highest open rates",
+    "confidence": 0.9,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Time scarcity drives habitual decision-making, and WhatsApp's 98% open rate beats all other channels",
+    "dont": [
+      "Never send before 9 AM or after 9 PM",
+      "Avoid promotional broadcasts without opt-in"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:59.823965+00:00"
+  },
+  {
+    "segment": "college_kids",
+    "channel": "instagram_ads",
+    "claim": "Run Instagram ads targeting college kids during peak hours (12 PM - 4 PM) to increase brand awareness and drive sales",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "College kids are active on Instagram during peak hours, and targeted ads can increase brand recall and drive conversions",
+    "dont": [
+      "Don't use overly promotional language",
+      "Avoid targeting kids under 18 years old"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:59.823976+00:00"
+  },
+  {
+    "segment": "couples",
+    "channel": "email",
+    "claim": "Send exclusive offers and discounts to couples via email to increase loyalty and retention",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Couples appreciate personalized offers and are more likely to return to a restaurant that shows they care",
+    "dont": [
+      "Don't spam or send too many emails",
+      "Avoid generic or non-personalized content"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:59.823981+00:00"
+  },
+  {
+    "segment": "families",
+    "channel": "zomato_swiggy",
+    "claim": "Optimize your Zomato and Swiggy listings to attract families by highlighting kid-friendly options and family packs",
+    "confidence": 0.95,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Families actively search for kid-friendly options on food delivery platforms, and optimized listings can increase visibility and sales",
+    "dont": [
+      "Don't neglect to update your menu and pricing regularly",
+      "Avoid low-quality food images or inaccurate descriptions"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:59.823985+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "google_ads",
+    "claim": "Run targeted Google Ads to attract premium customers by highlighting luxury offerings and exclusive experiences",
+    "confidence": 0.9,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium customers actively search for high-end experiences online, and targeted Google Ads can increase brand visibility and drive conversions",
+    "dont": [
+      "Don't use generic or non-targeted ad copy",
+      "Avoid bidding on irrelevant keywords"
+    ],
+    "source_file": "A concise executive summary.md",
+    "extracted_at": "2026-05-26T19:22:59.823987+00:00"
+  }
+]

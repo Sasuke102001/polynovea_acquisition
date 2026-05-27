@@ -11,6 +11,7 @@ the AI draws on the full research text. When someone asks "what should I do
 for this venue?" it draws on the venue-specific DB data.
 """
 
+import json
 import pathlib
 
 # ─── Research file loader ─────────────────────────────────────────────────────
@@ -18,6 +19,7 @@ import pathlib
 _BACKEND_DIR  = pathlib.Path(__file__).parent            # App/backend/
 _PROJECT_ROOT = _BACKEND_DIR.parent.parent               # project root
 _RESEARCH_DIR = _PROJECT_ROOT / "research"               # research/
+_PIPELINE_OUT = _PROJECT_ROOT / "research_pipeline" / "output"
 
 
 def _load(filename: str) -> str:
@@ -26,6 +28,13 @@ def _load(filename: str) -> str:
         return path.read_text(encoding="utf-8")
     except Exception:
         return f"[{filename} not found — place file in research/ folder]"
+
+
+def _load_json(path: pathlib.Path):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
 
 
 # Full research documents — loaded once at startup
@@ -45,6 +54,79 @@ _MASTER_OPERATING_DOC   = _load("Polynovea_Master_Operating_Document_FINAL.md")
 _MARKET_INTEL_PERPLEXITY = _load("india_market_intelligence_perplexity.md")
 _ARCHETYPE_VALIDATION   = _load("archetype_segment_validation_kimi.md")
 _AD_BRIEF_RESEARCH      = _load("india_fb_ad_brief_generator_research.md")
+
+
+# ─── Structured claims index (from research_pipeline/output/) ────────────────
+# Loaded once at startup. Silently absent if pipeline hasn't been run yet.
+
+def _build_claims_index() -> str:
+    data = _load_json(_PIPELINE_OUT / "claims.json")
+    if not data:
+        return ""
+
+    conf_code  = lambda c: "H" if c >= 0.80 else ("M" if c >= 0.60 else "L")
+    india_code = {"CONFIRMED": "C", "ADJUST": "A", "UNCONFIRMED": "U"}.get
+
+    # Group by segment
+    by_seg: dict[str, list] = {}
+    for claim in data:
+        seg = claim.get("segment", "unknown")
+        by_seg.setdefault(seg, []).append(claim)
+
+    lines = [
+        "STRUCTURED CLAIMS INDEX (pipeline-extracted, India-validated):",
+        "Conf: H=high(>=0.80) M=medium(>=0.60) L=low(<0.60) | India: C=CONFIRMED A=ADJUST U=UNCONFIRMED",
+        "",
+    ]
+    for seg, claims in sorted(by_seg.items()):
+        lines.append(f"[{seg.upper().replace('_', ' ')}]")
+        # Group by channel within segment
+        by_ch: dict[str, list] = {}
+        for c in claims:
+            by_ch.setdefault(c["channel"], []).append(c)
+        for ch, ch_claims in sorted(by_ch.items()):
+            # Pick highest-confidence claim for this channel
+            best = max(ch_claims, key=lambda x: x["confidence"])
+            cc   = conf_code(best["confidence"])
+            ic   = india_code(best.get("india_verdict", ""), "?")
+            dont = best["dont"][0] if best.get("dont") else ""
+            dont_str = f" | Avoid: {dont}" if dont else ""
+            lines.append(f"  {ch:<22} [{cc}][{ic}] {best['claim']}{dont_str}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def _build_archetypes_index() -> str:
+    data = _load_json(_PIPELINE_OUT / "archetypes.json")
+    if not data:
+        return ""
+
+    lines = ["ARCHETYPE QUICK REFERENCE (pipeline-extracted, India-validated):", ""]
+    for key, arch in sorted(data.items()):
+        tf    = "trust-first" if arch.get("trust_first") else ""
+        lang  = arch.get("language_rec", "")
+        iv    = arch.get("india_verdict", "")
+        driver = arch.get("emotional_driver", "")
+        hook   = arch.get("hook_formula", "")
+        donts  = arch.get("dont", [])
+        ia     = arch.get("india_adjustment", "")
+
+        lines.append(f"{key} | {driver} | lang:{lang} | india:{iv} {tf}")
+        if hook:
+            lines.append(f"  Hook: {hook}")
+        if ia:
+            lines.append(f"  India: {ia}")
+        if donts:
+            lines.append(f"  Avoid: {'; '.join(donts[:3])}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+# Build once at import — zero runtime cost per request
+_CLAIMS_INDEX     = _build_claims_index()
+_ARCHETYPES_INDEX = _build_archetypes_index()
 
 
 # ─── Identity guardrail ───────────────────────────────────────────────────────
@@ -495,6 +577,18 @@ DRIFT SIGNALS (emerging behavioral trends in this area — act before competitor
 
 STRATEGIC INTERVENTIONS (ranked by fit score):
 {interventions_str}{risk_str}
+
+══════════════════════════════════════════════════════════════════
+VALIDATED CLAIMS & ARCHETYPE INDEX
+══════════════════════════════════════════════════════════════════
+Pre-extracted, confidence-scored claims from all research sources.
+Use this as a fast-lookup layer — full research prose follows below.
+When a claim here and the prose disagree, trust the claim (it was
+extracted after validation; the prose may contain superseded drafts).
+
+{_CLAIMS_INDEX}
+
+{_ARCHETYPES_INDEX}
 
 ══════════════════════════════════════════════════════════════════
 POLYNOVEA ECOSYSTEM ARCHITECTURE & OPERATING DOCTRINE

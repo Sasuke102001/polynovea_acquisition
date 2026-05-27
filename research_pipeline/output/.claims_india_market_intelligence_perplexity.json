@@ -1,0 +1,35 @@
+[
+  {
+    "segment": "premium",
+    "channel": "instagram_organic",
+    "claim": "Use Instagram for trend spotting and sharing experiences, as it is the primary platform for premium diners to discover new venues and chef profiles",
+    "confidence": 0.85,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Premium diners are heavy social media users who share experiences and look for trend spotting on platforms like Instagram",
+    "dont": [],
+    "source_file": "india_market_intelligence_perplexity.md",
+    "extracted_at": "2026-05-26T20:50:23.517226+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "zomato_swiggy",
+    "claim": "List your premium dining venue on Zomato to leverage ratings and photos for discovery, especially for chef-driven venues",
+    "confidence": 0.8,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "Even premium diners rely on ratings and photos for discovery of new venues",
+    "dont": [],
+    "source_file": "india_market_intelligence_perplexity.md",
+    "extracted_at": "2026-05-26T20:50:23.517235+00:00"
+  },
+  {
+    "segment": "premium",
+    "channel": "whatsapp",
+    "claim": "Leverage WhatsApp for high-trust micro-word-of-mouth in closed groups and sometimes for direct reservations with hotels",
+    "confidence": 0.75,
+    "india_verdict": "CONFIRMED",
+    "why_it_works": "WhatsApp is used for high-trust micro-word-of-mouth in closed groups, which is important for premium diners",
+    "dont": [],
+    "source_file": "india_market_intelligence_perplexity.md",
+    "extracted_at": "2026-05-26T20:50:23.517239+00:00"
+  }
+]
