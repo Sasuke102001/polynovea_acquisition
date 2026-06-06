@@ -24,7 +24,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from database import get_pool
-from prompts import get_demo_system_prompt
+from prompts import get_demo_system_prompt, get_prism_system_prompt
 from routers.chat import fetch_venue_context, stream_from_nvidia
 from routers.council import run_council
 
@@ -265,7 +265,8 @@ async def demo_chat(token: str, req: DemoChatRequest):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Context error: {exc}")
 
-    system_prompt = get_demo_system_prompt(context, prospect)
+    system_prompt       = get_demo_system_prompt(context, prospect)
+    prism_system_prompt = get_prism_system_prompt(context, prospect)
 
     async def _generate() -> AsyncGenerator[str, None]:
         buffer: list[str] = []
@@ -283,7 +284,7 @@ async def demo_chat(token: str, req: DemoChatRequest):
 
             elif demo_level == 3:
                 yield "## Prism\n\n"
-                async for chunk in call_m3_prism(system_prompt, req.question, venue_id=venue_id):
+                async for chunk in call_m3_prism(prism_system_prompt, req.question, venue_id=venue_id):
                     buffer.append(chunk)
                     yield chunk
 
@@ -294,7 +295,7 @@ async def demo_chat(token: str, req: DemoChatRequest):
                     yield chunk
 
                 yield "\n\n---\n\n## Prism\n\n"
-                async for chunk in call_m3_prism(system_prompt, req.question, venue_id=venue_id):
+                async for chunk in call_m3_prism(prism_system_prompt, req.question, venue_id=venue_id):
                     buffer.append(chunk)
                     yield chunk
 

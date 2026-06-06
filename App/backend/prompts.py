@@ -496,6 +496,7 @@ def build_venue_prompt(
     dish_signals: list[dict] | None = None,
     mechanisms: list[dict] | None = None,
     drift_signals: list[dict] | None = None,
+    include_research: bool = True,
 ) -> str:
 
     # ── Basic venue snapshot ────────────────────────────────────────────────
@@ -553,7 +554,7 @@ def build_venue_prompt(
         "audience":     "Focus on who this venue actually attracts — spend composition, alcohol affinity, dwell, WOM, and platform reach.",
     }.get(tab, "Answer any question about this venue's behavioral data and strategy.")
 
-    return f"""You are Polynovea's venue intelligence AI — an expert with deep knowledge of F&B behavioral psychology, consumer segmentation, channel marketing, and the Mumbai/MMR hospitality market.
+    _result = f"""You are Polynovea's venue intelligence AI — an expert with deep knowledge of F&B behavioral psychology, consumer segmentation, channel marketing, and the Mumbai/MMR hospitality market.
 
 CURRENT TAB: {tab.upper()}
 {tab_focus}
@@ -744,6 +745,15 @@ HOW TO RESPOND
 - When referencing numbers (open rates, ROI lifts, engagement rates), always
   include the confidence level (MEDIUM / HIGH / LOW) from the research."""
 
+    if not include_research:
+        _RESEARCH_MARKER = "\n══════════════════════════════════════════════════════════════════\nVALIDATED CLAIMS"
+        _RULES_MARKER    = "\n══════════════════════════════════════════════════════════════════\nHOW TO RESPOND"
+        cut   = _result.find(_RESEARCH_MARKER)
+        rules = _result[_result.find(_RULES_MARKER):]
+        if cut != -1 and rules:
+            return _result[:cut] + rules
+    return _result
+
 
 # ─── Competitor deep-dive prompt ─────────────────────────────────────────────
 
@@ -903,6 +913,37 @@ def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
             dish_signals=venue_context.get("dish_signals"),
             mechanisms=venue_context.get("mechanisms"),
             drift_signals=venue_context.get("drift_signals"),
+        )
+    )
+
+
+def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
+    """Venue-data-only prompt for Prism demo calls.
+    Omits the full research corpus so the payload stays under Llama Maverick's 131k token limit.
+    Prism has its own agent knowledge — it only needs the venue signals."""
+    venue_name = venue_context.get("venue_name", "this venue")
+    return (
+        _IDENTITY_GUARDRAIL
+        + _build_demo_guardrail(venue_name, prospect_name)
+        + build_venue_prompt(
+            tab="overview",
+            venue_name=venue_name,
+            venue_type=venue_context.get("venue_type", "Restaurant"),
+            area=venue_context.get("area", ""),
+            city=venue_context.get("city", ""),
+            top_segments=venue_context.get("top_segments", []),
+            top_fitness_dims=venue_context.get("top_fitness_dims", []),
+            top_competitors=venue_context.get("top_competitors", []),
+            seg_profiles=venue_context.get("seg_profiles"),
+            channel_effectiveness=venue_context.get("channel_effectiveness"),
+            campaign_templates=venue_context.get("campaign_templates"),
+            interventions=venue_context.get("interventions"),
+            behavioral_primitives=venue_context.get("behavioral_primitives"),
+            behavioral_patterns=venue_context.get("behavioral_patterns"),
+            dish_signals=venue_context.get("dish_signals"),
+            mechanisms=venue_context.get("mechanisms"),
+            drift_signals=venue_context.get("drift_signals"),
+            include_research=False,
         )
     )
 
