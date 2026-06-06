@@ -554,6 +554,20 @@ def build_venue_prompt(
         "audience":     "Focus on who this venue actually attracts — spend composition, alcohol affinity, dwell, WOM, and platform reach.",
     }.get(tab, "Answer any question about this venue's behavioral data and strategy.")
 
+    # Tab-aware research selection — 2 prose files per tab instead of all 16.
+    # Always included: claims/archetypes index + segment research (compact, ~5-8k tokens).
+    # _MASTER_OPERATING_DOC excluded — too large (73KB) for per-request context.
+    _TAB_PROSE: dict[str, tuple] = {
+        "marketing":   (_MARKETING_FRAMEWORK,    _MARKET_INTEL_PERPLEXITY),
+        "campaign":    (_AD_BRIEF_RESEARCH,       _MARKETING_RESEARCH),
+        "competitors": (_SEGMENT_ALIGNMENT,       _VALIDATION_REPORT),
+        "transform":   (_SEGMENT_ALIGNMENT,       _BEHAVIORAL_RESEARCH),
+        "audience":    (_BEHAVIORAL_INTEL,        _ARCHETYPE_VALIDATION),
+        "deep_risk":   (_BEHAVIORAL_RESEARCH,     _CHANNEL_EFFECTIVENESS),
+        "overview":    (_PHASE1_RESEARCH,         _BEHAVIORAL_RESEARCH),
+    }
+    _prose1, _prose2 = _TAB_PROSE.get(tab, (_PHASE1_RESEARCH, _BEHAVIORAL_RESEARCH))
+
     _result = f"""You are Polynovea's venue intelligence AI — an expert with deep knowledge of F&B behavioral psychology, consumer segmentation, channel marketing, and the Mumbai/MMR hospitality market.
 
 CURRENT TAB: {tab.upper()}
@@ -607,22 +621,12 @@ STRATEGIC INTERVENTIONS (ranked by fit score):
 VALIDATED CLAIMS & ARCHETYPE INDEX
 ══════════════════════════════════════════════════════════════════
 Pre-extracted, confidence-scored claims from all research sources.
-Use this as a fast-lookup layer — full research prose follows below.
-When a claim here and the prose disagree, trust the claim (it was
-extracted after validation; the prose may contain superseded drafts).
+Use this as the fast-lookup layer — research prose follows below.
+When a claim here and the prose disagree, trust the claim.
 
 {_CLAIMS_INDEX}
 
 {_ARCHETYPES_INDEX}
-
-══════════════════════════════════════════════════════════════════
-POLYNOVEA ECOSYSTEM ARCHITECTURE & OPERATING DOCTRINE
-══════════════════════════════════════════════════════════════════
-Use this to understand what Polynovea actually is, what Module 2 is,
-how this platform fits into the larger intelligence infrastructure,
-and the founding philosophy behind the behavioral intelligence thesis.
-
-{_MASTER_OPERATING_DOC}
 
 ══════════════════════════════════════════════════════════════════
 SEGMENT PSYCHOLOGICAL INTELLIGENCE (copy triggers, timing, platform behavior)
@@ -630,105 +634,14 @@ SEGMENT PSYCHOLOGICAL INTELLIGENCE (copy triggers, timing, platform behavior)
 {_SEGMENT_RESEARCH}
 
 ══════════════════════════════════════════════════════════════════
-RESEARCH — PHASE 1 INDIA BEHAVIORAL RESEARCH
+RESEARCH — PRIMARY ({tab.upper()} TAB)
 ══════════════════════════════════════════════════════════════════
-{_PHASE1_RESEARCH}
+{_prose1}
 
 ══════════════════════════════════════════════════════════════════
-RESEARCH — MARKETING ENGINE FRAMEWORK
+RESEARCH — SUPPLEMENTARY ({tab.upper()} TAB)
 ══════════════════════════════════════════════════════════════════
-{_MARKETING_FRAMEWORK}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — BEHAVIORAL ACQUISITION MECHANISMS (academic backbone)
-══════════════════════════════════════════════════════════════════
-{_BEHAVIORAL_RESEARCH}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — CHANNEL EFFECTIVENESS IN HOSPITALITY MARKETING
-══════════════════════════════════════════════════════════════════
-{_CHANNEL_EFFECTIVENESS}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — BEHAVIORAL SEGMENTATION & TARGETED MARKETING
-══════════════════════════════════════════════════════════════════
-{_SEGMENTATION_MARKETING}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — INDIA F&B SEGMENTATION VALIDATION REPORT
-══════════════════════════════════════════════════════════════════
-Use this to flag corrected claims: SMS open rate ~20% (not 98%),
-Reels 2x engagement + 10-50x reach (not 6.5x), archetype caveat.
-{_VALIDATION_REPORT}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — SEGMENT & ARCHETYPE BEHAVIORAL INTELLIGENCE MODULE
-══════════════════════════════════════════════════════════════════
-{_BEHAVIORAL_INTEL}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — MARKETING CHANNEL STRATEGY
-══════════════════════════════════════════════════════════════════
-{_MARKETING_RESEARCH}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — INDIA F&B CHANNEL BENCHMARKS (EXECUTIVE SUMMARY)
-══════════════════════════════════════════════════════════════════
-{_EXEC_SUMMARY}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — THREE-LAYER BEHAVIORAL INTELLIGENCE ARCHITECTURE
-══════════════════════════════════════════════════════════════════
-{_THREE_LAYER_ARCH}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — VENUE SEGMENT ALIGNMENT & SCORING WEIGHTS
-══════════════════════════════════════════════════════════════════
-{_SEGMENT_ALIGNMENT}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — CUISINE PREFERENCES BY SEGMENT
-══════════════════════════════════════════════════════════════════
-{_CUISINE_RESEARCH}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — INDIA F&B MARKET INTELLIGENCE (PERPLEXITY, 2025–26)
-══════════════════════════════════════════════════════════════════
-Hard numbers: Mumbai spend ₹877/visit, RevPASH bands, WhatsApp/SMS/Reels
-benchmarks, micro-influencer costs, platform behavior matrix by segment.
-Treat figures flagged INDIA DATA as ground truth; INDIA BENCHMARK as
-operator heuristics; GLOBAL/GENERIC as directional proxies only.
-{_MARKET_INTEL_PERPLEXITY}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — ARCHETYPE & SEGMENT VALIDATION REPORT (KIMI, 2026)
-══════════════════════════════════════════════════════════════════
-Peer-reviewed validation of all 13 archetypes and 7 segments.
-Baseline peer influence coefficient: 0.142 (Herhausen et al., Nature
-Communications 2024). Use VALIDATED / INFERRED / HYPOTHESIS flags when
-citing mechanism or archetype evidence. Scene Seeker, Calm Pairs,
-Premium Prioritizer, Power Regular are HYPOTHESIS — no academic correlate.
-{_ARCHETYPE_VALIDATION}
-
-══════════════════════════════════════════════════════════════════
-RESEARCH — INDIA F&B AD BRIEF CREATIVE LAYER (KIMI, 2026)
-══════════════════════════════════════════════════════════════════
-India-specific creative rules for ad brief generation. Validated tone
-per archetype (CONFIRMED / ADJUST), platform-creative fit for WhatsApp /
-Reels / Meta / SMS / micro-influencer, mechanism-to-creative mapping,
-anti-patterns, and 7 missing elements for brief generator v2.0.
-
-Critical India rules to always apply:
-- Scarcity must be EARNED, not gated. "Limited covers. Regulars book first." not "Not for everyone."
-- Trust-first sequencing for new venues — trust signals before any scarcity or urgency.
-- FOMO must be occasion-bound for families/premium ("Diwali weekend filling fast") not time-bound.
-- Family decisions are collective — ads must speak to provider AND experience.
-- Value-consciousness applies at ALL price points including premium.
-- WhatsApp = conversational for repeat visitors. Deal-first only for lapsed (60+ days).
-- Reels = UGC-style outperforms polished production. Regional language = 1.5-2x engagement.
-- Never use Western minimalist aesthetic for mass-market Indian segments.
-- Social proof: specific beats generic. "Your friends love it here" > "1,000 people came."
-{_AD_BRIEF_RESEARCH}
+{_prose2}
 
 {_POLYNOVEA_CONTEXT}
 
@@ -746,7 +659,8 @@ HOW TO RESPOND
   include the confidence level (MEDIUM / HIGH / LOW) from the research."""
 
     if not include_research:
-        _RESEARCH_MARKER = "\n══════════════════════════════════════════════════════════════════\nVALIDATED CLAIMS"
+        # Strip only the 2 tab-selected prose files — keep claims/archetypes/segment intel.
+        _RESEARCH_MARKER = "\n══════════════════════════════════════════════════════════════════\nRESEARCH — PRIMARY"
         _RULES_MARKER    = "\n══════════════════════════════════════════════════════════════════\nHOW TO RESPOND"
         cut   = _result.find(_RESEARCH_MARKER)
         rules = _result[_result.find(_RULES_MARKER):]
@@ -918,9 +832,9 @@ def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
 
 
 def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
-    """Venue-data-only prompt for Prism demo calls.
-    Omits the full research corpus so the payload stays under Llama Maverick's 131k token limit.
-    Prism has its own agent knowledge — it only needs the venue signals."""
+    """System prompt for Prism demo calls.
+    Tab-aware injection keeps this to venue data + claims/archetypes + 2 M2 prose files,
+    staying well under Llama Maverick's 131k token limit."""
     venue_name = venue_context.get("venue_name", "this venue")
     return (
         _IDENTITY_GUARDRAIL
@@ -943,7 +857,6 @@ def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
             dish_signals=venue_context.get("dish_signals"),
             mechanisms=venue_context.get("mechanisms"),
             drift_signals=venue_context.get("drift_signals"),
-            include_research=False,
         )
     )
 
