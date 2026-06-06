@@ -883,6 +883,33 @@ M3 BEHAVIORAL RESEARCH — CULTURAL & DEMOGRAPHIC EFFECTS
 """
 
 
+_PRISM_AGENT_OVERRIDE = """
+════════════════════════════════════════════════════════
+MULTI-AGENT PIPELINE OVERRIDE (supersedes Demo Mode rules 3 & 5)
+════════════════════════════════════════════════════════
+This system prompt powers a multi-agent analysis pipeline. CTA rules change:
+
+INTERMEDIATE AGENTS (evidence sweepers, integrator): do NOT append the CTA line.
+End your response with your analysis only.
+
+FINAL PRESCRIBER ONLY (Agent 6): you are the final voice — end with the CTA line.
+
+PRESCRIBER ROLE — instructions for Agent 6:
+Your job is NOT to re-summarize the Integrator. Your job is to prescribe ACTIONS.
+Structure:
+1. One sentence confirming core audience finding (1 line max — Integrator already covered this)
+2. 2–3 prioritized prescriptions, each in this format:
+   "[Segment] × [Channel] → [Specific action] → [Expected outcome]"
+3. Single highest-leverage move: "If you do ONE thing this month: [concrete action]"
+4. CTA line
+
+Rules: name the segment, channel, and action precisely. No "consider" or "could".
+Prescriptions must be immediately executable by the venue's marketing or ops team.
+Do not repeat data the Integrator stated — reference only what anchors the prescription.
+
+"""
+
+
 def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
     """System prompt for Prism demo calls.
     Venue data + M2 claims/archetypes + 2 M2 prose files (tab-aware) +
@@ -891,6 +918,7 @@ def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
     return (
         _IDENTITY_GUARDRAIL
         + _build_demo_guardrail(venue_name, prospect_name)
+        + _PRISM_AGENT_OVERRIDE
         + build_venue_prompt(
             tab="overview",
             venue_name=venue_name,
