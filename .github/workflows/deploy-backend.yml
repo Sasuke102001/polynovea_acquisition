@@ -28,16 +28,17 @@ jobs:
 
             echo "── Pulling research content (M2, M3, SE) ──"
             if [ -d research_cache/.git ]; then
-              cd research_cache && git pull origin main && cd ~/polynovea_acquisition
+              cd research_cache && git pull origin master && cd ~/polynovea_acquisition
             else
-              git clone https://${{ secrets.RESEARCH_PAT }}@github.com/Sasuke102001/polynovea-research.git research_cache
+              git clone https://${{ secrets.RESEARCH_PAT }}@github.com/Sasuke102101/research.git research_cache
             fi
 
-            # Extract M2, M3, SE research into separate backend folders
-            mkdir -p App/backend/research App/backend/research_m3 App/backend/research_se
+            # Extract M2, M3, SE research into backend folders
+            mkdir -p App/backend/research App/backend/research_m3 App/backend/research_se App/backend/research_pipeline_m2
             cp -r research_cache/m2/* App/backend/research/ 2>/dev/null || echo "  (M2 research folder not found or empty)"
             cp -r research_cache/m3/* App/backend/research_m3/ 2>/dev/null || echo "  (M3 research folder not found or empty)"
             cp -r research_cache/se/* App/backend/research_se/ 2>/dev/null || echo "  (SE research folder not found or empty)"
+            cp -r research_cache/research_pipeline_m2/output/* App/backend/research_pipeline_m2/ 2>/dev/null || echo "  (pipeline_m2 output not found)"
             rm -rf research_cache
 
             echo "── Installing dependencies ──"

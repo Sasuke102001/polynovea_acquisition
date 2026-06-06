@@ -21,11 +21,22 @@ _PROJECT_ROOT  = _BACKEND_DIR.parent.parent               # project root
 _RESEARCH_ROOT = _PROJECT_ROOT / "research"               # shared research repo checkout
 _PIPELINE_OUT  = _RESEARCH_ROOT / "research_pipeline-M2" / "output"
 
-# M2 behavioral research lives at research/ (flat files)
+# M2 flat .md files — CI/CD copies research_cache/m2/* → App/backend/research/
 _RESEARCH_DIR  = _RESEARCH_ROOT if _RESEARCH_ROOT.exists() else _BACKEND_DIR / "research"
 
-# M3 neuroscience/behavioral research lives at research/research/
-_M3_RESEARCH_DIR = _RESEARCH_ROOT / "research"
+# M3 .md files — CI/CD copies research_cache/m3/* → App/backend/research_m3/
+_M3_RESEARCH_DIR = (
+    _RESEARCH_ROOT / "research"
+    if (_RESEARCH_ROOT / "research").exists()
+    else _BACKEND_DIR / "research_m3"
+)
+
+# Pipeline outputs (claims/archetypes JSON) — CI/CD copies research_cache/research_pipeline_m2/output/ → App/backend/research_pipeline_m2/
+_PIPELINE_OUT = (
+    _RESEARCH_ROOT / "research_pipeline-M2" / "output"
+    if (_RESEARCH_ROOT / "research_pipeline-M2").exists()
+    else _BACKEND_DIR / "research_pipeline_m2"
+)
 
 
 def _load(filename: str) -> str:
