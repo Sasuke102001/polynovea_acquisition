@@ -246,7 +246,7 @@ const STARTERS_M3 = [
 ];
 
 function getStarters(demoLevel: number): string[] {
-  return demoLevel === 3 || demoLevel === 4 ? STARTERS_M3 : STARTERS_M2;
+  return demoLevel === 3 || demoLevel === 4 ? [...STARTERS_M2, ...STARTERS_M3] : STARTERS_M2;
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
