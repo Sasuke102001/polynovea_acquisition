@@ -41,7 +41,7 @@ def _supabase_headers() -> dict:
 NVIDIA_MODEL_CREATIVE = os.getenv("NVIDIA_MODEL_CREATIVE", "meta/llama-3.3-70b-instruct")
 
 
-async def fetch_venue_context(venue_id: int, tab: str, demo_level: int = 1) -> dict:
+async def fetch_venue_context(venue_id: int, tab: str) -> dict:
     """
     Fetch all relevant venue context from RDS, gated by demo_level.
 
@@ -503,92 +503,6 @@ async def fetch_venue_context(venue_id: int, tab: str, demo_level: int = 1) -> d
         }
         for r in drift_rows
     ]
-
-    # ===== NEW: M3 Data (level 2+) =====
-    context["m3_recent_sessions"] = []
-    context["m3_kpi_summary"] = {}
-    context["m3_show_plans"] = []
-    context["m3_show_outcomes"] = []
-
-    if demo_level >= 2:
-        from database import get_m3_pool
-        m3_pool = get_m3_pool()
-        if m3_pool:
-            try:
-                # Recent sessions (last 5)
-                sessions = await m3_pool.fetch(
-                    """
-                    SELECT
-                        id, session_number, created_at,
-                        COUNT(*) as assessment_count
-                    FROM m3_sessions
-                    WHERE venue_id = $1
-                    ORDER BY created_at DESC
-                    LIMIT 5
-                    """,
-                    venue_id
-                )
-                context["m3_recent_sessions"] = [dict(s) for s in sessions] if sessions else []
-
-                # Average KPI signals
-                kpi_avg = await m3_pool.fetchrow(
-                    """
-                    SELECT
-                        COUNT(DISTINCT session_id) as session_count,
-                        AVG(value) as avg_value,
-                        MAX(value) as peak_value
-                    FROM m3_kpi_assessments
-                    WHERE venue_id = $1
-                    """,
-                    venue_id
-                )
-                if kpi_avg:
-                    context["m3_kpi_summary"] = {
-                        "sessions_with_kpi": kpi_avg["session_count"] or 0,
-                        "avg_signal_value": round(float(kpi_avg["avg_value"] or 0), 3),
-                        "peak_signal": round(float(kpi_avg["peak_value"] or 0), 3),
-                    }
-            except Exception as e:
-                import logging
-                logging.warning(f"M3 summary fetch failed (level 2): {e}")
-
-    if demo_level >= 3:
-        from database import get_m3_pool
-        m3_pool = get_m3_pool()
-        if m3_pool:
-            try:
-                # Full show plans (recent 3)
-                plans = await m3_pool.fetch(
-                    """
-                    SELECT
-                        id, plan_date, version, show_type, phase_count,
-                        council_brief, generated_at
-                    FROM m3_show_plans
-                    WHERE venue_id = $1
-                    ORDER BY created_at DESC
-                    LIMIT 3
-                    """,
-                    venue_id
-                )
-                context["m3_show_plans"] = [dict(p) for p in plans] if plans else []
-
-                # Show outcomes (recent 3)
-                outcomes = await m3_pool.fetch(
-                    """
-                    SELECT
-                        id, plan_id, overall_rating, peak_occupancy_pct,
-                        phase_outcomes, data_quality, finalized_at
-                    FROM m3_show_outcomes
-                    WHERE venue_id = $1
-                    ORDER BY finalized_at DESC
-                    LIMIT 3
-                    """,
-                    venue_id
-                )
-                context["m3_show_outcomes"] = [dict(o) for o in outcomes] if outcomes else []
-            except Exception as e:
-                import logging
-                logging.warning(f"M3 full fetch failed (level 3): {e}")
 
     # Risk signals for deep_risk tab
     if tab == "deep_risk":
