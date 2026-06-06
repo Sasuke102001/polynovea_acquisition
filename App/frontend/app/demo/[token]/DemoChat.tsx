@@ -231,12 +231,23 @@ function CouncilProgressPanel({ phase, events }: { phase: "r1" | "r2" | "synthes
 
 // ─── Suggested starter questions ─────────────────────────────────────────────
 
-const STARTERS = [
+const STARTERS_M2 = [
   "What audience does this venue attract?",
   "What's the biggest opportunity here?",
   "Which marketing channel should we focus on first?",
   "Who are the closest competitors?",
 ];
+
+const STARTERS_M3 = [
+  "Why do my regulars keep coming back?",
+  "What's stopping my audience from spending more per visit?",
+  "What does choosing this venue say about my customer?",
+  "Which cultural occasions should I build campaigns around?",
+];
+
+function getStarters(demoLevel: number): string[] {
+  return demoLevel === 3 || demoLevel === 4 ? STARTERS_M3 : STARTERS_M2;
+}
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -466,7 +477,7 @@ export default function DemoChat({ token }: DemoChatProps) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-[640px]">
-              {STARTERS.map((q) => (
+              {getStarters(venue.demo_level).map((q) => (
                 <button
                   key={q}
                   onClick={() => handleSubmit(q)}
