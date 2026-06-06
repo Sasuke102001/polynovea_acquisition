@@ -135,10 +135,10 @@ const COUNCIL_SYNTHESIS    = "[COUNCIL:SYNTHESIS]";
 const COUNCIL_PHASE_RE     = /\[COUNCIL:PHASE:(r[12]):([^:]+):([^\]]+)\]([^\n]*)\n/;
 
 const MODEL_META: Record<string, { label: string; color: string }> = {
-  nemotron: { label: "NEMOTRON",    color: "#a78bfa" },
-  deepseek: { label: "DEEPSEEK V4", color: "#67e8f9" },
-  mistral:  { label: "MISTRAL",     color: "#fcd34d" },
-  qwen:     { label: "QWEN",        color: "#fcd34d" },
+  nemotron: { label: "LLAMA 3.3",  color: "#a78bfa" },
+  deepseek: { label: "LLAMA 3.1",  color: "#67e8f9" },
+  mistral:  { label: "MISTRAL",    color: "#fcd34d" },
+  qwen:     { label: "QWEN",       color: "#fcd34d" },
 };
 
 function metaColor(round: string, meta: string): string {

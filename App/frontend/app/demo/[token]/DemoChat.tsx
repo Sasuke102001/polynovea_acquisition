@@ -141,10 +141,10 @@ const COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]";
 const COUNCIL_SYNTHESIS    = "[COUNCIL:SYNTHESIS]";
 
 const MODEL_META: Record<string, { label: string; color: string }> = {
-  nemotron: { label: "NEMOTRON",    color: "#a78bfa" },
-  deepseek: { label: "DEEPSEEK",    color: "#67e8f9" },
-  mistral:  { label: "MISTRAL",     color: "#fcd34d" },
-  qwen:     { label: "QWEN",        color: "#fcd34d" },
+  nemotron: { label: "LLAMA 3.3",  color: "#a78bfa" },
+  deepseek: { label: "LLAMA 3.1",  color: "#67e8f9" },
+  mistral:  { label: "MISTRAL",    color: "#fcd34d" },
+  qwen:     { label: "QWEN",       color: "#fcd34d" },
 };
 
 function parsePhaseEvents(buf: string): CouncilEvent[] {

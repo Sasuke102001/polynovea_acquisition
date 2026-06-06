@@ -72,6 +72,9 @@ def _strip_thinking(text: str) -> str:
     return text.strip()
 
 
+_CALL_TIMEOUT = 30  # seconds per model call — prevents one hanging key from blocking the gather
+
+
 async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
     """Non-streaming call to one council member. Returns the full response text."""
     provider = member.get("provider", "nvidia")
@@ -85,13 +88,18 @@ async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
             if not pc:
                 return f"[{member['name']} unavailable — NVIDIA_API_KEY not set]"
 
-        resp = await pc.client.chat.completions.create(
-            model=pc.model,
-            messages=messages,
-            temperature=member["temp"],
-            max_tokens=max_tokens,
+        resp = await asyncio.wait_for(
+            pc.client.chat.completions.create(
+                model=pc.model,
+                messages=messages,
+                temperature=member["temp"],
+                max_tokens=max_tokens,
+            ),
+            timeout=_CALL_TIMEOUT,
         )
         return _strip_thinking(resp.choices[0].message.content or "")
+    except asyncio.TimeoutError:
+        return f"[{member['name']} timed out after {_CALL_TIMEOUT}s]"
     except Exception as exc:
         return f"[{member['name']} error: {exc}]"
 
