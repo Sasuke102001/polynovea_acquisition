@@ -23,41 +23,45 @@ import time
 from typing import AsyncGenerator
 
 import httpx
-
-from routers.providers import get_nvidia_client, get_mistral_client, mistral_available
+from openai import AsyncOpenAI
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
-NVIDIA_API_BASE = "https://integrate.api.nvidia.com/v1"
+_NVIDIA_BASE = "https://integrate.api.nvidia.com/v1"
 
 # Sentinel: first chunk tells the frontend to show the deliberating spinner.
 COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]"
 
-# Council member definitions
+# ─── Dedicated council keys (one per seat, no shared round-robin) ─────────────
+# KEY_1 = NVIDIA_API_KEY  (Samhit 2nd)   → Seat 1 Nemotron  meta/llama-3.3-70b
+# KEY_2 = NVIDIA_API_KEY_2 (Khushi)      → Seat 2 Analyst   deepseek-ai/deepseek-v4-flash
+# KEY_3 = NVIDIA_API_KEY_3 (Payal)       → Seat 3 Mistral   mistralai/mistral-medium-3.5-128b
+
+_KEY1 = os.getenv("NVIDIA_API_KEY", "")
+_KEY2 = os.getenv("NVIDIA_API_KEY_2", "")
+_KEY3 = os.getenv("NVIDIA_API_KEY_3", "")
+
+# Council member definitions — each seat has its own key
 _NEMOTRON = {
     "name":  "nemotron",
     "model": os.getenv("NVIDIA_MODEL_NEMOTRON", "meta/llama-3.3-70b-instruct"),
+    "key":   _KEY1,
     "temp":  0.30,
-    "provider": "nvidia",
 }
 _DEEPSEEK = {
     "name":  "deepseek",
-    "model": os.getenv("NVIDIA_MODEL_DEEPSEEK", "deepseek-ai/deepseek-r1"),
+    "model": os.getenv("NVIDIA_MODEL_DEEPSEEK", "deepseek-ai/deepseek-v4-flash"),
+    "key":   _KEY2,
     "temp":  0.40,
-    "provider": "nvidia",
 }
-# Third seat: Mistral if configured, otherwise Qwen on NVIDIA NIM.
-# Mistral Large is stronger at structured reasoning than Qwen 72B and avoids
-# the thinking-mode token drain that slowed Qwen responses.
-_MISTRAL_OR_QWEN = {
-    "name":     "mistral" if mistral_available() else "qwen",
-    "model":    os.getenv("MISTRAL_MODEL", "mistral-large-latest") if mistral_available()
-                else os.getenv("NVIDIA_MODEL_QWEN", "qwen/qwen2.5-72b-instruct"),
-    "temp":     0.50,
-    "provider": "mistral" if mistral_available() else "nvidia",
+_MISTRAL = {
+    "name":  "mistral",
+    "model": os.getenv("NVIDIA_MODEL_QWEN", "mistralai/mistral-medium-3.5-128b"),
+    "key":   _KEY3,
+    "temp":  0.50,
 }
 
-_ALL = [_NEMOTRON, _DEEPSEEK, _MISTRAL_OR_QWEN]
+_ALL = [_NEMOTRON, _DEEPSEEK, _MISTRAL]
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -72,25 +76,19 @@ def _strip_thinking(text: str) -> str:
     return text.strip()
 
 
-_CALL_TIMEOUT = 30  # seconds per model call — prevents one hanging key from blocking the gather
+_CALL_TIMEOUT = 45  # seconds — deepseek-v4-flash can be slow to cold-start
 
 
 async def _call(member: dict, messages: list, max_tokens: int = 700) -> str:
-    """Non-streaming call to one council member. Returns the full response text."""
-    provider = member.get("provider", "nvidia")
+    """Call one council member using its dedicated key. Returns full response text."""
+    key = member.get("key", "")
+    if not key:
+        return f"[{member['name']} unavailable — key not configured]"
     try:
-        if provider == "mistral":
-            pc = get_mistral_client()
-            if not pc:
-                return f"[{member['name']} unavailable — MISTRAL_API_KEY not set]"
-        else:
-            pc = get_nvidia_client(member["model"])
-            if not pc:
-                return f"[{member['name']} unavailable — NVIDIA_API_KEY not set]"
-
+        client = AsyncOpenAI(api_key=key, base_url=_NVIDIA_BASE)
         resp = await asyncio.wait_for(
-            pc.client.chat.completions.create(
-                model=pc.model,
+            client.chat.completions.create(
+                model=member["model"],
                 messages=messages,
                 temperature=member["temp"],
                 max_tokens=max_tokens,
@@ -216,7 +214,7 @@ def _extract_r2(text: str) -> tuple[str, str]:
 
 
 def _synthesis_user_message(question: str, r1: dict, r2: dict) -> str:
-    third     = _MISTRAL_OR_QWEN["name"]
+    third     = _MISTRAL["name"]
     third_lbl = third.upper()
     return f"""QUESTION:
 {question}
@@ -241,14 +239,14 @@ Synthesise the best answer now."""
 async def _stream_synthesis(
     question: str, r1: dict, r2: dict
 ) -> AsyncGenerator[str, None]:
-    """Stream the Nemotron synthesis directly to the user."""
-    pc = get_nvidia_client(_NEMOTRON["model"])
-    if not pc:
+    """Stream the Nemotron synthesis directly to the user using Seat 1 key."""
+    if not _KEY1:
         yield "[Council synthesis unavailable — NVIDIA_API_KEY not set]"
         return
     try:
-        stream = await pc.client.chat.completions.create(
-            model=pc.model,
+        client = AsyncOpenAI(api_key=_KEY1, base_url=_NVIDIA_BASE)
+        stream = await client.chat.completions.create(
+            model=_NEMOTRON["model"],
             messages=[
                 {"role": "system", "content": _SYNTHESIS_SYSTEM},
                 {"role": "user",   "content": _synthesis_user_message(question, r1, r2)},
@@ -294,7 +292,7 @@ async def _log_session(
             "error": r1_val if is_error else None,
         }
 
-    third_key = _MISTRAL_OR_QWEN["name"]
+    third_key = _MISTRAL["name"]
     models_errored = [
         name for name in ("nemotron", "deepseek", third_key)
         if r1.get(name, "").startswith(f"[{name}")
