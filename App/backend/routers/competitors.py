@@ -41,18 +41,14 @@ from models import (
     CompetitorDeepDive, CompetitorInsight,
 )
 from prompts import build_competitor_analysis_prompt
+from routers.providers import get_nvidia_client
 from routers.utils import (
     map_venue_types, make_archetype_chip,
     DIM_LABELS, ALL_DIMS,
     SEGMENT_LABELS, SEGMENT_TOP_ARCHETYPES,
 )
 
-# Nvidia API config — mirrors chat.py
-_NVIDIA_API_BASE = "https://integrate.api.nvidia.com/v1"
-_NVIDIA_API_KEY  = os.getenv("NVIDIA_API_KEY")
-_NVIDIA_MODEL    = os.getenv(
-    "NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
-)
+_NVIDIA_MODEL = os.getenv("NVIDIA_MODEL_NEMOTRON", "meta/llama-3.3-70b-instruct")
 
 _BUCKET_LABELS: dict[int, str] = {
     0: "Direct Peer",
@@ -611,11 +607,11 @@ async def _call_nvidia_json(system_prompt: str, user_message: str) -> dict:
     stream is omitted intentionally — some Nvidia-compatible endpoints reject
     an explicit stream=False even though it is the default.
     """
-    from openai import AsyncOpenAI
-
-    client = AsyncOpenAI(api_key=_NVIDIA_API_KEY, base_url=_NVIDIA_API_BASE)
-    response = await client.chat.completions.create(
-        model=_NVIDIA_MODEL,
+    pc = get_nvidia_client(_NVIDIA_MODEL)
+    if not pc:
+        raise ValueError("NVIDIA_API_KEY not configured")
+    response = await pc.client.chat.completions.create(
+        model=pc.model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": user_message},
@@ -797,7 +793,7 @@ async def get_competitor_deep_dive(
     brief:      str = ""
     ai_used = False
 
-    if _NVIDIA_API_KEY:
+    if True:  # always attempt — key checked inside _call_nvidia_json
         sys_p, usr_p = build_competitor_analysis_prompt(
             client_name=client_v["name"],  client_area=client_v["area"] or "",
             client_types=list(client_v["types"] or []),
@@ -832,7 +828,7 @@ async def get_competitor_deep_dive(
     if not ai_used:
         reason = (
             f"AI error: {_ai_error}"
-            if _NVIDIA_API_KEY and "_ai_error" in dir() and _ai_error
+            if "_ai_error" in dir() and _ai_error
             else "AI key not configured — showing raw signal data."
         )
         learn_from, avoid, brief = _build_fallback(reason)

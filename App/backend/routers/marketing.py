@@ -32,7 +32,7 @@ from routers.utils import (
 
 router = APIRouter()
 
-_NVIDIA_MODEL = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
+_NVIDIA_MODEL = os.getenv("NVIDIA_MODEL_NEMOTRON", "meta/llama-3.3-70b-instruct")
 _float = lambda v: float(v) if v is not None else 0.0
 
 # ─── Research data (Kimi 2026-05-15) ─────────────────────────────────────────
