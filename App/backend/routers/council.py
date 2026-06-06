@@ -187,6 +187,19 @@ End your response on its own line with exactly one of:
 Do not mention the council, the debate process, or how you reached the answer. Just give the answer."""
 
 
+def _first_sentence(text: str, max_len: int = 160) -> str:
+    """Extract first meaningful sentence from free-form text (fallback for unformatted responses)."""
+    for line in text.split("\n"):
+        l = line.strip()
+        # Skip error strings, short lines, markdown headers
+        if not l or l.startswith("[") or l.startswith("#") or len(l) < 20:
+            continue
+        m = re.match(r"([^.!?]{10,}[.!?])", l)
+        snippet = m.group(1) if m else l
+        return snippet[:max_len]
+    return ""
+
+
 def _extract_r1(text: str) -> tuple[str, str]:
     """Extract (position, confidence) from a Round 1 response."""
     position = ""
@@ -197,6 +210,9 @@ def _extract_r1(text: str) -> tuple[str, str]:
             position = l[9:].strip()
         elif l.startswith("CONFIDENCE:"):
             confidence = l[11:].strip()
+    # Fallback: model didn't use structured labels — pull first sentence
+    if not position:
+        position = _first_sentence(text)
     return position, confidence
 
 
@@ -210,6 +226,9 @@ def _extract_r2(text: str) -> tuple[str, str]:
             refined = l[17:].strip()
         elif l.startswith("CHANGE_FROM_R1:"):
             change = l[15:].strip()
+    # Fallback: model didn't use structured labels — pull first sentence
+    if not refined:
+        refined = _first_sentence(text)
     return refined, change
 
 
