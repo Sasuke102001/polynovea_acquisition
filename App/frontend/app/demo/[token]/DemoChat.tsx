@@ -128,6 +128,107 @@ function inlineFormat(text: string): React.ReactNode {
   return parts.length === 1 ? parts[0] : <>{parts}</>;
 }
 
+// ─── Council mode helpers ─────────────────────────────────────────────────────
+
+interface CouncilEvent {
+  round: "r1" | "r2";
+  model: string;
+  meta: string;
+  text: string;
+}
+
+const COUNCIL_DELIBERATING = "[COUNCIL:DELIBERATING]";
+const COUNCIL_SYNTHESIS    = "[COUNCIL:SYNTHESIS]";
+
+const MODEL_META: Record<string, { label: string; color: string }> = {
+  nemotron: { label: "NEMOTRON",    color: "#a78bfa" },
+  deepseek: { label: "DEEPSEEK",    color: "#67e8f9" },
+  mistral:  { label: "MISTRAL",     color: "#fcd34d" },
+  qwen:     { label: "QWEN",        color: "#fcd34d" },
+};
+
+function parsePhaseEvents(buf: string): CouncilEvent[] {
+  const re = /\[COUNCIL:PHASE:(r[12]):([^:]+):([^\]]+)\]([^\n]*)\n/g;
+  const events: CouncilEvent[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(buf)) !== null) {
+    events.push({ round: match[1] as "r1" | "r2", model: match[2], meta: match[3], text: match[4].trim() });
+  }
+  return events;
+}
+
+function CouncilProgressPanel({ phase, events }: { phase: "r1" | "r2" | "synthesis" | null; events: CouncilEvent[] }) {
+  const r1Done = events.filter((e) => e.round === "r1");
+  const r2Done = events.filter((e) => e.round === "r2");
+
+  const steps = [
+    {
+      id: "r1",
+      label: "Round 1 — Independent analysis",
+      detail: r1Done.length > 0
+        ? r1Done.map((e) => MODEL_META[e.model]?.label ?? e.model.toUpperCase()).join(" · ")
+        : "3 models thinking…",
+      done: r1Done.length >= 3,
+      active: phase === "r1" || phase === null,
+    },
+    {
+      id: "r2",
+      label: "Round 2 — Cross-reviewing positions",
+      detail: r2Done.length > 0
+        ? r2Done.map((e) => MODEL_META[e.model]?.label ?? e.model.toUpperCase()).join(" · ")
+        : "Models deliberating…",
+      done: r2Done.length >= 3,
+      active: phase === "r2",
+    },
+    {
+      id: "synthesis",
+      label: "Synthesizing final answer",
+      detail: phase === "synthesis" ? "Streaming…" : "",
+      done: false,
+      active: phase === "synthesis",
+    },
+  ];
+
+  return (
+    <div style={{ background: "rgba(168,85,247,0.06)", border: "1px solid rgba(168,85,247,0.2)", borderRadius: 12, padding: "12px 16px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+        <span style={{ color: "#d8b4fe", fontSize: 10, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, letterSpacing: "0.1em" }}>
+          COUNCIL · DELIBERATING
+        </span>
+        <div className="flex gap-1">
+          {[0, 150, 300].map((d) => (
+            <div key={d} className="w-1 h-1 rounded-full animate-bounce" style={{ background: "#a78bfa", animationDelay: `${d}ms` }} />
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {steps.map((step) => (
+          <div key={step.id} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+            <div style={{
+              width: 14, height: 14, borderRadius: "50%", flexShrink: 0, marginTop: 3,
+              background: step.done ? "#a78bfa" : step.active ? "rgba(167,139,250,0.25)" : "transparent",
+              border: `1px solid ${step.done ? "#a78bfa" : step.active ? "#a78bfa" : "rgba(63,63,70,0.8)"}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {step.done && <span style={{ color: "#0A0A0A", fontSize: 8, fontWeight: 900 }}>✓</span>}
+            </div>
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 600, color: step.done ? "#d8b4fe" : step.active ? "#F5F5F5" : "#52525B", margin: 0 }}>
+                {step.label}
+              </p>
+              {step.detail && (
+                <p style={{ fontSize: 10, color: "#71717A", margin: "2px 0 0", fontFamily: "'JetBrains Mono', monospace" }}>
+                  {step.detail}
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Suggested starter questions ─────────────────────────────────────────────
 
 const STARTERS = [
@@ -150,6 +251,9 @@ export default function DemoChat({ token }: DemoChatProps) {
   const [input, setInput]           = useState("");
   const [isLoading, setIsLoading]   = useState(false);
   const [error, setError]           = useState<string | null>(null);
+  const [isDeliberating, setIsDeliberating]   = useState(false);
+  const [councilPhase, setCouncilPhase]       = useState<"r1" | "r2" | "synthesis" | null>(null);
+  const [councilEvents, setCouncilEvents]     = useState<CouncilEvent[]>([]);
   const messagesEndRef              = useRef<HTMLDivElement>(null);
   const inputRef                    = useRef<HTMLInputElement>(null);
   const badge                       = venue ? modeBadge(venue.demo_level) : null;
@@ -177,28 +281,84 @@ export default function DemoChat({ token }: DemoChatProps) {
   const handleSubmit = async (question: string) => {
     if (!question.trim() || isLoading || !venue) return;
 
+    // Reset council state for new message
+    setIsDeliberating(false);
+    setCouncilPhase(null);
+    setCouncilEvents([]);
+
     setInput("");
     setError(null);
     setMessages((prev) => [...prev, { role: "user", content: question }]);
     setIsLoading(true);
 
+    const isCouncil = venue.demo_level === 2 || venue.demo_level === 4;
+    let deliberatingDone = false;
+    let synthesisDone = false;
+    let councilBuf = "";
     let current = "";
+
+    const appendToResponse = (text: string) => {
+      current += text;
+      setMessages((prev) => {
+        const msgs = [...prev];
+        if (msgs[msgs.length - 1]?.role === "assistant") {
+          return [...msgs.slice(0, -1), { role: "assistant", content: current }];
+        }
+        return [...msgs, { role: "assistant", content: current }];
+      });
+    };
+
+    const absorbPhaseEvents = (buf: string) => {
+      const events = parsePhaseEvents(buf);
+      if (events.length === 0) return;
+      setCouncilEvents((prev) => {
+        const seen = new Set(prev.map((e) => `${e.round}:${e.model}`));
+        const fresh = events.filter((e) => !seen.has(`${e.round}:${e.model}`));
+        if (fresh.length === 0) return prev;
+        const next = [...prev, ...fresh];
+        const hasR2 = next.some((e) => e.round === "r2");
+        setCouncilPhase(hasR2 ? "r2" : "r1");
+        return next;
+      });
+    };
+
     await streamDemoChat(token, question, {
       onChunk: (chunk) => {
-        current += chunk;
-        setMessages((prev) => {
-          const msgs = [...prev];
-          if (msgs[msgs.length - 1]?.role === "assistant") {
-            return [...msgs.slice(0, -1), { role: "assistant", content: current }];
+        if (isCouncil && !synthesisDone) {
+          if (!deliberatingDone && chunk.includes(COUNCIL_DELIBERATING)) {
+            setIsDeliberating(true);
+            deliberatingDone = true;
+            chunk = chunk.replace(COUNCIL_DELIBERATING, "");
+            if (!chunk.trim()) return;
           }
-          return [...msgs, { role: "assistant", content: current }];
-        });
+
+          councilBuf += chunk;
+          const synthIdx = councilBuf.indexOf(COUNCIL_SYNTHESIS);
+          if (synthIdx !== -1) {
+            absorbPhaseEvents(councilBuf.slice(0, synthIdx));
+            synthesisDone = true;
+            setCouncilPhase("synthesis");
+            setIsDeliberating(false);
+            const tail = councilBuf.slice(synthIdx + COUNCIL_SYNTHESIS.length + 1);
+            councilBuf = "";
+            if (tail.trim()) appendToResponse(tail);
+            return;
+          }
+
+          absorbPhaseEvents(councilBuf);
+          return;
+        }
+        appendToResponse(chunk);
       },
       onError: (msg) => {
         setError(msg);
+        setIsDeliberating(false);
         setIsLoading(false);
       },
-      onComplete: () => setIsLoading(false),
+      onComplete: () => {
+        setIsDeliberating(false);
+        setIsLoading(false);
+      },
     });
   };
 
@@ -350,8 +510,17 @@ export default function DemoChat({ token }: DemoChatProps) {
           </div>
         ))}
 
-        {/* Typing indicator */}
-        {isLoading && messages[messages.length - 1]?.role === "user" && (
+        {/* Council deliberation panel */}
+        {isLoading && (isDeliberating || (councilPhase !== null && councilPhase !== "synthesis")) && (
+          <div className="flex justify-start">
+            <div className="max-w-[88%] w-full">
+              <CouncilProgressPanel phase={councilPhase} events={councilEvents} />
+            </div>
+          </div>
+        )}
+
+        {/* Typing indicator (non-council or initial load) */}
+        {isLoading && !isDeliberating && councilPhase === null && messages[messages.length - 1]?.role === "user" && (
           <div className="flex justify-start">
             <div
               className="rounded-2xl px-4 py-3 flex items-center gap-1.5"
