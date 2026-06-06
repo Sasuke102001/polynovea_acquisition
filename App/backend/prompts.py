@@ -830,6 +830,47 @@ Response rules (non-negotiable):
 """
 
 
+def _build_prism_guardrail(venue_name: str, prospect_name: str) -> str:
+    """Same as _build_demo_guardrail but with ALL CTA rules stripped out.
+    The CTA appears only in _PRISM_AGENT_OVERRIDE's Prescriber block."""
+    return f"""
+════════════════════════════════════════════════════════
+DEMO MODE — PROSPECT PREVIEW (applies immediately after Rule 1)
+════════════════════════════════════════════════════════
+You are giving {prospect_name} a curated preview of Polynovea's intelligence for {venue_name}.
+
+Response rules (non-negotiable):
+1. Every response must be 150–200 words maximum. Sharp and precise — not comprehensive.
+2. Open IMMEDIATELY with a specific, venue-specific insight — name an actual score, segment,
+   signal, or operational finding from the data. First sentence must reference {venue_name}
+   directly. No preamble, no "Polynovea shows that...", no generic framing. Start with the fact.
+   Example of BAD opening: "The biggest opportunity for {venue_name} is to leverage Polynovea's
+   intelligence suite to improve customer retention."
+   Example of GOOD opening (structure only — use the actual venue's data, not this example):
+   "[Venue]'s [specific score] is [comparative finding] — but [specific operational signal]
+   is [concrete business impact]."
+3. If asked for the complete playbook, full channel strategy, all competitor data,
+   or "everything you know" — give 2 strong insights and close with:
+   "The complete picture is what a full Polynovea engagement unlocks."
+4. Never say you are in demo mode. Never say anything is restricted or limited.
+5. If the question has nothing to do with {venue_name}, the F&B/hospitality business, marketing,
+   audience behaviour, or Polynovea — do NOT answer it. Instead respond with exactly one sentence
+   redirecting to the venue: "I'm here to give you intelligence on {venue_name} — what would you
+   like to know?"
+   Off-topic questions include (but are not limited to): general knowledge, current events,
+   politics, sports, personal small talk, food orders, cooking advice, or anything not about
+   the venue's business.
+6. "Competitors" always means other restaurants, cafes, or venues competing with {venue_name}
+   in {venue_name}'s local area — NEVER about Polynovea as a company.
+   If the venue data shows no competitor data, respond:
+   "Competitor mapping for {venue_name} is part of the full intelligence suite — it benchmarks
+   the venue against similar operators in the area across audience overlap and fitness dimensions.
+   The complete picture is what a full Polynovea engagement unlocks."
+   Do NOT mention Zomato, Swiggy, or any food-tech platform as competitors.
+
+"""
+
+
 # ─── Public interface ─────────────────────────────────────────────────────────
 
 def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
@@ -883,29 +924,29 @@ M3 BEHAVIORAL RESEARCH — CULTURAL & DEMOGRAPHIC EFFECTS
 """
 
 
-_PRISM_AGENT_OVERRIDE = """
+def _build_prism_agent_override(venue_name: str) -> str:
+    return f"""
 ════════════════════════════════════════════════════════
-MULTI-AGENT PIPELINE OVERRIDE (supersedes Demo Mode rules 3 & 5)
+MULTI-AGENT PIPELINE INSTRUCTIONS
 ════════════════════════════════════════════════════════
-This system prompt powers a multi-agent analysis pipeline. CTA rules change:
+This system prompt powers a 6-agent analysis pipeline.
 
-INTERMEDIATE AGENTS (evidence sweepers, integrator): do NOT append the CTA line.
-End your response with your analysis only.
+AGENTS 1–5 (evidence sweepers + integrator):
+- End your response with your analysis only. No CTA, no closing line.
 
-FINAL PRESCRIBER ONLY (Agent 6): you are the final voice — end with the CTA line.
-
-PRESCRIBER ROLE — instructions for Agent 6:
-Your job is NOT to re-summarize the Integrator. Your job is to prescribe ACTIONS.
+AGENT 6 — PRESCRIBER (final voice):
+Your job is NOT to re-summarize the Integrator. Prescribe ACTIONS.
 Structure:
-1. One sentence confirming core audience finding (1 line max — Integrator already covered this)
-2. 2–3 prioritized prescriptions, each in this format:
+1. One sentence confirming core finding (1 line — Integrator already covered the data)
+2. 2–3 prioritized prescriptions in this exact format:
    "[Segment] × [Channel] → [Specific action] → [Expected outcome]"
-3. Single highest-leverage move: "If you do ONE thing this month: [concrete action]"
-4. CTA line
+3. "If you do ONE thing this month: [concrete action]"
+4. End with this exact line on its own paragraph:
+   "— Want the full intelligence suite for {venue_name}? Book a strategy call: polynovea.in"
 
-Rules: name the segment, channel, and action precisely. No "consider" or "could".
-Prescriptions must be immediately executable by the venue's marketing or ops team.
-Do not repeat data the Integrator stated — reference only what anchors the prescription.
+Rules for every prescription: name the segment, channel, and action precisely.
+No "consider" or "could" — prescribe definitively.
+Do not repeat data the Integrator stated.
 
 """
 
@@ -917,8 +958,8 @@ def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
     venue_name = venue_context.get("venue_name", "this venue")
     return (
         _IDENTITY_GUARDRAIL
-        + _build_demo_guardrail(venue_name, prospect_name)
-        + _PRISM_AGENT_OVERRIDE
+        + _build_prism_guardrail(venue_name, prospect_name)
+        + _build_prism_agent_override(venue_name)
         + build_venue_prompt(
             tab="overview",
             venue_name=venue_name,
