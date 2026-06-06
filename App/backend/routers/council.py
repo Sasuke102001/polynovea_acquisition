@@ -378,13 +378,30 @@ async def run_council(
     yield "[COUNCIL:SYNTHESIS]\n"
 
     # Round 3 — stream live to user while collecting for logging
+    # [CONSENSUS]/[SPLIT] tags arrive at the very end of the synthesis, split across
+    # multiple streaming chunks.  A per-chunk replace() never catches them.
+    # Solution: hold back a suffix buffer large enough to contain the longest marker,
+    # yield only the "safe" prefix each iteration, then flush + strip at the end.
     synthesis_chunks: list[str] = []
+    _MARKERS = ("[CONSENSUS]", "[SPLIT]")
+    _MAX_MARKER = max(len(m) for m in _MARKERS)  # 11 chars
+    suffix_buf = ""
 
     async for chunk in _stream_synthesis(question, r1, r2):
-        # Strip the trailing marker tags before sending to user
-        clean = chunk.replace("[CONSENSUS]", "").replace("[SPLIT]", "")
+        synthesis_chunks.append(chunk)
+        suffix_buf += chunk
+        safe_len = max(0, len(suffix_buf) - _MAX_MARKER)
+        if safe_len > 0:
+            yield suffix_buf[:safe_len]
+            suffix_buf = suffix_buf[safe_len:]
+
+    # Flush remainder, stripping markers
+    if suffix_buf:
+        clean = suffix_buf
+        for m in _MARKERS:
+            clean = clean.replace(m, "")
+        clean = clean.rstrip()
         if clean:
-            synthesis_chunks.append(chunk)   # store raw (with markers) for logging
             yield clean
 
     synthesis_full = "".join(synthesis_chunks)

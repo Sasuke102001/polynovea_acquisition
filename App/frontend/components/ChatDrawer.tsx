@@ -343,7 +343,6 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
 
         // Fast mode or synthesis already streaming — append directly
         if (!deliberatingDone || synthesisDone) {
-          if (deliberatingDone) setIsDeliberating(false);
           appendToResponse(chunk);
           return;
         }
@@ -357,7 +356,8 @@ export default function ChatDrawer({ venueId, tab }: ChatDrawerProps) {
           parseCouncilEvents(councilBuf.slice(0, synthIdx));
           synthesisDone = true;
           setCouncilPhase("synthesis");
-          setIsDeliberating(false);
+          // Keep isDeliberating=true — chamber stays visible showing "Synthesising..."
+          // It will be cleared in onComplete once streaming finishes.
           const tail = councilBuf.slice(synthIdx + COUNCIL_SYNTHESIS.length + 1); // +1 for \n
           councilBuf = "";
           if (tail.trim()) appendToResponse(tail);

@@ -338,7 +338,8 @@ export default function DemoChat({ token }: DemoChatProps) {
             absorbPhaseEvents(councilBuf.slice(0, synthIdx));
             synthesisDone = true;
             setCouncilPhase("synthesis");
-            setIsDeliberating(false);
+            // Keep isDeliberating=true so the panel stays visible while synthesis streams.
+            // It will be cleared in onComplete.
             const tail = councilBuf.slice(synthIdx + COUNCIL_SYNTHESIS.length + 1);
             councilBuf = "";
             if (tail.trim()) appendToResponse(tail);
@@ -510,8 +511,8 @@ export default function DemoChat({ token }: DemoChatProps) {
           </div>
         ))}
 
-        {/* Council deliberation panel */}
-        {isLoading && (isDeliberating || (councilPhase !== null && councilPhase !== "synthesis")) && (
+        {/* Council deliberation panel — visible through synthesis, hidden on complete */}
+        {isLoading && (isDeliberating || councilPhase !== null) && (
           <div className="flex justify-start">
             <div className="max-w-[88%] w-full">
               <CouncilProgressPanel phase={councilPhase} events={councilEvents} />
