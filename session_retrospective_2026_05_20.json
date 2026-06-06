@@ -1,0 +1,126 @@
+{
+  "session_date": "2026-05-20",
+  "session_summary": "Strategic design session exploring the limitations of the existing BIF pipeline (Pipeline A) and designing a new people-first Pipeline B that augments Module 2's demand-side intelligence using 30L Google reviews as revealed behavioral data.",
+
+  "topics_covered": {
+
+    "topic_1_pipeline_a_diagnosis": {
+      "status": "UNDERSTOOD — no code changes",
+      "what": "Traced the full Pipeline A flow (step_3 → step_6) to understand what it actually does to review data",
+      "key_finding": "Pipeline A is a venue intelligence tool. Every step moves further from the person and deeper into the venue. The human is extracted for signals in step_3 and then discarded. Output answers: 'What kind of place is this?' not 'Who are the people visiting this city?'",
+      "specific_losses_identified": [
+        "Conditional logic flattened — 'food is good BUT service is pathetic' loses the tradeoff judgment; only individual signals survive",
+        "Person-level decision fingerprint discarded — why they came, what they tolerated, what caused exit — all lost after step_3 aggregation",
+        "Implicit behavioral identity signals not extracted — e.g. 'who goes dining and doesn't click pictures?' is a social identity signal, not a keyword match",
+        "Aggregation direction wrong for population intelligence — aggregates reviews→venue, not people→segments→population"
+      ]
+    },
+
+    "topic_2_pipeline_b_concept": {
+      "status": "DESIGNED — not built yet",
+      "what": "Designed a parallel Pipeline B that treats each review as one human behavioral record",
+      "core_principle": "Each review (deduped and algorithmically weighted) = one person. 30L reviews = behavioral data of 30L people. Pipeline B never aggregates upward to venue level.",
+      "unit_of_analysis": "Person fingerprint, not venue primitive",
+      "person_fingerprint_fields": [
+        "decision_trigger (why they came)",
+        "valued_dimensions (what they care about)",
+        "tolerance_floor (what they won't accept)",
+        "tradeoff_expressed (what compensated for what, or didn't)",
+        "exit_or_retention verdict",
+        "social_behavior (brought friends / warned others / shared online)",
+        "behavioral_identity (value_seeker, dignity_conscious, social_content_creator, etc.)"
+      ],
+      "aggregation_direction": "People → behavioral segments → population patterns (cross-venue)",
+      "key_new_extraction_needed": "Decision logic parsing — reading conjunctions and contrast markers (BUT, DESPITE, EVEN THOUGH) to understand tradeoff hierarchies. Everything else (negation, temporal, quality scoring) reusable from step_3."
+    },
+
+    "topic_3_architecture_decision": {
+      "status": "DECIDED — separate pipeline, same raw input",
+      "what": "Keeping Pipeline A untouched. Pipeline B runs on the same raw review JSON files but produces entirely separate outputs.",
+      "rationale": [
+        "Different schemas from the start — Pipeline A produces venue records, Pipeline B produces person records",
+        "Different aggregation keys — Pipeline A keys on place_id, Pipeline B keys on behavioral segment IDs (cross-venue by design)",
+        "Different update cadence — Pipeline A updates per venue when new reviews arrive, Pipeline B updates when enough new people shift a segment",
+        "They reference each other without owning each other via cross-reference fields"
+      ],
+      "new_db_tables_needed": [
+        "behavioral_segments (empirical, revealed, city-specific)",
+        "segment_exit_triggers",
+        "segment_retention_drivers",
+        "segment_decision_triggers",
+        "venue_segment_density (which segments actually visit which venues)",
+        "archetype_validation (how Pipeline B segments map to the 35 survey archetypes)"
+      ]
+    },
+
+    "topic_4_module_2_augmentation": {
+      "status": "DESIGNED — not implemented",
+      "what": "Identified exactly how Pipeline B augments Module 2's gap analysis",
+      "current_gap_analysis_weakness": "Demand side built from 45 survey responses (stated preferences). Supply side (venue primitives) is solid. Gap = weak demand side.",
+      "schema_mapping_discovered": {
+        "survey_what_makes_leave_early": "Pipeline B exit_triggers",
+        "survey_what_makes_stay_longer": "Pipeline B retention_drivers",
+        "survey_what_drives_return": "Pipeline B repeat_visit_signals",
+        "survey_decision_factors": "Pipeline B decision_trigger",
+        "survey_archetype_derived": "Pipeline B behavioral_segment (empirically derived)",
+        "survey_group_role": "Pipeline B social_behavior pattern"
+      },
+      "key_insight": "The survey schema and Pipeline B measure the same variables through different methods. Survey = 45 people stating preferences. Pipeline B = 30L people revealing behavior. Pipeline B validates and enriches the demand side without replacing the survey.",
+      "gap_analysis_improvement_example": "Current: Party Seeker wants live_music → venue lacks live_music → prescribe music. With Pipeline B: Party Seeker behavioral segment shows live_music absence in exit signals only 31% of the time; service dignity violations appear in 67% of exit signals. Intervention priority flips from music to service."
+    },
+
+    "topic_5_data_source_audit": {
+      "status": "CONFIRMED",
+      "what": "Audited all three pipeline instances to confirm primitive registry is shared",
+      "findings": {
+        "primitives_json": "Identical across all three pipeline locations (Google Places API, MagicPin BIF, Google Raw Scrapper BIF) — zero diff confirmed",
+        "google_places_api": "RUNNING — step_1 through step_6 complete, data in DB",
+        "magicpin": "RUNNING — step_1 through step_6 complete, data in DB",
+        "google_raw_scrapper": "STILL COLLECTING — reviews_worker_*.json accumulating, BIF scripts ready but not yet run on this data",
+        "zomato": "NOT STARTED — folder exists but empty",
+        "source_weighting": "Google 50%, MagicPin 20%, Zomato 30% (planned but Zomato not active yet)",
+        "merge_point": "Database layer, not pipeline layer — each source maintains separate primitive scores, combined score is weighted average"
+      },
+      "strategic_note": "Google Raw Scrapper data is still pristine (unprocessed). Architecture decision for Pipeline B should be made before this data is committed to Pipeline A processing."
+    },
+
+    "topic_6_module_3_preview": {
+      "status": "MENTIONED — to be discussed in future session",
+      "what": "Brief mention that Pipeline B's person-level behavioral segments would sharpen Module 3 music psychology targeting",
+      "current_m3_limitation": "Music prescriptions are archetype-level: 'Party Seekers → 120-130 BPM'. With Pipeline B: prescriptions could target specific behavioral sub-segments (which Party Seeker types respond to energy vs. intimacy vs. authenticity) and account for the actual friction causing exit before music even has a chance to work.",
+      "deferred_to": "Future session"
+    }
+  },
+
+  "decisions_made": [
+    "Pipeline B is a separate pipeline — not a replacement or modification of Pipeline A",
+    "Same raw review JSON files feed both pipelines",
+    "Pipeline B augments Module 2's demand side — survey archetypes get validated, not replaced",
+    "Google Raw Scrapper data architecture decision should be made before processing begins"
+  ],
+
+  "no_code_written": true,
+  "no_db_changes": true,
+
+  "next_steps": [
+    "Design Stage 1 of Pipeline B — the person fingerprint extractor (decision logic parsing layer)",
+    "Decide whether Google Raw Scrapper data feeds Pipeline A, Pipeline B, or both",
+    "Discuss Module 3 music psychology targeting augmentation via Pipeline B segments",
+    "Zomato pipeline setup when ready"
+  ],
+
+  "files_read_this_session": [
+    "output/Thane/reviews_worker_1.json (sample)",
+    "Behavioural_Intelligence_Framework/scripts/step_3_extract.py",
+    "Behavioural_Intelligence_Framework/scripts/step_4_pattern.py",
+    "Behavioural_Intelligence_Framework/scripts/step_5_score.py",
+    "Behavioural_Intelligence_Framework/scripts/step_6_output.py",
+    "Acquistion System/MODULE_2_AND_3_FRAMEWORK.md",
+    "Acquistion System/survey_canonical_schema.json",
+    "Acquistion System/Docs for database/AMENDMENT_LOGIC_AND_LAYER3_INTEGRATION.md",
+    "Acquistion System/Docs for database/SOURCE_WEIGHTING_STRATEGY_AND_ADS_FEATURES.md",
+    "Google Places API/config/primitives.json",
+    "MagicPin BIF Scripts_upper/config/primitives.json",
+    "Google Raw Scrapper BIF/config/primitives.json"
+  ]
+}

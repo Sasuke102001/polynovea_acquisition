@@ -25,15 +25,18 @@ DB_CONFIG = {
     'sslmode':  'require',
 }
 
+SOURCE = 'google'
+
 SCORE_SQL = """
     INSERT INTO pattern_scores
-        (pattern_id, confidence_score, evidence_density, temporal_consistency,
+        (pattern_id, source, confidence_score, evidence_density, temporal_consistency,
          evidence_diversity, commercial_reliability, venue_count, prevalence,
          friction_severity)
-    SELECT bp.id, %s, %s, %s, %s, %s, %s, %s, %s
+    SELECT bp.id, %s, %s, %s, %s, %s, %s, %s, %s, %s
     FROM behavioral_patterns bp
-    WHERE bp.pattern_name = %s AND bp.area = %s
+    WHERE bp.pattern_name = %s AND bp.area = %s AND bp.source = %s
     ON CONFLICT (pattern_id) DO UPDATE SET
+        source                 = EXCLUDED.source,
         confidence_score       = EXCLUDED.confidence_score,
         evidence_density       = EXCLUDED.evidence_density,
         temporal_consistency   = EXCLUDED.temporal_consistency,
@@ -84,6 +87,7 @@ def load_city(cursor, city: str) -> dict:
         friction_severity = info.get('friction_severity', '')
 
         cursor.execute(SCORE_SQL, (
+            SOURCE,
             confidence_score,
             frequency_score,    # evidence_density
             consistency_score,  # temporal_consistency
@@ -93,7 +97,8 @@ def load_city(cursor, city: str) -> dict:
             prevalence,
             friction_severity,
             pattern_name,
-            city
+            city,
+            SOURCE,
         ))
 
         if cursor.rowcount > 0:

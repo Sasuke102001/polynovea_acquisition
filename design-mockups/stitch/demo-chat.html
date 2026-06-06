@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea - Effingut Belapur Demo Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        polynovea: {
+                            black: '#0A0A0A',
+                            gold: '#E6D3A3',
+                            violet: '#7C3AED',
+                            gray: '#A1A1AA',
+                            surface: '#121212',
+                            surface2: '#18181B'
+                        },
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        headline: ["Clash Display", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                        "display": ["Public Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    animation: {
+                        'float-up': 'floatUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        floatUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #ffffff;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23E6D3A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>'), auto;
+        }
+        
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #18181B;
+            border-radius: 3px;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="font-body h-screen flex flex-col overflow-hidden antialiased">
+<canvas id="canvas-container"></canvas>
+<header class="relative z-10 w-full py-6 px-8 flex justify-between items-center border-b border-polynovea-gold/10 bg-polynovea-black/80 backdrop-blur-md">
+<div>
+<h1 class="font-headline font-semibold text-2xl text-polynovea-gold tracking-wide uppercase">Effingut Belapur</h1>
+<p class="text-polynovea-gray text-xs tracking-widest uppercase mt-1">Powered by Polynovea Intelligence</p>
+</div>
+<div class="flex items-center gap-4">
+<span class="flex h-3 w-3 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-polynovea-gold opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-polynovea-gold"></span>
+</span>
+<span class="font-mono text-xs text-polynovea-gold/70">SYS_ID: <span class="text-polynovea-gold">POL-7729</span></span>
+</div>
+</header>
+<main class="relative z-10 flex-1 overflow-y-auto chat-container pb-32 pt-8">
+<div class="max-w-[700px] mx-auto flex flex-col gap-8 px-4">
+<!-- AI Message -->
+<div class="flex flex-col gap-2 items-start w-full animate-float-up" style="animation-delay: 0.1s;">
+<div class="flex items-center gap-3 ml-2 mb-1">
+<span class="material-symbols-outlined text-polynovea-violet text-sm" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+<span class="text-xs font-mono text-polynovea-gray uppercase tracking-wider">Polynovea System</span>
+</div>
+<div class="bg-polynovea-surface border-l-2 border-polynovea-violet p-5 rounded-r-lg rounded-bl-lg shadow-lg w-full max-w-[90%] md:max-w-[80%]">
+<p class="text-sm text-gray-200 leading-relaxed mb-4">
+                        Analysis complete for <span class="font-mono text-polynovea-gold">Effingut Belapur</span>. Current audience demographic skews 68% towards urban professionals (Age 25-34). Weekend engagement is optimizing at 92% capacity, but mid-week retention shows a 14% delta.
+                    </p>
+<p class="text-xs text-polynovea-gold italic font-medium">How would you like to address the mid-week retention delta?</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col gap-2 items-end w-full animate-float-up" style="animation-delay: 0.4s;">
+<div class="flex items-center gap-3 mr-2 mb-1">
+<span class="text-xs font-mono text-polynovea-gray uppercase tracking-wider">Acquisition Director</span>
+<span class="material-symbols-outlined text-polynovea-gold text-sm" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<div class="bg-polynovea-surface2 border border-polynovea-gold/40 p-5 rounded-l-lg rounded-br-lg shadow-lg max-w-[90%] md:max-w-[80%]">
+<p class="text-sm text-gray-200 leading-relaxed">
+                        Break down the mid-week drop-off by segment. Are we losing the corporate post-work crowd or the casual dining segment?
+                    </p>
+</div>
+</div>
+<!-- AI Message -->
+<div class="flex flex-col gap-2 items-start w-full animate-float-up" style="animation-delay: 0.7s;">
+<div class="flex items-center gap-3 ml-2 mb-1">
+<span class="material-symbols-outlined text-polynovea-violet text-sm" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+<span class="text-xs font-mono text-polynovea-gray uppercase tracking-wider">Polynovea System</span>
+</div>
+<div class="bg-polynovea-surface border-l-2 border-polynovea-violet p-5 rounded-r-lg rounded-bl-lg shadow-lg w-full max-w-[90%] md:max-w-[85%]">
+<p class="text-sm text-gray-200 leading-relaxed mb-4">
+                        Segmenting mid-week data (Tues-Thurs, 18:00 - 22:00 UTC):
+                    </p>
+<div class="bg-black/50 rounded p-4 mb-4 border border-white/5 font-mono text-xs text-gray-300">
+<div class="flex justify-between mb-2 pb-2 border-b border-white/10">
+<span>SEGMENT</span>
+<span>RETENTION Δ</span>
+</div>
+<div class="flex justify-between mb-2">
+<span>Corporate Post-Work</span>
+<span class="text-red-400">-18%</span>
+</div>
+<div class="flex justify-between mb-2">
+<span>Casual Dining (Couples)</span>
+<span class="text-green-400">+2%</span>
+</div>
+<div class="flex justify-between">
+<span>Student / Academic</span>
+<span class="text-red-400">-8%</span>
+</div>
+</div>
+<p class="text-sm text-gray-200 leading-relaxed mb-4">
+                        The primary loss is indeed the corporate segment. Competitive intelligence indicates a nearby venue launched a "Tech Tuesday" networking event capturing ~200 local tech professionals.
+                    </p>
+<p class="text-xs text-polynovea-gold italic font-medium">Generate a counter-campaign targeting the corporate segment for Effingut Belapur?</p>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 w-full bg-gradient-to-t from-polynovea-black via-polynovea-black/90 to-transparent pt-12 pb-8 z-20">
+<div class="max-w-[700px] mx-auto px-4">
+<div class="relative flex items-center group">
+<input class="w-full bg-polynovea-surface2 border border-white/10 text-sm text-white rounded-lg pl-5 pr-14 py-4 focus:outline-none focus:border-polynovea-gold focus:ring-1 focus:ring-polynovea-gold transition-all placeholder-gray-500 font-body shadow-2xl" placeholder="Instruct Polynovea Intelligence..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-polynovea-black hover:bg-polynovea-gold/10 text-polynovea-gold rounded transition-colors group-focus-within:text-polynovea-gold">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<div class="text-center mt-3">
+<p class="text-[10px] text-polynovea-gray font-mono uppercase tracking-widest">System Online • Processing Core: P-NV8</p>
+</div>
+</div>
+</div>
+<script>
+        // Simple Particle Canvas Background
+        const canvas = document.getElementById('canvas-container');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedY = Math.random() * -0.5 - 0.1;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = height;
+                    this.x = Math.random() * width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(230, 211, 163, ${this.opacity})`; // Gold color
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            resize();
+            for(let i = 0; i < 100; i++) {
+                particles.push(new Particle());
+            }
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        init();
+    </script>
+</body></html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea Venue Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0A0A0A',
+                        surface: '#18181B',
+                        border: '#27272A',
+                        primary: '#E6D3A3',
+                        muted: '#71717A',
+                    },
+                    fontFamily: {
+                        headline: ["Public Sans", "sans-serif"],
+                        display: ["Public Sans", "sans-serif"],
+                        body: ["Public Sans", "sans-serif"],
+                        label: ["Public Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: white;
+            font-family: 'Public Sans', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        #cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #E6D3A3;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: difference;
+        }
+
+        #cursor-ring.hover {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(230, 211, 163, 0.2);
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Cinematic Entrance */
+        @keyframes cinematic-entrance {
+            0% {
+                opacity: 0;
+                transform: scale(1.1) translateY(20px);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .cinematic-text {
+            animation: cinematic-entrance 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        /* 3D Tilt Terminal */
+        .tilt-container {
+            perspective: 1000px;
+        }
+        
+        .tilt-card {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        /* 3D Grid Depth */
+        .grid-3d-container {
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+
+        .grid-3d-card {
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+
+        /* Fanned out initial state via nth-child */
+        .grid-3d-card:nth-child(1) { transform: translateZ(-20px) rotateY(2deg); }
+        .grid-3d-card:nth-child(2) { transform: translateZ(-20px) rotateY(-2deg); }
+        .grid-3d-card:nth-child(3) { transform: translateZ(-40px) rotateY(4deg); }
+        .grid-3d-card:nth-child(4) { transform: translateZ(-40px) rotateY(-4deg); }
+
+        .grid-3d-card:hover {
+            transform: translateZ(50px) rotateY(0deg) !important;
+            box-shadow: 0 0 20px rgba(230, 211, 163, 0.3), 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+
+        /* City Chips Depth */
+        .pill-3d {
+            box-shadow: 0 4px 0 #27272A;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .pill-3d:active {
+            transform: translateY(4px) translateZ(-4px);
+            box-shadow: 0 0 0 #18181B;
+        }
+
+        .top-nav {
+            background-color: #0A0A0A;
+            color: #E6D3A3;
+            border-bottom: 1px solid rgba(230, 211, 163, 0.2);
+        }
+        
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: #E6D3A3;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+<!-- Background Canvas -->
+<canvas id="particles"></canvas>
+<!-- Custom Cursor -->
+<div id="cursor-ring"></div>
+<!-- TopNavBar -->
+<header class="top-nav fixed top-0 w-full z-50 px-6 py-4 flex justify-between items-center transition-all">
+<div class="flex items-center">
+<span class="nav-logo">POLYNOVEA</span>
+</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 text-sm tracking-wide" href="#">Search</a>
+<a class="text-muted hover:text-primary transition-colors hover:bg-primary/10 px-2 py-1 rounded text-sm tracking-wide duration-300" href="#">Venues</a>
+<a class="text-muted hover:text-primary transition-colors hover:bg-primary/10 px-2 py-1 rounded text-sm tracking-wide duration-300" href="#">Insights</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full transition-all duration-300">
+<span class="material-symbols-outlined">search</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface border border-border overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV0WvmAWGpNJQlO6xbdOMXud2HjC0ATOoR1EHhtvyP-a3Gek67vKrz2ZGXM_6mJSDO2Gq8lCJR3p37UTZYTJSNkO04NZQEOtruIdDc3D-t8CozfC2QA8nz8A5OKD33ooCpwrZ--eeJabteAdmwnft0y_s6BBSgFKcI-U1UqrgMMVuJoGLKh7VBptlIqa7r0wihOsoTCySBr73SnJrXP2mw9BXz8zPaQVZvaoKWkq24ZfKOdp7Xbt4BV8Ykw4dE3qzqIJ6gm21YBCc"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center pt-32 pb-16 px-4 md:px-8 relative z-10 w-full max-w-5xl mx-auto">
+<!-- Header Section -->
+<div class="text-center mb-12">
+<h1 class="cinematic-text text-5xl md:text-7xl font-bold text-primary tracking-tight mb-4 font-headline uppercase" style="letter-spacing: -0.02em;">
+                POLYNOVEA
+            </h1>
+<p class="text-muted text-sm md:text-base tracking-[0.2em] font-body uppercase cinematic-text" style="animation-delay: 0.2s;">
+                Behavioral Intelligence for Venues
+            </p>
+</div>
+<!-- 3D Floating Search Bar -->
+<div class="w-full max-w-3xl tilt-container mb-12" id="search-tilt">
+<div class="tilt-card bg-surface border border-border rounded-xl p-2 shadow-2xl relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="flex items-center w-full bg-[#121214] rounded-lg px-4 py-3 border border-border/50 relative z-10" style="transform: translateZ(20px);">
+<span class="material-symbols-outlined text-muted mr-3">search</span>
+<input class="w-full bg-transparent border-none text-white placeholder-muted focus:ring-0 text-lg font-body" placeholder="Search venues, neighborhoods, or demographic signals..." style="outline: none;" type="text"/>
+<button class="ml-2 bg-primary/10 text-primary px-4 py-1.5 rounded text-sm font-semibold hover:bg-primary/20 transition-colors border border-primary/20">
+                        Analyze
+                    </button>
+</div>
+</div>
+</div>
+<!-- Active Market Chips -->
+<div class="mb-16 w-full max-w-3xl flex flex-col items-center">
+<h3 class="text-muted text-xs uppercase tracking-widest mb-4">Active Markets</h3>
+<div class="flex flex-wrap justify-center gap-4">
+<button class="pill-3d bg-surface border border-border text-white px-6 py-2 rounded-full text-sm font-body hover:bg-[#1f1f23] transition-colors cursor-pointer" data-hoverable="true">
+                    Mumbai
+                </button>
+<button class="pill-3d bg-surface border border-border text-white px-6 py-2 rounded-full text-sm font-body hover:bg-[#1f1f23] transition-colors cursor-pointer" data-hoverable="true">
+                    Navi Mumbai
+                </button>
+<button class="pill-3d bg-surface border border-border text-white px-6 py-2 rounded-full text-sm font-body hover:bg-[#1f1f23] transition-colors cursor-pointer" data-hoverable="true">
+                    Thane
+                </button>
+</div>
+</div>
+<!-- Recent Searches Grid -->
+<div class="w-full max-w-4xl grid-3d-container">
+<div class="flex items-center justify-between mb-6 relative z-10">
+<h2 class="text-xl text-primary font-headline font-semibold">Recent Intelligence</h2>
+<button class="text-muted text-sm hover:text-primary transition-colors flex items-center gap-1" data-hoverable="true">
+                    View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-0">
+<!-- Card 1 -->
+<div class="grid-3d-card bg-surface border border-border rounded-xl p-6 transition-all group cursor-pointer relative overflow-hidden" data-hoverable="true">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 flex justify-between items-start mb-4" style="transform: translateZ(10px);">
+<div>
+<h3 class="text-primary font-headline text-xl font-semibold mb-1">The Bombay Canteen</h3>
+<p class="text-muted text-sm flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-xs">location_on</span> Lower Parel
+                             </p>
+</div>
+<div class="bg-[#121214] border border-border px-2 py-1 rounded text-xs text-primary font-mono font-bold">
+                             94% Match
+                         </div>
+</div>
+<div class="relative z-10 mt-6 flex items-center justify-between" style="transform: translateZ(20px);">
+<span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded font-body border border-primary/20">Modern Indian</span>
+<span class="material-symbols-outlined text-muted group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="grid-3d-card bg-surface border border-border rounded-xl p-6 transition-all group cursor-pointer relative overflow-hidden" data-hoverable="true">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 flex justify-between items-start mb-4" style="transform: translateZ(10px);">
+<div>
+<h3 class="text-primary font-headline text-xl font-semibold mb-1">Soho House</h3>
+<p class="text-muted text-sm flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-xs">location_on</span> Juhu
+                            </p>
+</div>
+<div class="bg-[#121214] border border-border px-2 py-1 rounded text-xs text-primary font-mono font-bold">
+                            88% Match
+                        </div>
+</div>
+<div class="relative z-10 mt-6 flex items-center justify-between" style="transform: translateZ(20px);">
+<span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded font-body border border-primary/20">Members Club</span>
+<span class="material-symbols-outlined text-muted group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="grid-3d-card bg-surface border border-border rounded-xl p-6 transition-all group cursor-pointer relative overflow-hidden" data-hoverable="true">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 flex justify-between items-start mb-4" style="transform: translateZ(10px);">
+<div>
+<h3 class="text-primary font-headline text-xl font-semibold mb-1">Palladium Mall</h3>
+<p class="text-muted text-sm flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-xs">location_on</span> Lower Parel
+                            </p>
+</div>
+<div class="bg-[#121214] border border-border px-2 py-1 rounded text-xs text-primary font-mono font-bold">
+                            91% Match
+                        </div>
+</div>
+<div class="relative z-10 mt-6 flex items-center justify-between" style="transform: translateZ(20px);">
+<span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded font-body border border-primary/20">Luxury Retail</span>
+<span class="material-symbols-outlined text-muted group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="grid-3d-card bg-surface border border-border rounded-xl p-6 transition-all group cursor-pointer relative overflow-hidden" data-hoverable="true">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 flex justify-between items-start mb-4" style="transform: translateZ(10px);">
+<div>
+<h3 class="text-primary font-headline text-xl font-semibold mb-1">Masque</h3>
+<p class="text-muted text-sm flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-xs">location_on</span> Mahalaxmi
+                            </p>
+</div>
+<div class="bg-[#121214] border border-border px-2 py-1 rounded text-xs text-primary font-mono font-bold">
+                            96% Match
+                        </div>
+</div>
+<div class="relative z-10 mt-6 flex items-center justify-between" style="transform: translateZ(20px);">
+<span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded font-body border border-primary/20">Fine Dining</span>
+<span class="material-symbols-outlined text-muted group-hover:text-primary transition-colors">arrow_outward</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Custom Cursor Logic with Lag
+        const cursor = document.getElementById('cursor-ring');
+        const hoverables = document.querySelectorAll('a, button, input, [data-hoverable="true"], .grid-3d-card');
+        
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            // Slight lag effect
+            const dx = mouseX - cursorX;
+            const dy = mouseY - cursorY;
+            cursorX += dx * 0.2;
+            cursorY += dy * 0.2;
+            
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        hoverables.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // 3D Tilt Logic for Search Bar
+        const tiltContainer = document.getElementById('search-tilt');
+        const tiltCard = tiltContainer.querySelector('.tilt-card');
+
+        tiltContainer.addEventListener('mousemove', (e) => {
+            const rect = tiltContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Calculate rotation based on center
+            const rotateX = ((y - centerY) / centerY) * -10; 
+            const rotateY = ((x - centerX) / centerX) * 10;
+
+            tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        tiltContainer.addEventListener('mouseleave', () => {
+            tiltCard.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            tiltCard.style.transition = 'transform 0.5s ease-out';
+        });
+        
+        tiltContainer.addEventListener('mouseenter', () => {
+            tiltCard.style.transition = 'none';
+        });
+
+        // Particle Canvas
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height, particlesArray;
+
+        function initParticles() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particlesArray = [];
+            for (let i = 0; i < 70; i++) {
+                particlesArray.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    r: Math.random() * 1.5 + 0.5,
+                    dx: (Math.random() - 0.5) * 0.3,
+                    dy: (Math.random() - 0.5) * 0.3,
+                    opacity: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+
+            particlesArray.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(230, 211, 163, ${p.opacity})`;
+                ctx.fill();
+
+                p.x += p.dx;
+                p.y += p.dy;
+
+                if (p.x < 0) p.x = width;
+                if (p.x > width) p.x = 0;
+                if (p.y < 0) p.y = height;
+                if (p.y > height) p.y = 0;
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', initParticles);
+        initParticles();
+        animateParticles();
+    </script>
+</body></html>

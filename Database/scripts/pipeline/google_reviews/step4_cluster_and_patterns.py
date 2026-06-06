@@ -10,6 +10,7 @@ Regions: thane, navi-mumbai
 Run after: 036_load_google_reviews_step3_primitives.py
 """
 
+import argparse
 import json
 import os
 import sys
@@ -19,7 +20,9 @@ import psycopg2.extras
 sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_PATH  = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'google_reviews')
-REGIONS    = ['thane', 'navi-mumbai']
+REGIONS    = ['thane', 'navi-mumbai', 'sobo']
+_p = argparse.ArgumentParser(); _p.add_argument('regions', nargs='*', default=REGIONS, metavar='REGION')
+REGIONS    = _p.parse_args().regions or REGIONS
 SOURCE     = 'google_reviews'
 COLLECTOR  = 'google-reviews-clusters-1.0'
 
@@ -36,6 +39,7 @@ INSERT_PATTERN_SQL = """
     INSERT INTO behavioral_patterns
         (area, source, pattern_name, co_occurring_primitives, total_venues_in_city, prevalence_percentage)
     VALUES (%s, %s, %s, %s, %s, %s)
+    ON CONFLICT (area, source, pattern_name) DO NOTHING
     RETURNING id;
 """
 
@@ -82,7 +86,15 @@ def load_patterns(cursor, region: str, lookup: dict) -> dict:
             region, SOURCE, pattern_name,
             json.dumps(primitives), total_venues, prevalence,
         ))
-        pattern_id = cursor.fetchone()[0]
+        row = cursor.fetchone()
+        if row is None:
+            # Already exists — fetch the canonical id
+            cursor.execute(
+                "SELECT id FROM behavioral_patterns WHERE area=%s AND source=%s AND pattern_name=%s",
+                (region, SOURCE, pattern_name)
+            )
+            row = cursor.fetchone()
+        pattern_id = row[0]
         pats_loaded += 1
 
         # step_4_patterns_recognized venues are {name, place_id} objects
@@ -123,6 +135,7 @@ def load_clusters(cursor, region: str, lookup: dict) -> dict:
             SOURCE,
             json.dumps({
                 'evidence_count': entry.get('evidence_count', 0),
+                'data_quality':   entry.get('data_quality', 'UNKNOWN'),
                 'clusters':       entry.get('clusters', []),
             }),
             COLLECTOR,

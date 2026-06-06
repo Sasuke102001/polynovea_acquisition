@@ -12,6 +12,7 @@ export interface VenueMetadata {
   venue_name: string;
   venue_area: string;
   venue_city: string;
+  demo_level: number;  // NEW: 1, 2, or 3
 }
 
 export interface DemoVerifyError {

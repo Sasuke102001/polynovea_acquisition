@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea - Deep Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#0A0A0A",
+                        surface: "#18181B",
+                        gold: "#E6D3A3",
+                        violet: "#7C3AED",
+                        muted: "rgba(230, 211, 163, 0.4)",
+                        panel: "rgba(24, 24, 27, 0.8)",
+                    },
+                    fontFamily: {
+                        display: ["Clash Display", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                        label: ["Public Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'glow-gold': '0 0 20px -5px rgba(230, 211, 163, 0.5)',
+                        'glow-violet': '0 0 15px -3px rgba(124, 58, 237, 0.4)',
+                        'panel': '0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px -10px rgba(0, 0, 0, 0.8)',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                        'slide-in-left': 'slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+                        'slide-in-right': 'slideInRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+                        'slide-in-bottom': 'slideInBottom 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+                        'drop-bounce': 'dropBounce 1.2s cubic-bezier(0.28, 0.84, 0.42, 1) both',
+                        'fade-in': 'fadeIn 0.6s ease-out both',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px 0px rgba(230, 211, 163, 0.4)', borderColor: 'rgba(230, 211, 163, 0.5)' },
+                            '50%': { boxShadow: '0 0 40px 10px rgba(230, 211, 163, 0.8)', borderColor: 'rgba(230, 211, 163, 0.9)' },
+                        },
+                        slideInLeft: {
+                            '0%': { transform: 'translateX(-100px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        slideInBottom: {
+                            '0%': { transform: 'translateY(50px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        dropBounce: {
+                            '0%': { transform: 'translateY(-100px) scale(0.9)', opacity: '0' },
+                            '50%': { transform: 'translateY(15px) scale(1.02)', opacity: '1' },
+                            '75%': { transform: 'translateY(-5px) scale(0.98)' },
+                            '100%': { transform: 'translateY(0) scale(1)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;700&amp;family=Public+Sans:wght@400;600;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Font Face for Clash Display (fallback to Public Sans if unavailable) -->
+<style>
+        @font-face {
+            font-family: 'Clash Display';
+            src: url('https://fonts.cdnfonts.com/s/96053/ClashDisplay-Semibold.woff') format('woff');
+            font-weight: 600;
+        }
+        
+        body {
+            cursor: none; /* Hide default cursor */
+        }
+
+        /* Custom Cursor */
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(230, 211, 163, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+            mix-blend-mode: screen;
+        }
+
+        #custom-cursor.hovering {
+            width: 64px;
+            height: 64px;
+            background-color: rgba(230, 211, 163, 0.1);
+            border-color: rgba(230, 211, 163, 0.9);
+        }
+        
+        #custom-cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 4px;
+            background-color: #E6D3A3;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+
+        .particle {
+            position: absolute;
+            background: #E6D3A3;
+            border-radius: 50%;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .preserve-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .panel-3d {
+            transform: translateZ(20px);
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+        
+        .panel-3d:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 1), 0 0 40px -10px rgba(230, 211, 163, 0.2);
+        }
+
+        .panel-content-3d {
+            transform: translateZ(30px);
+        }
+
+        /* SVG Ring Animation */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 1s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-background text-gray-300 font-body overflow-hidden flex selection:bg-gold selection:text-background relative">
+<!-- Custom Cursor -->
+<div id="custom-cursor"></div>
+<div id="custom-cursor-dot"></div>
+<!-- Ambient Gold Particles Container -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-40" id="particles"></div>
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col py-8 z-40 bg-[#0A0A0A] dark:bg-[#0A0A0A] border-r border-[#E6D3A3]/10 w-64">
+<div class="px-6 mb-12">
+<h1 class="text-xl font-bold text-[#E6D3A3] font-display uppercase tracking-widest">Polynovea</h1>
+<p class="text-xs text-muted mt-1 font-mono">Cinematic Intelligence</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-2 font-label text-label-md tracking-widest uppercase">
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+                        Overview
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">groups</span>
+                        Audience
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">campaign</span>
+                        Marketing
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">compare_arrows</span>
+                        Competitors
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">auto_fix_high</span>
+                        Transform
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">ads_click</span>
+                        Campaign
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 bg-[#E6D3A3]/10 text-[#E6D3A3] border-r-4 border-[#E6D3A3] px-4 py-3 font-bold scale-[0.98] transition-transform cursor-hover-target" href="#">
+<span class="material-symbols-outlined text-lg">analytics</span>
+                        Deep Analysis
+                    </a>
+</li>
+</ul>
+</div>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 border border-gold/30 text-gold hover:bg-gold hover:text-background transition-colors duration-300 font-label uppercase tracking-wider text-sm flex items-center justify-center gap-2 cursor-hover-target">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Analysis
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 h-screen flex flex-col relative z-10 preserve-3d">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-8 py-6 z-50 bg-[#0A0A0A] dark:bg-[#0A0A0A] border-b border-[#E6D3A3]/20 shadow-2xl">
+<div class="font-display text-2xl font-black tracking-tighter text-[#E6D3A3] dark:text-[#E6D3A3] uppercase">
+                Polynovea
+            </div>
+<nav class="hidden md:flex gap-8 font-display text-sm font-semibold tracking-tight">
+<a class="text-on-surface-variant/70 hover:text-[#E6D3A3] transition-colors hover:bg-[#E6D3A3]/10 py-2 px-3 rounded cursor-hover-target" href="#">Overview</a>
+<a class="text-[#E6D3A3] font-bold border-b-2 border-[#E6D3A3] py-2 px-3 cursor-hover-target" href="#">Deep Analysis</a>
+<a class="text-on-surface-variant/70 hover:text-[#E6D3A3] transition-colors hover:bg-[#E6D3A3]/10 py-2 px-3 rounded cursor-hover-target" href="#">Reports</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 text-gold hover:bg-gold/10 rounded-full transition-colors cursor-hover-target">
+<span class="material-symbols-outlined">search</span>
+</button>
+<div class="h-8 w-8 rounded-full border border-gold/40 bg-surface flex items-center justify-center overflow-hidden cursor-hover-target">
+<span class="material-symbols-outlined text-gold text-sm">person</span>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex-1 overflow-y-auto p-8 relative preserve-3d">
+<!-- Header -->
+<div class="mb-10 animate-slide-in-bottom">
+<h2 class="font-display text-4xl text-gold tracking-wider mb-2 drop-shadow-md">AI COUNCIL CHAMBER</h2>
+<p class="font-mono text-sm text-muted">AWAITING SYNTHESIS // THREAD_ID: #0X99A2 // CONFIDENCE: EVALUATING</p>
+</div>
+<!-- AI Model Panels (Debate Layer) -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-12 preserve-3d">
+<!-- Model 1: NEMOTRON -->
+<div class="bg-panel border border-gold/20 rounded-lg p-6 backdrop-blur-md shadow-panel panel-3d animate-slide-in-left flex flex-col interactive-card cursor-hover-target" style="animation-delay: 0.2s;">
+<div class="panel-content-3d h-full flex flex-col">
+<div class="flex justify-between items-start mb-6 border-b border-gold/10 pb-4">
+<div>
+<span class="font-mono text-xs text-gold/60 uppercase tracking-widest block mb-1">Model Node A</span>
+<h3 class="font-mono text-xl font-bold text-gray-200">NEMOTRON-4</h3>
+</div>
+<div class="relative w-12 h-12">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-surface stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-width="8"></circle>
+<circle class="text-gold progress-ring__circle stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-dasharray="251.2" stroke-dashoffset="50.24" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center font-mono text-xs text-gold">80%</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-sm text-gray-400 leading-relaxed font-body">
+                            The proposed retention strategy over-indexes on immediate engagement. Predictive modeling suggests a 14% drop-off in cohort B if we deploy the gamification layer without adjusting the reward threshold.
+                        </p>
+</div>
+<div class="mt-4 pt-4 border-t border-gold/10 flex justify-between items-center text-xs font-mono">
+<span class="text-red-400">Pessimistic Lean</span>
+<span class="text-gray-500">Latency: 42ms</span>
+</div>
+</div>
+</div>
+<!-- Model 2: DEEPSEEK -->
+<div class="bg-panel border border-gold/20 rounded-lg p-6 backdrop-blur-md shadow-panel panel-3d animate-slide-in-bottom flex flex-col interactive-card cursor-hover-target" style="animation-delay: 0.4s;">
+<div class="panel-content-3d h-full flex flex-col">
+<div class="flex justify-between items-start mb-6 border-b border-gold/10 pb-4">
+<div>
+<span class="font-mono text-xs text-gold/60 uppercase tracking-widest block mb-1">Model Node B</span>
+<h3 class="font-mono text-xl font-bold text-gray-200">DEEPSEEK-V2</h3>
+</div>
+<div class="relative w-12 h-12">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-surface stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-width="8"></circle>
+<circle class="text-violet progress-ring__circle stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-dasharray="251.2" stroke-dashoffset="20.1" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center font-mono text-xs text-violet">92%</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-sm text-gray-400 leading-relaxed font-body">
+                            Countering Nemotron: The drop-off is offset by an LTV increase of 22% among retained users. Historical cross-chain data implies gamification creates higher emotional switching costs.
+                        </p>
+</div>
+<div class="mt-4 pt-4 border-t border-gold/10 flex justify-between items-center text-xs font-mono">
+<span class="text-violet">Optimistic Lean</span>
+<span class="text-gray-500">Latency: 56ms</span>
+</div>
+</div>
+</div>
+<!-- Model 3: QWEN -->
+<div class="bg-panel border border-gold/20 rounded-lg p-6 backdrop-blur-md shadow-panel panel-3d animate-slide-in-right flex flex-col interactive-card cursor-hover-target" style="animation-delay: 0.3s;">
+<div class="panel-content-3d h-full flex flex-col">
+<div class="flex justify-between items-start mb-6 border-b border-gold/10 pb-4">
+<div>
+<span class="font-mono text-xs text-gold/60 uppercase tracking-widest block mb-1">Model Node C</span>
+<h3 class="font-mono text-xl font-bold text-gray-200">QWEN-MAX</h3>
+</div>
+<div class="relative w-12 h-12">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-surface stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-width="8"></circle>
+<circle class="text-blue-400 progress-ring__circle stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-dasharray="251.2" stroke-dashoffset="35.16" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center font-mono text-xs text-blue-400">86%</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-sm text-gray-400 leading-relaxed font-body">
+                            Synthesizing edge cases: Deepseek ignores the seasonal ad-spend variance. Recommend a phased rollout. A/B test the threshold against a 10% holdout group before global scaling.
+                        </p>
+</div>
+<div class="mt-4 pt-4 border-t border-gold/10 flex justify-between items-center text-xs font-mono">
+<span class="text-blue-400">Neutral / Pragmatic</span>
+<span class="text-gray-500">Latency: 38ms</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Central Synthesis Panel -->
+<div class="mb-12 flex justify-center preserve-3d animate-drop-bounce" style="animation-delay: 0.8s;">
+<div class="w-full max-w-4xl border-2 border-gold/50 bg-surface/90 rounded-xl p-8 shadow-panel animate-pulse-glow panel-3d text-center relative overflow-hidden backdrop-blur-xl interactive-card cursor-hover-target">
+<div class="panel-content-3d">
+<!-- Decorative corner accents -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-gold m-2"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-gold m-2"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-gold m-2"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-gold m-2"></div>
+<h2 class="font-display text-3xl text-gold mb-6 tracking-widest uppercase">Final Synthesis Consensus</h2>
+<p class="text-lg text-gray-200 font-body leading-relaxed mb-8 max-w-3xl mx-auto">
+                        The Council recommends a <strong class="text-violet">Phased Gamification Deployment</strong>. Initiate with QWEN's proposed 10% holdout group to mitigate NEMOTRON's predicted short-term churn, while capturing DEEPSEEK's high-LTV segment.
+                    </p>
+<div class="inline-flex items-center gap-4 border border-gold/30 rounded-full px-6 py-2 bg-background/50">
+<span class="material-symbols-outlined text-gold">verified</span>
+<span class="font-mono text-sm text-gold">CONSENSUS CONFIDENCE: 89.4%</span>
+<div class="w-px h-4 bg-gold/30"></div>
+<button class="font-mono text-xs text-white hover:text-gold transition-colors cursor-hover-target">EXECUTE STRATEGY -&gt;</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Debate Tree Visualization (Bottom Section) -->
+<div class="bg-surface/50 border border-white/5 rounded-lg p-6 relative animate-slide-in-bottom shadow-panel" style="animation-delay: 1.2s;">
+<h4 class="font-mono text-xs text-muted mb-6 tracking-widest uppercase">Argument Flow Vector</h4>
+<div class="relative h-64 w-full flex items-center justify-between px-12">
+<!-- SVG Connecting Lines -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0" preserveaspectratio="none">
+<!-- Nemotron to synthesis -->
+<path d="M 20%,30% C 40%,30% 60%,50% 80%,50%" fill="none" stroke="rgba(230, 211, 163, 0.2)" stroke-dasharray="4 4" stroke-width="2"></path>
+<!-- Deepseek to synthesis -->
+<path d="M 20%,50% C 40%,50% 60%,50% 80%,50%" fill="none" stroke="rgba(124, 58, 237, 0.4)" stroke-width="3"></path>
+<!-- Qwen to synthesis -->
+<path d="M 20%,70% C 40%,70% 60%,50% 80%,50%" fill="none" stroke="rgba(96, 165, 250, 0.4)" stroke-width="2"></path>
+</svg>
+<!-- Nodes Left -->
+<div class="flex flex-col justify-between h-full py-8 z-10 w-48">
+<div class="bg-background border border-gold/20 p-3 rounded text-center shadow-panel animate-fade-in" style="animation-delay: 1.4s;">
+<span class="font-mono text-[10px] text-gray-400 block">Node: Churn Risk</span>
+</div>
+<div class="bg-background border border-violet/40 p-3 rounded text-center shadow-glow-violet animate-fade-in" style="animation-delay: 1.6s;">
+<span class="font-mono text-[10px] text-violet block">Node: LTV Spike</span>
+</div>
+<div class="bg-background border border-blue-400/30 p-3 rounded text-center shadow-panel animate-fade-in" style="animation-delay: 1.8s;">
+<span class="font-mono text-[10px] text-blue-400 block">Node: Seasonal Var</span>
+</div>
+</div>
+<!-- Node Right (Synthesis) -->
+<div class="z-10 w-48 animate-fade-in" style="animation-delay: 2.0s;">
+<div class="bg-background border-2 border-gold/60 p-4 rounded text-center shadow-glow-gold animate-float cursor-hover-target">
+<span class="material-symbols-outlined text-gold mb-1">mediation</span>
+<span class="font-mono text-xs text-gold block font-bold">Phased Rollout</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Particle System
+            const container = document.getElementById('particles');
+            const particleCount = 80;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size, position, and opacity
+                const size = Math.random() * 4 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const opacity = Math.random() * 0.4 + 0.1;
+                const duration = Math.random() * 30 + 15;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${x}%`;
+                particle.style.top = `${y}%`;
+                particle.style.opacity = opacity;
+                
+                // Float animation
+                particle.animate([
+                    { transform: `translate(0, 0)` },
+                    { transform: `translate(${Math.random() * 150 - 75}px, ${Math.random() * -150 - 50}px)` }
+                ], {
+                    duration: duration * 1000,
+                    iterations: Infinity,
+                    direction: 'alternate',
+                    easing: 'ease-in-out'
+                });
+
+                container.appendChild(particle);
+            }
+
+            // Custom Cursor Logic
+            const cursor = document.getElementById('custom-cursor');
+            const cursorDot = document.getElementById('custom-cursor-dot');
+            const hoverTargets = document.querySelectorAll('.cursor-hover-target, a, button');
+
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = `${e.clientX}px`;
+                cursor.style.top = `${e.clientY}px`;
+                cursorDot.style.left = `${e.clientX}px`;
+                cursorDot.style.top = `${e.clientY}px`;
+            });
+
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.classList.add('hovering');
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('hovering');
+                });
+            });
+
+            // 3D Parallax Tilt Effect for Cards
+            const interactiveCards = document.querySelectorAll('.interactive-card');
+            
+            interactiveCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; // x position within the element.
+                    const y = e.clientY - rect.top;  // y position within the element.
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = ((y - centerY) / centerY) * -10; // Max rotation 10deg
+                    const rotateY = ((x - centerX) / centerX) * 10;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+                });
+            });
+        });
+    </script>
+</body></html>

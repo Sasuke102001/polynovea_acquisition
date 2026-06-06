@@ -1,0 +1,191 @@
+{
+  "fitness": {
+    "fitness_for_office_lunch":      0.30,
+    "fitness_for_repeat_habit":      0.68,
+    "fitness_for_social_dwell":      0.72,
+    "fitness_for_group_energy":      0.82,
+    "fitness_for_destination_visit": 0.58,
+    "operational_quality":           0.52,
+    "retention_strength":            0.65,
+    "monetization_potential":        0.70
+  },
+  "fitness_details": {
+    "source_type":     "manual_review_analysis",
+    "review_count":    30,
+    "collection_date": "2026-05-26",
+    "platform_mix":    ["google"],
+    "analyst_notes": "High-energy American bar/restaurant anchored by live music, DJ, karaoke, and sports screening. Broasted chicken is the clear signature draw. Primarily an evening/weekend destination — after-office and group hangout is the dominant use case. Happy hours and 1+1 drink offers drive repeat and dwell. Music consistently called loud (multiple complaints about inability to converse), which simultaneously amplifies group energy and deters quieter segments. Operational issues are moderate: happy hour/Dineout offer non-fulfillment reported by 2-3 reviewers, one bad DJ incident. Overall staff reviews positive. Price-value perception mixed — needs discount apps for some. Strong loyalist base with several reviewers citing years of repeat visits.",
+    "key_positives": [
+      "Live music, DJ, karaoke — core identity signal, mentioned in nearly every review",
+      "Broasted chicken universally praised: crispy skin, tender meat, unique technique",
+      "Ambience: unique sports/film-themed decor, helmets, frames, well-lit (not dark bar)",
+      "After-office hangout — multiple reviewers cite as their default post-work venue",
+      "Happy hours + 1+1 drinks all day — strong repeat driver",
+      "Sports live screening — extended dwell on match days",
+      "Safe for women — explicitly mentioned as ladies-friendly",
+      "Birthday parties, group celebrations — venue actively used for events",
+      "Strong loyalists: 'been going 3 years', 'second home', 'so many times last month'"
+    ],
+    "key_negatives": [
+      "Music too loud — repeated complaint, can't talk across table (fareeda Ibrahim, prakash moorthy)",
+      "Happy hour / Dineout offers not honored in 2-3 incidents — owner acknowledged",
+      "Cocktails average — multiple mentions (not a cocktail bar)",
+      "One bad DJ incident (Sept 2024) — specific complaint",
+      "Service slow in some reviews",
+      "Alcohols not served at MRP (older review)",
+      "Price-value gap without discount apps"
+    ]
+  },
+  "reviews": [
+    {
+      "rating": 3,
+      "text": "We visited Broaster Chicken in Vashi and really enjoyed the food. We ordered the Broaster Platter which included crispy fried chicken, juicy kebabs, and stir-fried prawns. The rum-infused chicken pizza was a unique twist. Fell short of a four or five-star rating overall.",
+      "review_age_days": 300
+    },
+    {
+      "rating": 5,
+      "text": "The vibe at Broaster Chicken was welcoming, making it a great spot for friends, families, or couples to gather. The staff were incredibly friendly and attentive, which made the overall experience pleasant. The interior design had a nice aesthetic.",
+      "review_age_days": 365
+    },
+    {
+      "rating": 4,
+      "text": "Its a wonderful place, except for the loud blaring music that's basically just vibrating on the speaker. They should really consider people who come there to sit enjoy a good meal, talk and have a good time. Its practically impossible to have a conversation.",
+      "review_age_days": 120
+    },
+    {
+      "rating": 4,
+      "text": "Great ambience, we had live music when we visited as a group for dinner. The cocktails are pretty average. But the food options were great. Would have preferred if the music was toned down a bit, we were unable to talk across the table even.",
+      "review_age_days": 90
+    },
+    {
+      "rating": 5,
+      "text": "A quick getaway for a weekend evening. A blend of Good Food, Live Music and DJ music. The Vibe of the place is perfect for one who wants to dance their heart out.",
+      "review_age_days": 730
+    },
+    {
+      "rating": 5,
+      "text": "First time trying Broasted chicken. Fricking amazing with the layered crunchy skin, marinade, and tender meat. Went well with the ambience.",
+      "review_age_days": 1095
+    },
+    {
+      "rating": 5,
+      "text": "We entered the restaurant and the whole atmosphere and ambience was amazing. We visited this place for Sunday dinner. It was the karaoke night and we had a great time.",
+      "review_age_days": 365
+    },
+    {
+      "rating": 4,
+      "text": "A nice place to hangout with friends. Food and Bar Menu covers almost everything. For non alcoholic people, there are less options. Food quality is good. There is live streaming of sports matches available. Hospitality is also good.",
+      "review_age_days": 2190
+    },
+    {
+      "rating": 4,
+      "text": "It has a great ambience and staff. The environment here is superb, live music and friends makes it even better. Service is good. Food tastes good, except they don't make spicy food. Alcohols are served here.",
+      "review_age_days": 2920
+    },
+    {
+      "rating": 5,
+      "text": "Great food, great taste, even for vegetarians. Good collection of liqueur. Loved the ambiance and music. Great for a date or party with friends or family. Staff is very friendly, kept the restaurant opened for us well after their closing time.",
+      "review_age_days": 1460
+    },
+    {
+      "rating": 5,
+      "text": "I have been here so many times in the last month alone. The place is great with live music and nice ambience. The staff is helpful and the offers on drinks are great. Excellent place for after office hangouts.",
+      "review_age_days": 2920
+    },
+    {
+      "rating": 5,
+      "text": "Been going there since 3 years. Amazing food and ambience is so much fun.",
+      "review_age_days": 1095
+    },
+    {
+      "rating": 2,
+      "text": "The food is good. Alcohol not so great. The DJ on a Friday night was the worst — will play music of an artist and then when requested for another song of the same artist he won't.",
+      "review_age_days": 240
+    },
+    {
+      "rating": 3,
+      "text": "Price is too high compared to the food's taste, ambiance and service is good. A one time visit restaurant.",
+      "review_age_days": 1460
+    },
+    {
+      "rating": 5,
+      "text": "Randomly visited this place for dinner and I think it was the best decision. Excellent food with good portion size and quality. Never had such juicy chicken in a long time. The management and staff were very courteous and the service was excellent.",
+      "review_age_days": 1095
+    },
+    {
+      "rating": 4,
+      "text": "One of the best places to hangout and chill in Vashi, Navi Mumbai. The ambience is well lit, live and peppy, and not gloomy and dark as most places. The food is no doubt a fried chicken aficionado's dream.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 3,
+      "text": "It used to be one of the happening places in Navi Mumbai. GBC suits your pocket and is also very lovely at the same time. Food is good for starters, varieties of Ale are even better. I wish it had a dance floor.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 5,
+      "text": "Brand new place in Vashi and it's brilliant. The menu is pretty diverse and also has quite a lot of veg options. The fried chicken is superb. They have some crazy burgers as well. Alcohol is 1+1 all day long all days of the week.",
+      "review_age_days": 2920
+    },
+    {
+      "rating": 4,
+      "text": "Cozy place with rocking music. Food is nice. Service is a little slow. Otherwise very good place to hang out with friends.",
+      "review_age_days": 2190
+    },
+    {
+      "rating": 5,
+      "text": "The best cozy place to unwind yourself from the daily hustle. No second thought for ladies who are willing to hang out in a safe and nice place. Their fire pizza and LIT is a must try. Brownie is on point.",
+      "review_age_days": 730
+    },
+    {
+      "rating": 4,
+      "text": "Good place to hangout with friends. Nice ambiance and a bonus for people having booze because of the Happy hours.",
+      "review_age_days": 1460
+    },
+    {
+      "rating": 5,
+      "text": "Amazing place for a group of 4-5 people. This place serves the best fried chicken.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 4,
+      "text": "Good food and ambience, nice place to hangout with friends and grab a drink.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 5,
+      "text": "Great place to chill and hang around. The live music is absolutely stunning, makes for a great Friday evening. Strongly recommend.",
+      "review_age_days": 2190
+    },
+    {
+      "rating": 5,
+      "text": "GBC in Satra Plaza is well known for their food and drinks. Amazing restaurant located in 1st floor of Satra Plaza, Vashi. Great ambience with nice and attractive lights.",
+      "review_age_days": 2190
+    },
+    {
+      "rating": 4,
+      "text": "I heard a lot about it but never got a chance to visit. A friend threw his birthday party here and I was literally cursing myself for waiting so long. The food is awesome, the ambience is awesome and everything is awesome.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 3,
+      "text": "Used Dineout for booking to avail the discount. Even without discounts the overall menu prices are manageable. Decent experience overall at Satra Plaza location.",
+      "review_age_days": 1825
+    },
+    {
+      "rating": 4,
+      "text": "Pretty interior design and playlist. Wish the burgers were bigger for the price. Pasta was good. So were the platters and starters. Great dips. The environment during lunch was very quiet compared to the ambience in the evening on weekends or match days with good music and drinks.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 4,
+      "text": "Located at Satra Plaza, first floor. Entire interior is so unique — helmets, different frames, lights, different styles of seating arrangements. Ambience helped me refresh after tiring work.",
+      "review_age_days": 2555
+    },
+    {
+      "rating": 5,
+      "text": "Its a nice place for drink, food and chilling. I specifically go for the wings. Never had such awesome wings anywhere. Highly recommended.",
+      "review_age_days": 2190
+    }
+  ]
+}

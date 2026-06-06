@@ -159,22 +159,24 @@ Regions: **thane, navi-mumbai only** (no mumbai-main, no sobo)
 | Step | Script | Tables | DB rows (verified 2026-05-25) |
 |---|---|---|---|
 | 3 | `pipeline/google_reviews/step3_primitives.py` | `primitives_scores` | 25,019 |
+| 3b ⭐ | `pipeline/google_reviews/step3b_subdimension_loader.py` | `venue_subdimension_scores` | new — see §8 |
 | 4 | `pipeline/google_reviews/step4_cluster_and_patterns.py` | `behavioral_patterns`, `pattern_venues`, `raw_venue_data` | 2,624 / 10,465 / 1,120 |
 | 4b gov | `pipeline/google_reviews/step4b_governance.py` | `data_quality_metrics`, `cluster_quality` | 2 / 2 |
 | 4b scores | `pipeline/google_reviews/step4b_pattern_scores.py` | `pattern_scores` | 2,624 |
 | 5b | `pipeline/google_reviews/step5b_similarity_loader.py` | `venue_vectors`, `venue_similarity` | 1,114 / 27,913 |
 | 6 | `pipeline/google_reviews/step6_fitness_and_interventions.py` | `venue_fitness_dimensions`, `behavioral_summary`, `intervention_triggers` | 1,120 / 1,120 / 4,480 |
 
-**Status: ALL STEPS LOADED ✅**
+**Status: ALL STEPS LOADED ✅ (pre-BIF betterment baseline)**
 
 Run order (must be sequential — each step depends on the prior):
 ```
 python pipeline/google_reviews/step3_primitives.py
+python pipeline/google_reviews/step3b_subdimension_loader.py
 python pipeline/google_reviews/step4_cluster_and_patterns.py
 python pipeline/google_reviews/step4b_governance.py
 python pipeline/google_reviews/step4b_pattern_scores.py
-python pipeline/google_reviews/step5b_similarity_loader.py
 python pipeline/google_reviews/step6_fitness_and_interventions.py
+python pipeline/google_reviews/step5b_similarity_loader.py
 python blend/blend_fitness.py
 ```
 
@@ -257,3 +259,74 @@ If re-running BIF for a new source, always verify signal IDs against the step_4 
 ```
 python Database/scripts/check_source_coverage.py
 ```
+
+---
+
+## 8. Post-BIF Betterment Reload Sequence (2026-06-02)
+
+After the BIF betterment pipeline re-run (Phases 1, 2, 4), all three BIF pipelines were re-processed from step 3. The full DB loader sequence to apply those results is:
+
+### Pre-migration (one-time, run before step 5b loaders)
+```sql
+-- Adds vector_confidence column to venue_vectors (F5 fix)
+psql -f Database/scripts/schema/venue_vectors_vector_confidence.sql
+
+-- Creates venue_subdimension_scores table (E2 fix — GRS only)
+psql -f Database/scripts/schema/venue_subdimension_scores.sql
+```
+
+### Full loader sequence (run from project root, in order)
+
+```bash
+# Step 3 — primitive signals (all 3 sources)
+python Database/scripts/pipeline/google_places_api/step3_signals_extraction.py
+python Database/scripts/pipeline/magicpin_upper/step3_signals_extraction.py
+python Database/scripts/pipeline/google_reviews/step3_primitives.py
+
+# Step 3b — sub-dimension scores (GRS only — Food/Service/Atmosphere)
+python Database/scripts/pipeline/google_reviews/step3b_subdimension_loader.py
+
+# Step 4 — clusters & patterns (all 3 sources)
+python Database/scripts/pipeline/google_places_api/step4_cluster_and_patterns.py
+python Database/scripts/pipeline/magicpin_upper/step4_cluster_and_patterns.py
+python Database/scripts/pipeline/google_reviews/step4_cluster_and_patterns.py
+
+# Step 4b — governance (all 3 sources)
+python Database/scripts/pipeline/google_places_api/step4b_governance.py
+python Database/scripts/pipeline/magicpin_upper/step4b_governance.py
+python Database/scripts/pipeline/google_reviews/step4b_governance.py
+
+# Step 4b — pattern scores (all 3 sources)
+python Database/scripts/pipeline/google_places_api/step4b_pattern_scores.py
+python Database/scripts/pipeline/magicpin_upper/step4b_pattern_scores.py
+python Database/scripts/pipeline/google_reviews/step4b_pattern_scores.py
+
+# Step 6 — fitness dimensions & interventions (all 3 sources)
+python Database/scripts/pipeline/google_places_api/step6_mechanisms_and_interventions.py
+python Database/scripts/pipeline/magicpin_upper/step6_fitness_and_interventions.py
+python Database/scripts/pipeline/google_reviews/step6_fitness_and_interventions.py
+
+# Step 5b — vectors & similarity (all 3 sources)
+# ⚠️ Run AFTER the venue_vectors_vector_confidence.sql migration above
+python Database/scripts/pipeline/google_places_api/step5b_similarity_enrichment.py
+python Database/scripts/pipeline/magicpin_upper/step5b_similarity_enrichment.py
+python Database/scripts/pipeline/google_reviews/step5b_similarity_loader.py
+
+# Blend — recompute blended fitness across all sources
+python Database/scripts/blend/blend_fitness.py
+```
+
+### What changed in this reload (BIF betterment fixes)
+
+| Fix | Affected scripts | Impact |
+|-----|-----------------|--------|
+| F1: evidence truncation 5→50 | all 3 `step_4_pattern.py` | more evidence in patterns |
+| F2: confidence floor 0.25→0.15 | GRS `step_4_pattern.py` | fewer signals suppressed |
+| F3: signal_confidences dict | all 3 `step_4_pattern.py` | richer pattern metadata |
+| F4: 3-star → neutral_experience | all 3 `step_3_extract.py` | star-only reviews captured |
+| F5: vector_confidence persisted | all 3 `step5b` loaders + migration | new column in venue_vectors |
+| F7: data_quality field | all 3 `step4_cluster_and_patterns.py` | data quality visible in DB |
+| E1: SNR per signal | all 3 `step_3_extract.py` | signal strength scoring |
+| E2: sub-dimension scores | GRS `step_3_extract.py` + new `step3b_subdimension_loader.py` | new table: venue_subdimension_scores |
+| E3: gender → women_friendly | MagicPin `step_3_extract.py` | new signal from gender enrichment |
+| E10: Kalman IV blend | `blend_fitness.py` | improved multi-source blending |

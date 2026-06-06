@@ -40,12 +40,13 @@ DB_CONFIG = {
 }
 
 VECTOR_SQL = """
-    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source)
+    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source, vector_confidence)
     VALUES %s
     ON CONFLICT (venue_id, source) DO UPDATE SET
-        fitness_vector = EXCLUDED.fitness_vector,
-        vector_source  = EXCLUDED.vector_source,
-        last_computed  = CURRENT_TIMESTAMP;
+        fitness_vector    = EXCLUDED.fitness_vector,
+        vector_source     = EXCLUDED.vector_source,
+        vector_confidence = EXCLUDED.vector_confidence,
+        last_computed     = CURRENT_TIMESTAMP;
 """
 
 SIMILARITY_SQL = """
@@ -93,6 +94,7 @@ def load_region(cursor, region: str) -> dict:
             SOURCE,
             entry.get('fitness_vector', []),
             entry.get('vector_source', 'behavioral'),
+            entry.get('vector_confidence', 'behavioral_evidence'),
         )
 
         for similar in entry.get('similar_venues_pool', []):

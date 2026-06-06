@@ -245,13 +245,26 @@ export default function DemoChat({ token }: DemoChatProps) {
           >
             <span className="material-symbols-outlined text-[16px]" style={{ color: "#E6D3A3" }}>smart_toy</span>
           </div>
-          <div>
+          <div className="flex-1">
             <p className="text-[9px] font-bold uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#9A8F6A" }}>
               Polynovea Intelligence · Preview
             </p>
-            <h1 className="text-base font-bold leading-tight gold-glow" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif" }}>
-              {venue.venue_name}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-bold leading-tight gold-glow" style={{ fontFamily: "'Clash Display', 'Inter', sans-serif" }}>
+                {venue.venue_name}
+              </h1>
+              {/* NEW: Level Badge */}
+              <span
+                className="text-[10px] font-bold px-2 py-1 rounded"
+                style={{
+                  background: venue.demo_level === 1 ? "rgba(59,130,246,0.2)" : venue.demo_level === 2 ? "rgba(168,85,247,0.2)" : "rgba(234,179,8,0.2)",
+                  border: venue.demo_level === 1 ? "1px solid rgba(59,130,246,0.4)" : venue.demo_level === 2 ? "1px solid rgba(168,85,247,0.4)" : "1px solid rgba(234,179,8,0.4)",
+                  color: venue.demo_level === 1 ? "#60a5fa" : venue.demo_level === 2 ? "#d8b4fe" : "#eab308",
+                }}
+              >
+                Level {venue.demo_level}
+              </span>
+            </div>
             <p className="text-[11px]" style={{ color: "#71717A" }}>
               {[venue.venue_area, venue.venue_city].filter(Boolean).join(", ")}
             </p>

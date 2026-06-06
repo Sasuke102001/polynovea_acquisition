@@ -24,9 +24,7 @@ from models import (
     AdBrief, PlatformBriefRules, BriefGenerateRequest,
 )
 
-_NVIDIA_API_BASE  = "https://integrate.api.nvidia.com/v1"
-_NVIDIA_KEY       = os.getenv("NVIDIA_API_KEY")
-_NVIDIA_MODEL     = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
+from routers.providers import next_fast_client
 from routers.utils import (
     SEGMENT_LABELS, SEGMENT_TOP_ARCHETYPES, make_archetype_chip,
     CHANNEL_LABELS, MECHANISM_LABELS, DIM_LABELS,
@@ -34,6 +32,7 @@ from routers.utils import (
 
 router = APIRouter()
 
+_NVIDIA_MODEL = os.getenv("NVIDIA_MODEL_CREATIVE", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning")
 _float = lambda v: float(v) if v is not None else 0.0
 
 # ─── Research data (Kimi 2026-05-15) ─────────────────────────────────────────
@@ -1083,15 +1082,13 @@ async def _log_brief_to_supabase(
 
 async def _stream_brief_content(system_prompt: str, user_message: str):
     try:
-        from openai import AsyncOpenAI
-
-        if not _NVIDIA_KEY:
-            yield "[Error: NVIDIA_API_KEY not configured]"
+        pc = next_fast_client(_NVIDIA_MODEL)
+        if not pc:
+            yield "[Error: No AI provider configured — set NVIDIA_API_KEY or MISTRAL_API_KEY]"
             return
 
-        client = AsyncOpenAI(api_key=_NVIDIA_KEY, base_url=_NVIDIA_API_BASE)
-        stream = await client.chat.completions.create(
-            model=_NVIDIA_MODEL,
+        stream = await pc.client.chat.completions.create(
+            model=pc.model,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": user_message},

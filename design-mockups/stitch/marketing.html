@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea - Marketing Intelligence</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Public+Sans:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#E6D3A3',
+                            bg: '#0A0A0A',
+                            surface: '#18181B',
+                            border: '#27272A',
+                            muted: '#A1A1AA'
+                        }
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Clash Display", "Public Sans", "sans-serif"],
+                        "display": ["Clash Display", "Public Sans", "sans-serif"],
+                        "body": ["Inter", "Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* 3D Flip Card Styles */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        .flip-card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Particle Background */
+        #particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(230,211,163,0.05) 0%, transparent 50%);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stagger-1 { animation: fadeInUp 0.6s ease-out 0.1s both; }
+        .stagger-2 { animation: fadeInUp 0.6s ease-out 0.2s both; }
+        .stagger-3 { animation: fadeInUp 0.6s ease-out 0.3s both; }
+        .stagger-4 { animation: fadeInUp 0.6s ease-out 0.4s both; }
+        .stagger-5 { animation: fadeInUp 0.6s ease-out 0.5s both; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0A0A0A; }
+        ::-webkit-scrollbar-thumb { background: #27272A; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #E6D3A3; }
+    </style>
+</head>
+<body class="bg-[#0A0A0A] text-white font-body min-h-screen overflow-x-hidden relative">
+<!-- Particle Background -->
+<canvas id="particles"></canvas>
+<!-- SideNavBar (from JSON) -->
+<nav class="fixed left-0 top-0 h-full flex flex-col py-8 z-40 w-64 bg-[#0A0A0A] border-r border-[#E6D3A3]/10 font-label text-label-md tracking-widest uppercase hidden md:flex">
+<!-- Header -->
+<div class="px-6 mb-12">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-[#E6D3A3]/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[#E6D3A3]" style="font-variation-settings: 'FILL' 1;">movie</span>
+</div>
+<div>
+<h1 class="text-xl font-bold text-[#E6D3A3]">Polynovea</h1>
+<p class="text-[10px] text-brand-muted normal-case tracking-normal">Cinematic Intelligence</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 text-on-surface-variant/60 text-brand-muted hover:text-[#E6D3A3] px-6 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span> Overview
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 text-brand-muted hover:text-[#E6D3A3] px-6 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">groups</span> Audience
+            </a>
+<!-- Active State: Marketing -->
+<a class="flex items-center gap-3 bg-[#E6D3A3]/10 text-[#E6D3A3] border-r-4 border-[#E6D3A3] px-6 py-3 font-bold opacity-80 duration-200 transition-all scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">campaign</span> Marketing
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 text-brand-muted hover:text-[#E6D3A3] px-6 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">compare_arrows</span> Competitors
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 text-brand-muted hover:text-[#E6D3A3] px-6 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">auto_fix_high</span> Transform
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 text-brand-muted hover:text-[#E6D3A3] px-6 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">ads_click</span> Campaign
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 text-brand-muted hover:text-[#E6D3A3] px-6 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span> Deep Analysis
+            </a>
+</div>
+<!-- CTA -->
+<div class="px-6 mt-auto">
+<button class="w-full bg-[#E6D3A3] text-[#0A0A0A] font-bold py-3 rounded-lg hover:bg-white transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span> New Analysis
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="md:ml-64 relative z-10 p-6 md:p-10 min-h-screen flex flex-col">
+<!-- Top Horizontal Tab Bar (Marketing Section Style) -->
+<header class="mb-10 flex justify-between items-end border-b border-brand-border pb-4">
+<div>
+<h2 class="font-headline text-3xl font-bold text-white tracking-tight mb-2">Marketing Channels</h2>
+<p class="text-brand-muted text-sm">Optimize distribution and timing for target audience segments.</p>
+</div>
+<div class="flex gap-6 font-mono text-sm">
+<button class="text-brand-gold border-b-2 border-brand-gold pb-4 -mb-[17px] font-bold">Channels</button>
+<button class="text-brand-muted hover:text-white pb-4 transition-colors">Messaging</button>
+<button class="text-brand-muted hover:text-white pb-4 transition-colors">A/B Testing</button>
+</div>
+</header>
+<!-- Focal Element: 3D Flip Cards -->
+<section class="mb-16">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+<!-- Card 1: WhatsApp Broadcast (High/Gold) -->
+<div class="flip-card perspective-1000 h-64 w-full stagger-1 group cursor-pointer">
+<div class="flip-card-inner relative w-full h-full transform-style-3d">
+<!-- Front Face -->
+<div class="absolute w-full h-full backface-hidden bg-brand-surface border border-brand-border rounded-xl p-5 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/50">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-brand-gold"></div>
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-brand-gold text-2xl">forum</span>
+<span class="bg-brand-gold/10 text-brand-gold px-2 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider border border-brand-gold/20">High Priority</span>
+</div>
+<div>
+<h3 class="font-headline text-xl font-bold text-white mb-1">WhatsApp Broadcast</h3>
+<div class="flex items-center gap-2 text-sm text-brand-muted">
+<div class="w-full bg-brand-bg rounded-full h-1.5">
+<div class="bg-brand-gold h-1.5 rounded-full" style="width: 94%"></div>
+</div>
+<span class="font-mono text-brand-gold">94%</span>
+</div>
+<p class="text-[10px] text-brand-muted uppercase tracking-wider mt-1">Audience Match</p>
+</div>
+</div>
+<!-- Back Face -->
+<div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1A1A1A] border border-brand-gold/30 rounded-xl p-5 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs text-brand-muted uppercase tracking-widest mb-2 border-b border-brand-border pb-2">Timing &amp; Reach</h4>
+<div class="flex justify-between items-center mb-3">
+<span class="material-symbols-outlined text-sm text-brand-gold">schedule</span>
+<span class="font-mono text-sm text-white">08:00 - 10:00</span>
+</div>
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-sm text-brand-gold">group</span>
+<span class="font-mono text-sm text-white">45.2K Est.</span>
+</div>
+</div>
+<div class="bg-black/50 p-2 rounded border border-brand-border/50 text-xs text-brand-muted italic line-clamp-3">
+                                "Exclusive early access for VIP members. Tap to secure..."
+                            </div>
+</div>
+</div>
+</div>
+<!-- Card 2: Instagram Reels (High/Gold) -->
+<div class="flip-card perspective-1000 h-64 w-full stagger-2 group cursor-pointer">
+<div class="flip-card-inner relative w-full h-full transform-style-3d">
+<div class="absolute w-full h-full backface-hidden bg-brand-surface border border-brand-border rounded-xl p-5 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/50">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-brand-gold"></div>
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-brand-gold text-2xl">movie</span>
+<span class="bg-brand-gold/10 text-brand-gold px-2 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider border border-brand-gold/20">High Priority</span>
+</div>
+<div>
+<h3 class="font-headline text-xl font-bold text-white mb-1">Instagram Reels</h3>
+<div class="flex items-center gap-2 text-sm text-brand-muted">
+<div class="w-full bg-brand-bg rounded-full h-1.5">
+<div class="bg-brand-gold h-1.5 rounded-full" style="width: 88%"></div>
+</div>
+<span class="font-mono text-brand-gold">88%</span>
+</div>
+<p class="text-[10px] text-brand-muted uppercase tracking-wider mt-1">Audience Match</p>
+</div>
+</div>
+<div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1A1A1A] border border-brand-gold/30 rounded-xl p-5 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs text-brand-muted uppercase tracking-widest mb-2 border-b border-brand-border pb-2">Timing &amp; Reach</h4>
+<div class="flex justify-between items-center mb-3">
+<span class="material-symbols-outlined text-sm text-brand-gold">schedule</span>
+<span class="font-mono text-sm text-white">18:00 - 22:00</span>
+</div>
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-sm text-brand-gold">group</span>
+<span class="font-mono text-sm text-white">120K Est.</span>
+</div>
+</div>
+<div class="bg-black/50 p-2 rounded border border-brand-border/50 text-xs text-brand-muted italic line-clamp-3">
+                                [Video: Fast cuts, trending audio] "Behind the scenes look..."
+                            </div>
+</div>
+</div>
+</div>
+<!-- Card 3: Google Ads (Medium/Amber) -->
+<div class="flip-card perspective-1000 h-64 w-full stagger-3 group cursor-pointer">
+<div class="flip-card-inner relative w-full h-full transform-style-3d">
+<div class="absolute w-full h-full backface-hidden bg-brand-surface border border-brand-border rounded-xl p-5 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/50">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500/70"></div>
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-amber-500/70 text-2xl">travel_explore</span>
+<span class="bg-amber-500/10 text-amber-500/70 px-2 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider border border-amber-500/20">Med Priority</span>
+</div>
+<div>
+<h3 class="font-headline text-xl font-bold text-white mb-1">Google Ads</h3>
+<div class="flex items-center gap-2 text-sm text-brand-muted">
+<div class="w-full bg-brand-bg rounded-full h-1.5">
+<div class="bg-amber-500/70 h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+<span class="font-mono text-amber-500/70">65%</span>
+</div>
+<p class="text-[10px] text-brand-muted uppercase tracking-wider mt-1">Audience Match</p>
+</div>
+</div>
+<div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1A1A1A] border border-amber-500/30 rounded-xl p-5 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs text-brand-muted uppercase tracking-widest mb-2 border-b border-brand-border pb-2">Timing &amp; Reach</h4>
+<div class="flex justify-between items-center mb-3">
+<span class="material-symbols-outlined text-sm text-amber-500/70">schedule</span>
+<span class="font-mono text-sm text-white">Always On</span>
+</div>
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-sm text-amber-500/70">group</span>
+<span class="font-mono text-sm text-white">85K Impr.</span>
+</div>
+</div>
+<div class="bg-black/50 p-2 rounded border border-brand-border/50 text-xs text-brand-muted italic line-clamp-3">
+                                Search Network: Targeting intent keywords related to cinematic experiences.
+                            </div>
+</div>
+</div>
+</div>
+<!-- Card 4: In-Venue Activation (Medium/Amber) -->
+<div class="flip-card perspective-1000 h-64 w-full stagger-4 group cursor-pointer">
+<div class="flip-card-inner relative w-full h-full transform-style-3d">
+<div class="absolute w-full h-full backface-hidden bg-brand-surface border border-brand-border rounded-xl p-5 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/50">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500/70"></div>
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-amber-500/70 text-2xl">storefront</span>
+<span class="bg-amber-500/10 text-amber-500/70 px-2 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider border border-amber-500/20">Med Priority</span>
+</div>
+<div>
+<h3 class="font-headline text-xl font-bold text-white mb-1">In-Venue</h3>
+<div class="flex items-center gap-2 text-sm text-brand-muted">
+<div class="w-full bg-brand-bg rounded-full h-1.5">
+<div class="bg-amber-500/70 h-1.5 rounded-full" style="width: 58%"></div>
+</div>
+<span class="font-mono text-amber-500/70">58%</span>
+</div>
+<p class="text-[10px] text-brand-muted uppercase tracking-wider mt-1">Audience Match</p>
+</div>
+</div>
+<div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1A1A1A] border border-amber-500/30 rounded-xl p-5 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs text-brand-muted uppercase tracking-widest mb-2 border-b border-brand-border pb-2">Timing &amp; Reach</h4>
+<div class="flex justify-between items-center mb-3">
+<span class="material-symbols-outlined text-sm text-amber-500/70">schedule</span>
+<span class="font-mono text-sm text-white">Weekends</span>
+</div>
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-sm text-amber-500/70">group</span>
+<span class="font-mono text-sm text-white">12K Footfall</span>
+</div>
+</div>
+<div class="bg-black/50 p-2 rounded border border-brand-border/50 text-xs text-brand-muted italic line-clamp-3">
+                                Physical standees with QR codes for instant digital integration.
+                            </div>
+</div>
+</div>
+</div>
+<!-- Card 5: Influencer Seeding (Low/Muted) -->
+<div class="flip-card perspective-1000 h-64 w-full stagger-5 group cursor-pointer">
+<div class="flip-card-inner relative w-full h-full transform-style-3d">
+<div class="absolute w-full h-full backface-hidden bg-brand-surface border border-brand-border rounded-xl p-5 flex flex-col justify-between overflow-hidden shadow-lg shadow-black/50 opacity-70">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-brand-muted/50"></div>
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-brand-muted/70 text-2xl">campaign</span>
+<span class="bg-brand-muted/10 text-brand-muted px-2 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider border border-brand-muted/20">Low Priority</span>
+</div>
+<div>
+<h3 class="font-headline text-xl font-bold text-white mb-1">Influencer</h3>
+<div class="flex items-center gap-2 text-sm text-brand-muted">
+<div class="w-full bg-brand-bg rounded-full h-1.5">
+<div class="bg-brand-muted/50 h-1.5 rounded-full" style="width: 32%"></div>
+</div>
+<span class="font-mono text-brand-muted">32%</span>
+</div>
+<p class="text-[10px] text-brand-muted uppercase tracking-wider mt-1">Audience Match</p>
+</div>
+</div>
+<div class="absolute w-full h-full backface-hidden rotate-y-180 bg-[#1A1A1A] border border-brand-muted/30 rounded-xl p-5 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-xs text-brand-muted uppercase tracking-widest mb-2 border-b border-brand-border pb-2">Timing &amp; Reach</h4>
+<div class="flex justify-between items-center mb-3">
+<span class="material-symbols-outlined text-sm text-brand-muted">schedule</span>
+<span class="font-mono text-sm text-white">TBD</span>
+</div>
+<div class="flex justify-between items-center mb-4">
+<span class="material-symbols-outlined text-sm text-brand-muted">group</span>
+<span class="font-mono text-sm text-white">Variable</span>
+</div>
+</div>
+<div class="bg-black/50 p-2 rounded border border-brand-border/50 text-xs text-brand-muted italic line-clamp-3">
+                                Micro-influencer gifting strategy. Pending budget approval.
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Section: Recommended Message Timing Heatmap -->
+<section class="bg-brand-surface border border-brand-border rounded-xl p-6 shadow-2xl relative overflow-hidden">
+<!-- Decorative gradient blur -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-gold/5 blur-[100px] rounded-full pointer-events-none"></div>
+<div class="flex items-center justify-between mb-8 relative z-10">
+<h3 class="font-headline text-2xl font-bold text-white flex items-center gap-3">
+<span class="material-symbols-outlined text-brand-gold">calendar_month</span>
+                    Recommended Message Timing
+                </h3>
+<div class="flex gap-4 items-center text-xs font-mono text-brand-muted">
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-[#10B981]/20 border border-[#10B981]"></div> Optimal</div>
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-[#F59E0B]/20 border border-[#F59E0B]"></div> Moderate</div>
+<div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-brand-bg border border-brand-border"></div> Low</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm font-mono text-left">
+<thead>
+<tr class="text-brand-muted border-b border-brand-border">
+<th class="pb-4 font-normal w-1/4">Audience Segment</th>
+<th class="pb-4 font-normal text-center">08:00</th>
+<th class="pb-4 font-normal text-center">12:00</th>
+<th class="pb-4 font-normal text-center">16:00</th>
+<th class="pb-4 font-normal text-center">20:00</th>
+<th class="pb-4 font-normal text-center">22:00</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-brand-border/50">
+<!-- Row 1 -->
+<tr class="group hover:bg-white/[0.02] transition-colors">
+<td class="py-4 font-label tracking-wide text-white">Social Crowd</td>
+<td class="p-2"><div class="h-10 rounded bg-brand-bg border border-brand-border transition-all duration-300"></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 hover:bg-[#F59E0B]/20 hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.2)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#F59E0B] opacity-0 group-hover:opacity-100 transition-opacity">Med</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-brand-bg border border-brand-border transition-all duration-300"></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#10B981]/20 border border-[#10B981]/50 hover:bg-[#10B981]/30 hover:border-[#10B981] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#10B981] font-bold">Peak</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#10B981]/20 border border-[#10B981]/50 hover:bg-[#10B981]/30 hover:border-[#10B981] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#10B981] font-bold">Peak</span></div></td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-white/[0.02] transition-colors">
+<td class="py-4 font-label tracking-wide text-white">Office Workers</td>
+<td class="p-2"><div class="h-10 rounded bg-[#10B981]/20 border border-[#10B981]/50 hover:bg-[#10B981]/30 hover:border-[#10B981] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#10B981] font-bold">Peak</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#10B981]/20 border border-[#10B981]/50 hover:bg-[#10B981]/30 hover:border-[#10B981] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#10B981] font-bold">Peak</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 hover:bg-[#F59E0B]/20 hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.2)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#F59E0B] opacity-0 group-hover:opacity-100 transition-opacity">Med</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 hover:bg-[#F59E0B]/20 hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.2)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#F59E0B] opacity-0 group-hover:opacity-100 transition-opacity">Med</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-brand-bg border border-brand-border transition-all duration-300"></div></td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-white/[0.02] transition-colors">
+<td class="py-4 font-label tracking-wide text-white">Students</td>
+<td class="p-2"><div class="h-10 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 hover:bg-[#F59E0B]/20 hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.2)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#F59E0B] opacity-0 group-hover:opacity-100 transition-opacity">Med</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-brand-bg border border-brand-border transition-all duration-300"></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#10B981]/20 border border-[#10B981]/50 hover:bg-[#10B981]/30 hover:border-[#10B981] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#10B981] font-bold">Peak</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#10B981]/20 border border-[#10B981]/50 hover:bg-[#10B981]/30 hover:border-[#10B981] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#10B981] font-bold">Peak</span></div></td>
+<td class="p-2"><div class="h-10 rounded bg-[#F59E0B]/10 border border-[#F59E0B]/30 hover:bg-[#F59E0B]/20 hover:border-[#F59E0B] hover:shadow-[0_0_10px_rgba(245,158,11,0.2)] transition-all duration-300 flex items-center justify-center cursor-pointer"><span class="text-[10px] text-[#F59E0B] opacity-0 group-hover:opacity-100 transition-opacity">Med</span></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<script>
+        // Very lightweight particle effect script
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            for(let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    r: Math.random() * 1.5,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(230, 211, 163, 0.3)'; // Gold color with low opacity
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if(p.x < 0 || p.x > width) p.vx *= -1;
+                if(p.y < 0 || p.y > height) p.vy *= -1;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        draw();
+    </script>
+</body></html>

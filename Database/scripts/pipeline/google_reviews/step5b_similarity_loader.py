@@ -13,6 +13,7 @@ Run after: 034_load_google_reviews_step6_fitness.py
 Run before: 027_blend_fitness.py
 """
 
+import argparse
 import json
 import os
 import re
@@ -23,7 +24,9 @@ import psycopg2.extras
 sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_PATH = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'google_reviews')
-REGIONS   = ['thane', 'navi-mumbai']
+REGIONS   = ['thane', 'navi-mumbai', 'sobo']
+_p = argparse.ArgumentParser(); _p.add_argument('regions', nargs='*', default=REGIONS, metavar='REGION')
+REGIONS   = _p.parse_args().regions or REGIONS
 SOURCE    = 'google_reviews'
 
 DB_CONFIG = {
@@ -36,12 +39,13 @@ DB_CONFIG = {
 }
 
 VECTOR_SQL = """
-    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source)
+    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source, vector_confidence)
     VALUES %s
     ON CONFLICT (venue_id, source) DO UPDATE SET
-        fitness_vector = EXCLUDED.fitness_vector,
-        vector_source  = EXCLUDED.vector_source,
-        last_computed  = CURRENT_TIMESTAMP;
+        fitness_vector    = EXCLUDED.fitness_vector,
+        vector_source     = EXCLUDED.vector_source,
+        vector_confidence = EXCLUDED.vector_confidence,
+        last_computed     = CURRENT_TIMESTAMP;
 """
 
 SIMILARITY_SQL = """
@@ -110,6 +114,7 @@ def load_region(cursor, region: str, place_id_to_db_id: dict) -> dict:
             SOURCE,
             entry.get('fitness_vector', []),   # passed as PG array, not JSON
             entry.get('vector_source', 'behavioral'),
+            entry.get('vector_confidence', 'behavioral_evidence'),
         )
 
         for similar in entry.get('similar_venues_pool', []):

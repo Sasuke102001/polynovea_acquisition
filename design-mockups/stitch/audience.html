@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea Acquisition Platform - Audience</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<!-- Assuming Public Sans as the base for the theme config, overriding Clash Display/Inter/JetBrains Mono for simplicity but keeping the visual hierarchy requested -->
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0A0A0A',
+                        surface: '#18181B',
+                        border: '#27272A',
+                        gold: '#E6D3A3',
+                        violet: '#7C3AED',
+                        emerald: '#10B981',
+                        amber: '#F59E0B',
+                        muted: '#A1A1AA'
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Public Sans", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            font-family: 'Public Sans', sans-serif;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272A; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46; 
+        }
+
+        /* Particle Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Custom Cursor */
+        #custom-cursor {
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(230, 211, 163, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, border-color 0.2s;
+            mix-blend-mode: difference;
+        }
+        
+        body:hover #custom-cursor {
+            opacity: 1;
+        }
+
+        .interactive-hover:hover ~ #custom-cursor,
+        a:hover ~ #custom-cursor,
+        button:hover ~ #custom-cursor {
+            width: 48px;
+            height: 48px;
+            border-color: rgba(230, 211, 163, 1);
+            background-color: rgba(230, 211, 163, 0.1);
+        }
+
+        /* 3D Card Tilt */
+        .tilt-card {
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            transition: transform 0.1s ease;
+        }
+        .tilt-content {
+            transform: translateZ(30px);
+        }
+
+        /* Donut Chart SVG Animations */
+        .donut-segment {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center;
+            cursor: pointer;
+        }
+        .donut-segment:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 12px currentColor);
+        }
+    </style>
+</head>
+<body class="antialiased h-screen flex overflow-hidden selection:bg-gold/30">
+<canvas id="particle-canvas"></canvas>
+<div class="hidden md:block" id="custom-cursor"></div>
+<!-- SIDE NAV (Shared Component Data Driven) -->
+<nav class="fixed left-0 top-0 h-full flex flex-col py-8 z-40 bg-[#0A0A0A] border-r border-[#E6D3A3]/10 w-64">
+<!-- Header -->
+<div class="px-6 mb-12">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface border border-border flex items-center justify-center relative overflow-hidden">
+<img alt="Polynovea Intelligence Logo" class="w-full h-full object-cover opacity-80 mix-blend-screen" data-alt="Abstract cinematic liquid gold texture against deep black background. High contrast, luxury aesthetic. Sharp details, soft glows. Cinematic lighting, sophisticated mood. Strict adherence to #E6D3A3 gold and deep space black colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD15oyyvudMMd-VOHxa6rMLddi3DA5LPW__9j1ZhMXogeGlzmXLeNbdwocVz5LTtBcA2G_cdABVCbKgY1hp6GTw7Mh-uT-Oo8iWtuLkUwLQRmgEueuRu8CMjcp6jSU__0_rCD9m0vQFR9G4ZQQhDKu4BfcY8cJVfwxG67ptVqhzK_vM00rhS5pNCxcj9gVKWQnXILHwaMnRoULrgPHs50uAYNLlKz0Fqyla1JQDBE6J-6RufvuMZI4YtulgN3khQMxxxASL5A4Dgw0"/>
+</div>
+<div>
+<h1 class="text-xl font-bold text-[#E6D3A3] tracking-tighter">Polynovea</h1>
+<p class="text-xs text-muted font-mono tracking-widest uppercase mt-1">Cinematic Intelligence</p>
+</div>
+</div>
+</div>
+<!-- Links -->
+<div class="flex-1 flex flex-col gap-1 overflow-y-auto px-2">
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-muted group-hover:text-gold transition-colors text-[20px]">dashboard</span>
+<span class="font-label text-xs tracking-widest uppercase">Overview</span>
+</a>
+<a class="flex items-center gap-3 bg-[#E6D3A3]/10 text-[#E6D3A3] border-r-4 border-[#E6D3A3] px-4 py-3 font-bold rounded-l-lg scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined text-gold text-[20px]" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-label text-xs tracking-widest uppercase">Audience</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-muted group-hover:text-gold transition-colors text-[20px]">campaign</span>
+<span class="font-label text-xs tracking-widest uppercase">Marketing</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-muted group-hover:text-gold transition-colors text-[20px]">compare_arrows</span>
+<span class="font-label text-xs tracking-widest uppercase">Competitors</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-muted group-hover:text-gold transition-colors text-[20px]">auto_fix_high</span>
+<span class="font-label text-xs tracking-widest uppercase">Transform</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-muted group-hover:text-gold transition-colors text-[20px]">ads_click</span>
+<span class="font-label text-xs tracking-widest uppercase">Campaign</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300 rounded-lg group" href="#">
+<span class="material-symbols-outlined text-muted group-hover:text-gold transition-colors text-[20px]">analytics</span>
+<span class="font-label text-xs tracking-widest uppercase">Deep Analysis</span>
+</a>
+</div>
+<!-- CTA -->
+<div class="px-4 mt-auto">
+<button class="w-full py-3 bg-gold/10 hover:bg-gold/20 text-gold border border-gold/30 rounded-lg font-label text-xs tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-[18px] group-hover:rotate-90 transition-transform">add</span>
+                New Analysis
+            </button>
+</div>
+</nav>
+<!-- MAIN CONTENT AREA -->
+<main class="flex-1 ml-64 flex flex-col h-full relative z-10">
+<!-- TOP NAV (Shared Component Data Driven) -->
+<header class="flex justify-between items-center w-full px-8 py-6 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#E6D3A3]/20 shadow-2xl shrink-0">
+<div>
+<h2 class="font-display text-2xl font-semibold tracking-tight text-[#E6D3A3]">Audience Topography</h2>
+<p class="text-sm text-muted font-mono mt-1">Real-time demographic segmentation engine.</p>
+</div>
+<div class="flex items-center gap-6">
+<!-- Search -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-gold transition-colors text-[20px]">search</span>
+<input class="bg-surface border border-border rounded-full py-2 pl-10 pr-4 text-sm text-white placeholder-muted focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-all w-64 font-mono" placeholder="Query segments..." type="text"/>
+</div>
+<!-- Actions -->
+<button class="text-muted hover:text-gold transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-violet rounded-full border border-background"></span>
+</button>
+<button class="text-muted hover:text-gold transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<!-- Profile -->
+<div class="w-10 h-10 rounded-full border border-gold/30 overflow-hidden cursor-pointer hover:border-gold transition-colors">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close up professional portrait of a tech executive. Dark moody lighting, subtle rim light. Clean sharp background. Confident expression. Corporate aesthetic matching a dark mode interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn2uV_P2y_9xbm3kU8j1XN6aHnRVWYXvoXYD7P0CWcrRZs1134j15kOflwmK5xVJzjhAGDB924oH9sAi0scHytBFkktwnc46H6nv5aJYlD4XPcswWRF12SnItl03JBaX0VhWCqgirXrQtSLSh6QYYqOWTFMaluiacPm45qd8fWzP0FzEXm5j2KU0ZNxTGRWGVqwBEB8qBpXUbRd5DXwRD_sqBP4PSDGPZGB-ysnrfM68sNQU9ZOGrZegDCtfibA-u7yGJjL3ZpwF4"/>
+</div>
+</div>
+</header>
+<!-- SCROLLABLE CANVAS -->
+<div class="flex-1 overflow-y-auto p-8" id="main-scroll-area">
+<!-- TOP GRID: Left Donut, Right Cards -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8 mb-8">
+<!-- LEFT COLUMN: Interactive Donut Chart -->
+<div class="xl:col-span-7 bg-surface border border-border rounded-xl p-8 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-8">
+<div>
+<h3 class="font-display text-xl text-white tracking-tight">Primary Constituents</h3>
+<p class="text-sm text-muted font-mono mt-1">Volume distribution past 30 days</p>
+</div>
+<button class="text-xs font-mono text-gold border border-gold/30 px-3 py-1 rounded hover:bg-gold/10 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">download</span> Export
+                        </button>
+</div>
+<div class="flex justify-center items-center h-[400px] relative">
+<!-- SVG Donut Chart -->
+<svg class="w-full h-full max-w-[360px] drop-shadow-2xl" viewbox="0 0 100 100">
+<!-- Definitions for glows -->
+<defs>
+<filter height="140%" id="glow-gold" width="140%" x="-20%" y="-20%">
+<fegaussianblur result="blur" stddeviation="3"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+</defs>
+<!-- Social Crowd (45%, Gold #E6D3A3) -->
+<!-- stroke-dasharray: 45 55 (45 is length, 55 is gap to total 100) -->
+<circle class="donut-segment" cx="50" cy="50" data-segment="social" fill="transparent" r="40" stroke="#E6D3A3" stroke-dasharray="45 55" stroke-dashoffset="25" stroke-width="15" style="color: #E6D3A3;"></circle>
+<!-- Office Workers (30%, Violet #7C3AED) -->
+<!-- Offset = 25 - 45 = -20 -->
+<circle class="donut-segment" cx="50" cy="50" data-segment="office" fill="transparent" r="40" stroke="#7C3AED" stroke-dasharray="30 70" stroke-dashoffset="-20" stroke-width="15" style="color: #7C3AED;"></circle>
+<!-- Couples (15%, Emerald #10B981) -->
+<!-- Offset = -20 - 30 = -50 -->
+<circle class="donut-segment" cx="50" cy="50" data-segment="couples" fill="transparent" r="40" stroke="#10B981" stroke-dasharray="15 85" stroke-dashoffset="-50" stroke-width="15" style="color: #10B981;"></circle>
+<!-- Solo Diners (10%, Amber #F59E0B) -->
+<!-- Offset = -50 - 15 = -65 -->
+<circle class="donut-segment" cx="50" cy="50" data-segment="solo" fill="transparent" r="40" stroke="#F59E0B" stroke-dasharray="10 90" stroke-dashoffset="-65" stroke-width="15" style="color: #F59E0B;"></circle>
+</svg>
+<!-- Center Metrics -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+<span class="text-4xl font-display font-bold text-white tracking-tighter" id="center-metric-value">12.4k</span>
+<span class="text-xs font-mono text-muted uppercase tracking-widest mt-1" id="center-metric-label">Total Volume</span>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Stacked Cards -->
+<div class="xl:col-span-5 flex flex-col gap-4 relative" id="cards-container">
+<!-- Card 1 -->
+<div class="tilt-card bg-surface border border-border rounded-xl p-6 relative overflow-hidden group cursor-pointer">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-gold/20 transition-all duration-500"></div>
+<div class="tilt-content relative z-10">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-gold shadow-[0_0_10px_#E6D3A3]"></div>
+<h4 class="font-display text-lg text-gold font-semibold">Social Crowd</h4>
+</div>
+<span class="bg-gold/10 text-gold text-xs font-mono px-2 py-1 rounded border border-gold/20">45%</span>
+</div>
+<p class="text-sm text-muted font-body mb-6 leading-relaxed">High volume groups typical on weekends. Driven by events and promotions. High elasticity to pricing.</p>
+<div class="flex flex-wrap gap-2">
+<span class="flex items-center gap-1 text-xs bg-background border border-border px-2 py-1 rounded text-white font-mono">
+<span class="material-symbols-outlined text-[14px] text-muted">schedule</span> Peak: 8PM - 11PM
+                                </span>
+<span class="flex items-center gap-1 text-xs bg-background border border-border px-2 py-1 rounded text-white font-mono">
+<span class="material-symbols-outlined text-[14px] text-muted">payments</span> High Spend
+                                </span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="tilt-card bg-surface border border-border rounded-xl p-6 relative overflow-hidden group cursor-pointer opacity-90 hover:opacity-100">
+<div class="absolute top-0 right-0 w-32 h-32 bg-violet/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-violet/20 transition-all duration-500"></div>
+<div class="tilt-content relative z-10">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-violet shadow-[0_0_10px_#7C3AED]"></div>
+<h4 class="font-display text-lg text-violet font-semibold">Office Workers</h4>
+</div>
+<span class="bg-violet/10 text-violet text-xs font-mono px-2 py-1 rounded border border-violet/20">30%</span>
+</div>
+<p class="text-sm text-muted font-body mb-6 leading-relaxed">Consistent weekday lunch and early evening volume. Value speed and reliability over experience.</p>
+<div class="flex flex-wrap gap-2">
+<span class="flex items-center gap-1 text-xs bg-background border border-border px-2 py-1 rounded text-white font-mono">
+<span class="material-symbols-outlined text-[14px] text-muted">schedule</span> Peak: 12PM - 2PM
+                                </span>
+<span class="flex items-center gap-1 text-xs bg-background border border-border px-2 py-1 rounded text-white font-mono">
+<span class="material-symbols-outlined text-[14px] text-muted">speed</span> Fast Churn
+                                </span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="tilt-card bg-surface border border-border rounded-xl p-6 relative overflow-hidden group cursor-pointer opacity-80 hover:opacity-100">
+<div class="absolute top-0 right-0 w-32 h-32 bg-emerald/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald/20 transition-all duration-500"></div>
+<div class="tilt-content relative z-10">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-3 h-3 rounded-full bg-emerald shadow-[0_0_10px_#10B981]"></div>
+<h4 class="font-display text-lg text-emerald font-semibold">Couples</h4>
+</div>
+<span class="bg-emerald/10 text-emerald text-xs font-mono px-2 py-1 rounded border border-emerald/20">15%</span>
+</div>
+<p class="text-sm text-muted font-body mb-6 leading-relaxed">Experience-driven segment. Higher likelihood of ordering premium items and extending dwell time.</p>
+<div class="flex flex-wrap gap-2">
+<span class="flex items-center gap-1 text-xs bg-background border border-border px-2 py-1 rounded text-white font-mono">
+<span class="material-symbols-outlined text-[14px] text-muted">wine_bar</span> High Premium
+                                </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM SECTION: Data Table -->
+<div class="bg-surface border border-border rounded-xl overflow-hidden">
+<div class="p-6 border-b border-border flex justify-between items-center bg-[#121212]">
+<h3 class="font-display text-lg text-white font-semibold">Behavioral Metrics Matrix</h3>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded border border-border bg-background flex items-center justify-center text-muted hover:text-gold transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+<button class="w-8 h-8 rounded border border-border bg-background flex items-center justify-center text-muted hover:text-gold transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse font-mono text-sm">
+<thead>
+<tr class="bg-background border-b border-border text-xs uppercase tracking-wider text-muted">
+<th class="p-4 font-normal">Segment ID</th>
+<th class="p-4 font-normal">Avg Dwell Time</th>
+<th class="p-4 font-normal">Freq (30d)</th>
+<th class="p-4 font-normal">Spend Volatility</th>
+<th class="p-4 font-normal text-right">Acq Cost</th>
+</tr>
+</thead>
+<tbody class="text-gray-300">
+<!-- Row 1 -->
+<tr class="border-b border-border bg-[#0A0A0A] hover:bg-gold/5 transition-colors group">
+<td class="p-4 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-gold"></div>
+<span class="text-gold font-medium">S-CRWD-01</span>
+</td>
+<td class="p-4 group-hover:text-white transition-colors">124 mins</td>
+<td class="p-4 group-hover:text-white transition-colors">1.2x</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1 bg-border rounded-full overflow-hidden">
+<div class="h-full bg-amber w-3/4"></div>
+</div>
+<span class="text-xs">High</span>
+</div>
+</td>
+<td class="p-4 text-right group-hover:text-white transition-colors">$12.40</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-border bg-[#121212] hover:bg-violet/5 transition-colors group">
+<td class="p-4 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-violet"></div>
+<span class="text-violet font-medium">O-WRKR-02</span>
+</td>
+<td class="p-4 group-hover:text-white transition-colors">45 mins</td>
+<td class="p-4 group-hover:text-white transition-colors">4.5x</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1 bg-border rounded-full overflow-hidden">
+<div class="h-full bg-emerald w-1/4"></div>
+</div>
+<span class="text-xs">Low</span>
+</div>
+</td>
+<td class="p-4 text-right group-hover:text-white transition-colors">$4.20</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-border bg-[#0A0A0A] hover:bg-emerald/5 transition-colors group">
+<td class="p-4 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-emerald"></div>
+<span class="text-emerald font-medium">C-PLES-03</span>
+</td>
+<td class="p-4 group-hover:text-white transition-colors">95 mins</td>
+<td class="p-4 group-hover:text-white transition-colors">1.8x</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1 bg-border rounded-full overflow-hidden">
+<div class="h-full bg-gold w-1/2"></div>
+</div>
+<span class="text-xs">Med</span>
+</div>
+</td>
+<td class="p-4 text-right group-hover:text-white transition-colors">$18.50</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-[#121212] hover:bg-amber/5 transition-colors group">
+<td class="p-4 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-amber"></div>
+<span class="text-amber font-medium">S-DNR-04</span>
+</td>
+<td class="p-4 group-hover:text-white transition-colors">35 mins</td>
+<td class="p-4 group-hover:text-white transition-colors">2.1x</td>
+<td class="p-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1 bg-border rounded-full overflow-hidden">
+<div class="h-full bg-emerald w-1/5"></div>
+</div>
+<span class="text-xs">Low</span>
+</div>
+</td>
+<td class="p-4 text-right group-hover:text-white transition-colors">$6.80</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Footer spacer -->
+<div class="h-12"></div>
+</div>
+</main>
+<!-- Interactive Scripts -->
+<script>
+        // Custom Cursor Logic
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth > 768) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            }
+        });
+
+        // 3D Card Tilt Effect
+        const cards = document.querySelectorAll('.tilt-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10; // Max 10 deg
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            });
+        });
+
+        // Donut Chart Hover Interactions
+        const segments = document.querySelectorAll('.donut-segment');
+        const metricValue = document.getElementById('center-metric-value');
+        const metricLabel = document.getElementById('center-metric-label');
+        
+        const dataMap = {
+            'social': { val: '45%', label: 'Social Crowd', color: '#E6D3A3' },
+            'office': { val: '30%', label: 'Office Workers', color: '#7C3AED' },
+            'couples': { val: '15%', label: 'Couples', color: '#10B981' },
+            'solo': { val: '10%', label: 'Solo Diners', color: '#F59E0B' }
+        };
+
+        let activeSegment = null;
+
+        segments.forEach(seg => {
+            seg.addEventListener('mouseenter', (e) => {
+                const id = e.target.dataset.segment;
+                const data = dataMap[id];
+                
+                // Update center text
+                metricValue.textContent = data.val;
+                metricValue.style.color = data.color;
+                metricLabel.textContent = data.label;
+                
+                // Dim others
+                segments.forEach(s => {
+                    if(s !== seg) s.style.opacity = '0.3';
+                });
+            });
+
+            seg.addEventListener('mouseleave', () => {
+                // Reset
+                metricValue.textContent = '12.4k';
+                metricValue.style.color = 'white';
+                metricLabel.textContent = 'Total Volume';
+                
+                segments.forEach(s => s.style.opacity = '1');
+            });
+        });
+
+        // Lightweight Particle Background (Vanilla JS Canvas)
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initParticles() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            
+            const numParticles = Math.min(Math.floor(window.innerWidth / 20), 100);
+            
+            for(let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    r: Math.random() * 1.5 + 0.5,
+                    dx: (Math.random() - 0.5) * 0.5,
+                    dy: (Math.random() - 0.5) * 0.5,
+                    alpha: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // #E6D3A3 RGB is 230, 211, 163
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(230, 211, 163, ${p.alpha})`;
+                ctx.fill();
+                
+                p.x += p.dx;
+                p.y -= p.dy + 0.2; // Drifting upwards
+                
+                // Wrap around
+                if(p.x < 0) p.x = width;
+                if(p.x > width) p.x = 0;
+                if(p.y < 0) p.y = height;
+                if(p.y > height) p.y = 0;
+            });
+            
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', initParticles);
+        initParticles();
+        animateParticles();
+    </script>
+</body></html>

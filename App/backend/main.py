@@ -26,7 +26,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import init_pool, close_pool
+from database import init_pool, close_pool, init_m3_pool, close_m3_pool
 from routers import venues, overview, competitors, transform, marketing, intelligence, risk, primitives_tab, benchmarks, trends_tab, audience, chat, demo
 from routers.providers import nvidia_key_count, mistral_available, mistral_model
 
@@ -34,6 +34,7 @@ from routers.providers import nvidia_key_count, mistral_available, mistral_model
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_pool()
+    await init_m3_pool()  # Initialize M3 pool (optional, graceful if not configured)
     from database import get_pool
     async with get_pool().acquire() as _conn:
         for _t in ("venue_similarity_deltas", "fitness_delta_rules", "venue_similarity",
@@ -41,6 +42,7 @@ async def lifespan(app: FastAPI):
             await _conn.execute(f"ANALYZE {_t}")
     yield
     await close_pool()
+    await close_m3_pool()
 
 
 app = FastAPI(

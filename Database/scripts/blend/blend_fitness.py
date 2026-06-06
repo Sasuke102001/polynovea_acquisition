@@ -102,36 +102,74 @@ UPSERT_SUMMARY_SQL = """
 """
 
 
-def blend_venue(source_rows: list[dict]) -> dict:
+def _source_variances(by_venue: dict) -> dict:
     """
-    Equal weight per source that has a non-zero value for each dimension.
-    N is computed per-dimension, not globally.
+    E10: Compute per-source variance across all venues for each fitness dimension.
+    A consistent source (low variance) gets higher Kalman gain.
+    Returns {source: {dim: variance}}.
+    """
+    source_vals: dict = {}
+    for rows in by_venue.values():
+        for row in rows:
+            src = row["source"]
+            source_vals.setdefault(src, {d: [] for d in FITNESS_DIMS})
+            for dim in FITNESS_DIMS:
+                val = float(row.get(dim) or 0.0)
+                if val > 0.0:
+                    source_vals[src][dim].append(val)
 
-    Rationale: a 0.0 from a source means "no signal detected", not "genuinely zero
-    performance". Averaging a real score with a no-signal zero would dilute it
-    incorrectly. Only sources that detected signal (> 0.0) contribute to the average
-    for that dimension.
+    variances = {}
+    for src, dim_vals in source_vals.items():
+        variances[src] = {}
+        for dim, vals in dim_vals.items():
+            if len(vals) < 2:
+                variances[src][dim] = 1.0  # unknown variance → neutral weight
+            else:
+                mean = sum(vals) / len(vals)
+                variances[src][dim] = sum((v - mean) ** 2 for v in vals) / len(vals)
+    return variances
 
-    If ALL sources are 0.0 for a dimension → blended stays 0.0 (correct: no signal
-    anywhere means no basis for a non-zero score).
+
+def blend_venue(source_rows: list[dict], source_variances: dict | None = None) -> dict:
+    """
+    E10: Inverse-variance (Kalman) weighted blend per dimension.
+
+    Each source's weight = 1/variance for that dimension, normalised so weights sum to 1.
+    A consistent source (low variance across all venues) contributes more than a noisy one.
+    Falls back to equal weight when variance data is unavailable.
+
+    A 0.0 value means "no signal detected" and is excluded from the blend (same as before).
+    If ALL sources are 0.0 → blended stays 0.0.
     """
     if not source_rows:
         return {d: 0.0 for d in FITNESS_DIMS}
 
-    totals = {d: 0.0 for d in FITNESS_DIMS}
-    counts = {d: 0   for d in FITNESS_DIMS}
+    result = {}
+    for dim in FITNESS_DIMS:
+        active = [
+            (float(row.get(dim) or 0.0), row["source"])
+            for row in source_rows
+            if float(row.get(dim) or 0.0) > 0.0
+        ]
+        if not active:
+            result[dim] = 0.0
+            continue
 
-    for row in source_rows:
-        for dim in FITNESS_DIMS:
-            val = float(row.get(dim) or 0.0)
-            if val > 0.0:
-                totals[dim] += val
-                counts[dim] += 1
+        if source_variances:
+            # Inverse-variance weights — clamp variance floor at 0.001 to avoid division by zero
+            inv_vars = [
+                1.0 / max(source_variances.get(src, {}).get(dim, 1.0), 0.001)
+                for _, src in active
+            ]
+            total_inv = sum(inv_vars)
+            weights = [iv / total_inv for iv in inv_vars]
+        else:
+            n = len(active)
+            weights = [1.0 / n] * n
 
-    return {
-        d: round(totals[d] / counts[d], 4) if counts[d] > 0 else 0.0
-        for d in FITNESS_DIMS
-    }
+        result[dim] = round(sum(v * w for (v, _), w in zip(active, weights)), 4)
+
+    return result
 
 
 def main():
@@ -151,6 +189,15 @@ def main():
         for row in rows:
             by_venue.setdefault(row['venue_id'], []).append(dict(row))
 
+        # E10: compute source reliability variances once across all venues
+        src_variances = _source_variances(by_venue)
+        src_list = sorted(src_variances.keys())
+        print(f"\n  Source reliability (avg variance across dims):")
+        for src in src_list:
+            avg_var = sum(src_variances[src].values()) / max(1, len(src_variances[src]))
+            print(f"    {src:<25} avg_var={avg_var:.4f}")
+        print()
+
         blended_fitness  = []
         blended_summary  = []
         source_breakdown = {}
@@ -160,7 +207,7 @@ def main():
             key = '+'.join(sorted(set(sources)))
             source_breakdown[key] = source_breakdown.get(key, 0) + 1
 
-            blended = blend_venue(source_rows)
+            blended = blend_venue(source_rows, src_variances)
             blended_fitness.append((
                 venue_id,
                 'blended',
@@ -172,7 +219,7 @@ def main():
                 blended['operational_quality'],
                 blended['retention_strength'],
                 blended['monetization_potential'],
-                'blend-runner-2.0-equal-weight',
+                'blend-runner-3.0-kalman-iv',
                 1,
             ))
             blended_summary.append((

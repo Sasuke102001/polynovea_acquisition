@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Polynovea Venue Overview Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0A0A0A',
+                        surface: '#18181B',
+                        border: '#27272A',
+                        gold: '#E6D3A3',
+                        muted: '#A1A1AA',
+                        emerald: '#10B981',
+                        amber: '#F59E0B',
+                        coral: '#EF4444'
+                    },
+                    fontFamily: {
+                        display: ['Clash Display', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { 
+            background-color: #0A0A0A; 
+            color: #FFFFFF; 
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            perspective: 1000px;
+        }
+        
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .parallax-wrapper {
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        /* 3D Orb Styles */
+        .orb-grid {
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+        
+        .orb-container {
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        
+        .orb-container:hover {
+            transform: scale3d(1.1, 1.1, 1.1) translateZ(20px);
+        }
+
+        .orb-sphere {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: relative;
+            transform-style: preserve-3d;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 
+                        inset 10px 10px 20px rgba(255,255,255,0.1),
+                        0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background: radial-gradient(circle at 30% 30%, #2A2A2D, #0A0A0A);
+        }
+
+        .orb-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotateX(70deg) rotateY(20deg);
+            transition: all 0.5s ease;
+        }
+
+        .orb-container:hover .orb-ring {
+            transform: translate(-50%, -50%) rotateX(60deg) rotateY(40deg) scale(1.1);
+            animation: ringSpin 4s linear infinite;
+        }
+
+        @keyframes ringSpin {
+            0% { transform: translate(-50%, -50%) rotateX(60deg) rotateY(40deg) rotateZ(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(60deg) rotateY(40deg) rotateZ(360deg); }
+        }
+
+        .orb-value {
+            transform: translateZ(30px);
+            text-shadow: 0 0 10px rgba(230, 211, 163, 0.5);
+        }
+
+        /* Metric Specific Colors */
+        .metric-emerald .orb-ring { border-top-color: #10B981; border-right-color: #10B981; box-shadow: 0 0 15px rgba(16,185,129,0.2) inset; }
+        .metric-emerald:hover .orb-ring { box-shadow: 0 0 20px rgba(16,185,129,0.5), inset 0 0 20px rgba(16,185,129,0.5); }
+        .metric-emerald .orb-sphere { background: radial-gradient(circle at 30% 30%, rgba(16,185,129,0.2), #0A0A0A); }
+
+        .metric-amber .orb-ring { border-top-color: #F59E0B; border-right-color: #F59E0B; box-shadow: 0 0 15px rgba(245,158,11,0.2) inset; }
+        .metric-amber:hover .orb-ring { box-shadow: 0 0 20px rgba(245,158,11,0.5), inset 0 0 20px rgba(245,158,11,0.5); }
+        .metric-amber .orb-sphere { background: radial-gradient(circle at 30% 30%, rgba(245,158,11,0.2), #0A0A0A); }
+
+        .metric-coral .orb-ring { border-top-color: #EF4444; border-right-color: #EF4444; box-shadow: 0 0 15px rgba(239,68,68,0.2) inset; }
+        .metric-coral:hover .orb-ring { box-shadow: 0 0 20px rgba(239,68,68,0.5), inset 0 0 20px rgba(239,68,68,0.5); }
+        .metric-coral .orb-sphere { background: radial-gradient(circle at 30% 30%, rgba(239,68,68,0.2), #0A0A0A); }
+
+        /* 3D Cards */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(39, 39, 42, 0.8);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7);
+        }
+        
+        .card-3d:hover {
+            transform: translateY(-5px) rotateX(2deg) rotateY(-2deg);
+            box-shadow: 20px 30px 50px -10px rgba(0,0,0,0.8), 
+                        inset 0 0 0 1px rgba(230, 211, 163, 0.1);
+        }
+
+        .card-content-3d {
+            transform: translateZ(20px);
+        }
+
+        /* Staggered Animations */
+        .stagger-item {
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-item:nth-child(2) { animation-delay: 0.3s; }
+        .stagger-item:nth-child(3) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body class="min-h-screen text-white font-body selection:bg-gold selection:text-black">
+<canvas id="particle-canvas"></canvas>
+<!-- Top Navigation -->
+<nav class="bg-[#0A0A0A]/90 backdrop-blur-md flex justify-between items-center w-full px-6 h-16 border-b border-border fixed top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="text-xl font-display font-bold text-gold">Polynovea</span>
+</div>
+<div class="hidden md:flex gap-6">
+<button class="text-gold border-b-2 border-gold pb-1 font-body text-sm font-medium hover:text-gold transition-colors">Overview</button>
+<button class="text-muted font-body text-sm hover:text-gold transition-colors cursor-pointer">Audience</button>
+<button class="text-muted font-body text-sm hover:text-gold transition-colors cursor-pointer">Marketing</button>
+<button class="text-muted font-body text-sm hover:text-gold transition-colors cursor-pointer">Competitors</button>
+<button class="text-muted font-body text-sm hover:text-gold transition-colors cursor-pointer">Transform</button>
+<button class="text-muted font-body text-sm hover:text-gold transition-colors cursor-pointer">Campaign</button>
+<button class="text-muted font-body text-sm hover:text-gold transition-colors cursor-pointer">Deep Analysis</button>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-muted hover:text-gold cursor-pointer transition-colors" data-icon="search">search</span>
+<span class="material-symbols-outlined text-muted hover:text-gold cursor-pointer transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-muted hover:text-gold cursor-pointer transition-colors" data-icon="settings">settings</span>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD89P1M2EDaVcphSm4bfWyRY49Hy8BmyYeu5WH3NZQ5o_i6AnjBtUA2gLSQVUHyCviuQ6deeQBHQtQudaI_cFJrjRtaY1PnbXwhctwyOkW4PoMhXLO_DoLHiCgKoZ-h16pDhcFieWQ0ApatEgkZHePa_xhsP9QviRfSGZGyfXHKZ_lICd_e0QqEEOvchcimNYk3kRhyGoj3xpcI3O-ji8JeXhAfxrIa558qqrQhMAzGi0bPHhhVgmXK75WMSiSjeq2yoEjE3dBj8hc"/>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="max-w-[1400px] mx-auto p-6 md:p-8 space-y-8 mt-16 parallax-wrapper" id="parallax-container">
+<!-- Header Section -->
+<header class="space-y-2 card-content-3d">
+<h1 class="text-4xl md:text-5xl font-display font-bold text-gold tracking-tight">The Continental Core</h1>
+<p class="text-muted text-lg">Financial District, New York City</p>
+</header>
+<!-- Navigation Tabs (Venue Context) -->
+<div class="flex border-b border-border gap-8 overflow-x-auto no-scrollbar card-content-3d pb-1">
+<button class="text-gold border-b-2 border-gold pb-2 font-medium whitespace-nowrap">Overview</button>
+<button class="text-muted pb-2 hover:text-gray-300 transition-colors whitespace-nowrap">Audience</button>
+<button class="text-muted pb-2 hover:text-gray-300 transition-colors whitespace-nowrap">Marketing</button>
+<button class="text-muted pb-2 hover:text-gray-300 transition-colors whitespace-nowrap">Competitors</button>
+<button class="text-muted pb-2 hover:text-gray-300 transition-colors whitespace-nowrap">Transform</button>
+<button class="text-muted pb-2 hover:text-gray-300 transition-colors whitespace-nowrap">Campaign</button>
+<button class="text-muted pb-2 hover:text-gray-300 transition-colors whitespace-nowrap">Deep Analysis</button>
+</div>
+<!-- Two Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+<!-- Left Column: 3D Perspective Grid -->
+<div class="lg:col-span-3 space-y-6 orb-grid">
+<h2 class="text-xl font-display font-medium text-gray-200 card-content-3d">Venue Intelligence Scores</h2>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-8 p-6 bg-surface/30 rounded-2xl border border-border/50 shadow-2xl backdrop-blur-sm">
+<!-- Orb 1: Social Dwell -->
+<div class="orb-container metric-emerald flex flex-col items-center gap-4">
+<div class="orb-sphere">
+<div class="orb-ring"></div>
+<span class="orb-value font-mono text-2xl font-bold text-gold">84</span>
+</div>
+<span class="text-xs uppercase tracking-widest text-muted font-medium text-center transform translate-z-10">Social Dwell</span>
+</div>
+<!-- Orb 2: Destination -->
+<div class="orb-container metric-amber flex flex-col items-center gap-4">
+<div class="orb-sphere">
+<div class="orb-ring"></div>
+<span class="orb-value font-mono text-2xl font-bold text-gold">65</span>
+</div>
+<span class="text-xs uppercase tracking-widest text-muted font-medium text-center transform translate-z-10">Destination</span>
+</div>
+<!-- Orb 3: Retention -->
+<div class="orb-container metric-emerald flex flex-col items-center gap-4">
+<div class="orb-sphere">
+<div class="orb-ring"></div>
+<span class="orb-value font-mono text-2xl font-bold text-gold">92</span>
+</div>
+<span class="text-xs uppercase tracking-widest text-muted font-medium text-center transform translate-z-10">Retention</span>
+</div>
+<!-- Orb 4: Repeat -->
+<div class="orb-container metric-coral flex flex-col items-center gap-4">
+<div class="orb-sphere">
+<div class="orb-ring"></div>
+<span class="orb-value font-mono text-2xl font-bold text-gold">41</span>
+</div>
+<span class="text-xs uppercase tracking-widest text-muted font-medium text-center transform translate-z-10">Repeat</span>
+</div>
+<!-- Orb 5: Office Lunch -->
+<div class="orb-container metric-emerald flex flex-col items-center gap-4">
+<div class="orb-sphere">
+<div class="orb-ring"></div>
+<span class="orb-value font-mono text-2xl font-bold text-gold">78</span>
+</div>
+<span class="text-xs uppercase tracking-widest text-muted font-medium text-center transform translate-z-10">Office Lunch</span>
+</div>
+<!-- Orb 6: Operational -->
+<div class="orb-container metric-amber flex flex-col items-center gap-4">
+<div class="orb-sphere">
+<div class="orb-ring"></div>
+<span class="orb-value font-mono text-2xl font-bold text-gold">55</span>
+</div>
+<span class="text-xs uppercase tracking-widest text-muted font-medium text-center transform translate-z-10">Operational</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Context & Intelligence -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Primary Segment Card -->
+<div class="card-3d rounded-2xl p-6 relative overflow-hidden group">
+<div class="card-content-3d">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl" data-icon="groups">groups</span>
+</div>
+<h3 class="text-sm font-medium text-muted mb-2 uppercase tracking-wider">Dominant Cohort</h3>
+<div class="text-4xl font-display font-bold text-white mb-4">Social Crowd</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-mono text-emerald drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">42%</span>
+<span class="text-sm text-muted">of total footfall</span>
+</div>
+</div>
+</div>
+<!-- Operational Signals Card -->
+<div class="card-3d rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald via-amber to-coral"></div>
+<div class="card-content-3d">
+<div class="flex items-center justify-between mb-6 pl-4">
+<h3 class="text-lg font-display font-medium text-white">Live Operational Signals</h3>
+<span class="material-symbols-outlined text-gold animate-pulse" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<ul class="space-y-5 pl-4">
+<li class="flex items-start gap-4 stagger-item">
+<div class="w-2 h-2 rounded-full bg-emerald mt-2 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+<div>
+<p class="text-sm font-medium text-white">Peak Dwell Time Maintained</p>
+<p class="text-xs text-muted mt-1">Average stay duration exceeds baseline by 15% during core social hours.</p>
+</div>
+</li>
+<li class="flex items-start gap-4 stagger-item">
+<div class="w-2 h-2 rounded-full bg-amber mt-2 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></div>
+<div>
+<p class="text-sm font-medium text-white">Capacity Warning: Patio</p>
+<p class="text-xs text-muted mt-1">Density approaching optimal limits; consider staff reallocation for service speed.</p>
+</div>
+</li>
+<li class="flex items-start gap-4 stagger-item">
+<div class="w-2 h-2 rounded-full bg-coral mt-2 shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+<div>
+<p class="text-sm font-medium text-white">Low Repeat Conversion</p>
+<p class="text-xs text-muted mt-1">First-time visitors from the transient segment show a 4% drop in return rates.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Particle Background System
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5;
+                this.speedX = (Math.random() - 0.5) * 0.2;
+                this.speedY = (Math.random() - 0.5) * 0.2;
+                this.opacity = Math.random() * 0.5;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(230, 211, 163, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.floor((canvas.width * canvas.height) / 10000);
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // Parallax Effect
+        const parallaxContainer = document.getElementById('parallax-container');
+        
+        document.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
+            
+            parallaxContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Reset transform when mouse leaves window to avoid sticking
+        document.addEventListener('mouseleave', () => {
+            parallaxContainer.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+    </script>
+</body></html>

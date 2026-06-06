@@ -38,6 +38,20 @@ import psycopg2.extras
 
 sys.stdout.reconfigure(encoding='utf-8')
 
+# Import authoritative priors + weights from the main demographics script
+# so this file never drifts out of sync with the batch pipeline.
+_COMPUTE_DIR = os.path.join(os.path.dirname(__file__), '..', 'compute')
+sys.path.insert(0, _COMPUTE_DIR)
+from compute_venue_demographics import (
+    VENUE_TYPE_SEGMENT_PRIORS,
+    SEGMENT_FITNESS_WEIGHTS,
+    DIM_MAP,
+    CONFIDENCE_DISCOUNT,
+    ALL_SEGMENTS,
+    FLAT_PRIOR,
+    _PRIOR_GENERIC,
+)
+
 DB_CONFIG = {
     'host':     os.getenv('PG_HOST',     'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
@@ -69,112 +83,6 @@ SIM_DIMS = [
 ]
 
 TOP_N_SIMILAR = 25
-
-# ─── Demographics config (mirrors compute_venue_demographics.py) ──────────────
-
-DIM_MAP = {
-    "operational_quality":  "operational_quality",
-    "repeat_habit":         "fitness_for_repeat_habit",
-    "retention_strength":   "retention_strength",
-    "friction_tolerance":   None,
-    "social_dwell":         "fitness_for_social_dwell",
-    "destination_visit":    "fitness_for_destination_visit",
-    "office_lunch":         "fitness_for_office_lunch",
-    "group_energy":         "fitness_for_group_energy",
-}
-
-CONFIDENCE_DISCOUNT = {"HIGH": 1.0, "MED": 0.80, "LOW": 0.60}
-
-SEGMENT_FITNESS_WEIGHTS = {
-    "solo_diners": {
-        "operational_quality": (0.45, "HIGH"),
-        "repeat_habit":        (0.20, "MED"),
-        "retention_strength":  (0.15, "MED"),
-        "social_dwell":        (0.05, "LOW"),
-        "destination_visit":   (0.05, "LOW"),
-    },
-    "working_women": {
-        "operational_quality": (0.30, "HIGH"),
-        "office_lunch":        (0.25, "HIGH"),
-        "retention_strength":  (0.15, "MED"),
-        "social_dwell":        (0.10, "MED"),
-        "destination_visit":   (0.05, "LOW"),
-    },
-    "couples": {
-        "destination_visit":   (0.40, "HIGH"),
-        "social_dwell":        (0.20, "HIGH"),
-        "operational_quality": (0.15, "MED"),
-        "repeat_habit":        (0.10, "MED"),
-        "retention_strength":  (0.10, "MED"),
-    },
-    "premium": {
-        "destination_visit":   (0.35, "HIGH"),
-        "social_dwell":        (0.25, "HIGH"),
-        "operational_quality": (0.20, "HIGH"),
-        "retention_strength":  (0.10, "MED"),
-        "repeat_habit":        (0.05, "LOW"),
-    },
-    "college_kids": {
-        "group_energy":        (0.35, "HIGH"),
-        "social_dwell":        (0.25, "HIGH"),
-        "repeat_habit":        (0.10, "MED"),
-        "operational_quality": (0.10, "MED"),
-        "destination_visit":   (0.05, "LOW"),
-    },
-    "office_workers": {
-        "office_lunch":        (0.35, "HIGH"),
-        "repeat_habit":        (0.25, "HIGH"),
-        "operational_quality": (0.20, "HIGH"),
-        "retention_strength":  (0.05, "MED"),
-        "social_dwell":        (0.05, "LOW"),
-    },
-    "families": {
-        "repeat_habit":        (0.30, "HIGH"),
-        "operational_quality": (0.25, "HIGH"),
-        "retention_strength":  (0.20, "MED"),
-        "social_dwell":        (0.05, "LOW"),
-        "destination_visit":   (0.05, "LOW"),
-    },
-}
-
-ALL_SEGMENTS = list(SEGMENT_FITNESS_WEIGHTS.keys())
-FLAT_PRIOR = 1.0 / len(ALL_SEGMENTS)
-
-_PRIOR_GENERIC = frozenset({
-    "food", "point_of_interest", "establishment", "store",
-    "premise", "locality", "political", "street_address", "geocode",
-})
-
-# Venue-type priors — same as compute_venue_demographics.py (abbreviated to key types)
-VENUE_TYPE_SEGMENT_PRIORS = {
-    "cafe": {
-        "college_kids":   (0.25, "HIGH", ""),
-        "working_women":  (0.20, "HIGH", ""),
-        "solo_diners":    (0.20, "HIGH", ""),
-        "office_workers": (0.15, "MED",  ""),
-        "couples":        (0.10, "MED",  ""),
-        "families":       (0.07, "LOW",  ""),
-        "premium":        (0.03, "LOW",  ""),
-    },
-    "restaurant": {
-        "families":       (0.25, "MED",  ""),
-        "couples":        (0.20, "MED",  ""),
-        "office_workers": (0.15, "MED",  ""),
-        "college_kids":   (0.12, "MED",  ""),
-        "solo_diners":    (0.10, "MED",  ""),
-        "premium":        (0.10, "MED",  ""),
-        "working_women":  (0.08, "LOW",  ""),
-    },
-    "bar": {
-        "college_kids":   (0.30, "HIGH", ""),
-        "couples":        (0.20, "MED",  ""),
-        "office_workers": (0.15, "MED",  ""),
-        "solo_diners":    (0.10, "MED",  ""),
-        "premium":        (0.10, "MED",  ""),
-        "working_women":  (0.08, "LOW",  ""),
-        "families":       (0.07, "LOW",  ""),
-    },
-}
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────

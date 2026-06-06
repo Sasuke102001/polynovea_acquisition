@@ -18,6 +18,7 @@ from models import ChatRequest, ChatMessage
 from prompts import get_system_prompt
 from routers.utils import SEGMENT_LABELS
 from routers.council import run_council, COUNCIL_DELIBERATING
+from routers.providers import next_fast_client
 import httpx
 
 router = APIRouter()
@@ -37,20 +38,18 @@ def _supabase_headers() -> dict:
         "Prefer":        "return=minimal",
     }
 
-# Nvidia API config — single model for all tabs
-NVIDIA_API_BASE        = "https://integrate.api.nvidia.com/v1"
-NVIDIA_API_KEY_CREATIVE = os.getenv("NVIDIA_API_KEY")
-NVIDIA_MODEL_CREATIVE   = os.getenv("NVIDIA_MODEL_CREATIVE", "meta/llama-3.3-70b-instruct")
+NVIDIA_MODEL_CREATIVE = os.getenv("NVIDIA_MODEL_CREATIVE", "meta/llama-3.3-70b-instruct")
 
 
-async def fetch_venue_context(venue_id: int, tab: str) -> dict:
+async def fetch_venue_context(venue_id: int, tab: str, demo_level: int = 1) -> dict:
     """
-    Fetch all relevant venue context from RDS.
-    Pulls: basic venue info, fitness dimensions, segment alignment,
-    full behavioral profiles, archetypes, platform usage,
-    channel effectiveness, campaign templates, and interventions.
-    All enriched queries are wrapped in try/except — chat degrades
-    gracefully if any optional table is not yet populated.
+    Fetch all relevant venue context from RDS, gated by demo_level.
+
+    Level 1: M2 data only (existing behavior)
+    Level 2: M2 + M3 summary (recent sessions, avg KPI)
+    Level 3: M2 + M3 full (show plans, outcomes, all detail)
+
+    All enriched queries are wrapped in try/except — chat degrades gracefully.
     """
     pool = get_pool()
 
@@ -505,6 +504,92 @@ async def fetch_venue_context(venue_id: int, tab: str) -> dict:
         for r in drift_rows
     ]
 
+    # ===== NEW: M3 Data (level 2+) =====
+    context["m3_recent_sessions"] = []
+    context["m3_kpi_summary"] = {}
+    context["m3_show_plans"] = []
+    context["m3_show_outcomes"] = []
+
+    if demo_level >= 2:
+        from database import get_m3_pool
+        m3_pool = get_m3_pool()
+        if m3_pool:
+            try:
+                # Recent sessions (last 5)
+                sessions = await m3_pool.fetch(
+                    """
+                    SELECT
+                        id, session_number, created_at,
+                        COUNT(*) as assessment_count
+                    FROM m3_sessions
+                    WHERE venue_id = $1
+                    ORDER BY created_at DESC
+                    LIMIT 5
+                    """,
+                    venue_id
+                )
+                context["m3_recent_sessions"] = [dict(s) for s in sessions] if sessions else []
+
+                # Average KPI signals
+                kpi_avg = await m3_pool.fetchrow(
+                    """
+                    SELECT
+                        COUNT(DISTINCT session_id) as session_count,
+                        AVG(value) as avg_value,
+                        MAX(value) as peak_value
+                    FROM m3_kpi_assessments
+                    WHERE venue_id = $1
+                    """,
+                    venue_id
+                )
+                if kpi_avg:
+                    context["m3_kpi_summary"] = {
+                        "sessions_with_kpi": kpi_avg["session_count"] or 0,
+                        "avg_signal_value": round(float(kpi_avg["avg_value"] or 0), 3),
+                        "peak_signal": round(float(kpi_avg["peak_value"] or 0), 3),
+                    }
+            except Exception as e:
+                import logging
+                logging.warning(f"M3 summary fetch failed (level 2): {e}")
+
+    if demo_level >= 3:
+        from database import get_m3_pool
+        m3_pool = get_m3_pool()
+        if m3_pool:
+            try:
+                # Full show plans (recent 3)
+                plans = await m3_pool.fetch(
+                    """
+                    SELECT
+                        id, plan_date, version, show_type, phase_count,
+                        council_brief, generated_at
+                    FROM m3_show_plans
+                    WHERE venue_id = $1
+                    ORDER BY created_at DESC
+                    LIMIT 3
+                    """,
+                    venue_id
+                )
+                context["m3_show_plans"] = [dict(p) for p in plans] if plans else []
+
+                # Show outcomes (recent 3)
+                outcomes = await m3_pool.fetch(
+                    """
+                    SELECT
+                        id, plan_id, overall_rating, peak_occupancy_pct,
+                        phase_outcomes, data_quality, finalized_at
+                    FROM m3_show_outcomes
+                    WHERE venue_id = $1
+                    ORDER BY finalized_at DESC
+                    LIMIT 3
+                    """,
+                    venue_id
+                )
+                context["m3_show_outcomes"] = [dict(o) for o in outcomes] if outcomes else []
+            except Exception as e:
+                import logging
+                logging.warning(f"M3 full fetch failed (level 3): {e}")
+
     # Risk signals for deep_risk tab
     if tab == "deep_risk":
         context["risk_signals"] = [
@@ -519,28 +604,18 @@ async def stream_from_nvidia(
     system_prompt: str, user_question: str, tab: str
 ) -> AsyncGenerator[str, None]:
     """
-    Stream response from Nvidia API using the creative model for all tabs.
+    Stream response for fast-mode tabs, rotating across all configured providers
+    (NVIDIA keys round-robin + Mistral when available).
     Temperature varies by tab type — higher for content/creative, lower for analytical.
     """
     try:
-        from openai import AsyncOpenAI
-
-        api_key = NVIDIA_API_KEY_CREATIVE
-        model   = NVIDIA_MODEL_CREATIVE
-
-        # Creative tabs: higher temperature for engaging copy
-        # Analytical tabs: lower temperature for accuracy
-        creative_tabs = {"marketing", "overview", "audience"}
-        temperature = 0.8 if tab in creative_tabs else 0.4
-
-        if not api_key:
-            yield "[Error: NVIDIA_API_KEY is not configured]"
+        pc = next_fast_client(NVIDIA_MODEL_CREATIVE)
+        if not pc:
+            yield "[Error: No AI provider configured — set NVIDIA_API_KEY or MISTRAL_API_KEY]"
             return
 
-        client = AsyncOpenAI(
-            api_key=api_key,
-            base_url=NVIDIA_API_BASE,
-        )
+        creative_tabs = {"marketing", "overview", "audience"}
+        temperature = 0.8 if tab in creative_tabs else 0.4
 
         max_tokens = {
             "marketing":   4096,
@@ -551,11 +626,11 @@ async def stream_from_nvidia(
             "deep_risk":   3000,
         }.get(tab, 2000)
 
-        stream = await client.chat.completions.create(
-            model=model,
+        stream = await pc.client.chat.completions.create(
+            model=pc.model,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_question},
+                {"role": "user",   "content": user_question},
             ],
             temperature=temperature,
             max_tokens=max_tokens,

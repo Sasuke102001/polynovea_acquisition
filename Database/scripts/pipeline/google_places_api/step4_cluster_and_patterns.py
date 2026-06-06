@@ -80,11 +80,19 @@ def load_patterns(cursor, city: str) -> dict:
             INSERT INTO behavioral_patterns
                 (area, source, pattern_name, co_occurring_primitives, total_venues_in_city, prevalence_percentage)
             VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (area, source, pattern_name) DO NOTHING
             RETURNING id;
             """,
             (city, 'google', pattern_name, json.dumps(primitives), total_venues, prevalence)
         )
-        pattern_id = cursor.fetchone()[0]
+        row = cursor.fetchone()
+        if row is None:
+            cursor.execute(
+                "SELECT id FROM behavioral_patterns WHERE area=%s AND source=%s AND pattern_name=%s",
+                (city, 'google', pattern_name)
+            )
+            row = cursor.fetchone()
+        pattern_id = row[0]
         patterns_loaded += 1
 
         city_label = CITY_LABEL[city]
@@ -124,6 +132,7 @@ def load_clusters(cursor, city: str) -> dict:
             venue_id,
             json.dumps({
                 'evidence_count': entry.get('evidence_count', 0),
+                'data_quality':   entry.get('data_quality', 'UNKNOWN'),
                 'clusters':       entry.get('clusters', []),
             }),
             COLLECTOR,

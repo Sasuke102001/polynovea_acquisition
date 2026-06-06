@@ -13,6 +13,7 @@ Run after: 018_add_source_columns.py
 Run before: 027_blend_fitness.py
 """
 
+import argparse
 import json
 import os
 import sys
@@ -21,7 +22,9 @@ import psycopg2
 sys.stdout.reconfigure(encoding='utf-8')
 
 BASE_PATH        = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'google_reviews')
-REGIONS          = ['thane', 'navi-mumbai']
+REGIONS          = ['thane', 'navi-mumbai', 'sobo']
+_p = argparse.ArgumentParser(); _p.add_argument('regions', nargs='*', default=REGIONS, metavar='REGION')
+REGIONS          = _p.parse_args().regions or REGIONS
 SOURCE           = 'google_reviews'
 PIPELINE_VERSION = 'google-reviews-bif-1.0'
 

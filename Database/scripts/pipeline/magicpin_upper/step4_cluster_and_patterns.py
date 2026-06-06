@@ -86,6 +86,7 @@ def load_clusters(cursor, region: str, lookup: dict) -> dict:
             venue_id,
             json.dumps({
                 'evidence_count': entry.get('evidence_count', 0),
+                'data_quality':   entry.get('data_quality', 'UNKNOWN'),
                 'clusters':       entry.get('clusters', []),
             }),
             CLUSTER_COLLECTOR,

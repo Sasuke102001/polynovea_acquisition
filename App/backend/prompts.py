@@ -16,10 +16,12 @@ import pathlib
 
 # ─── Research file loader ─────────────────────────────────────────────────────
 
-_BACKEND_DIR  = pathlib.Path(__file__).parent            # App/backend/
-_PROJECT_ROOT = _BACKEND_DIR.parent.parent               # project root
-_RESEARCH_DIR = _PROJECT_ROOT / "research"               # research/
-_PIPELINE_OUT = _PROJECT_ROOT / "research_pipeline" / "output"
+_BACKEND_DIR   = pathlib.Path(__file__).parent            # App/backend/
+_PROJECT_ROOT  = _BACKEND_DIR.parent.parent               # project root
+_RESEARCH_DIR  = _PROJECT_ROOT / "research"               # research/ (M2)
+_RESEARCH_M3_DIR = _PROJECT_ROOT / "research_m3"          # research_m3/ (M3) — NEW
+_RESEARCH_SE_DIR = _PROJECT_ROOT / "research_se"          # research_se/ (SE) — NEW
+_PIPELINE_OUT  = _PROJECT_ROOT / "research_pipeline" / "output"
 
 
 def _load(filename: str) -> str:
@@ -35,6 +37,26 @@ def _load_json(path: pathlib.Path):
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return None
+
+
+def _load_all_from_dir(directory: pathlib.Path, file_pattern: str = "*.md") -> str:
+    """Load all files matching pattern from a directory and concatenate."""
+    if not directory.exists():
+        return f"[{directory.name} directory not found]"
+
+    files = sorted(directory.glob(file_pattern))
+    if not files:
+        return f"[No {file_pattern} files found in {directory.name}]"
+
+    contents = []
+    for file in files:
+        try:
+            content = file.read_text(encoding="utf-8")
+            contents.append(f"## {file.stem}\n\n{content}\n\n")
+        except Exception as e:
+            contents.append(f"[Error loading {file.name}: {e}]\n\n")
+
+    return "\n".join(contents)
 
 
 # Full research documents — loaded once at startup
@@ -127,6 +149,11 @@ def _build_archetypes_index() -> str:
 # Build once at import — zero runtime cost per request
 _CLAIMS_INDEX     = _build_claims_index()
 _ARCHETYPES_INDEX = _build_archetypes_index()
+
+# ─── M3 + SE Research (loaded once at startup) ────────────────────────────────
+
+_M3_RESEARCH_CACHE = _load_all_from_dir(_RESEARCH_M3_DIR)  # NEW
+_SE_RESEARCH_CACHE = _load_all_from_dir(_RESEARCH_SE_DIR)  # NEW
 
 
 # ─── Identity guardrail ───────────────────────────────────────────────────────
@@ -855,14 +882,16 @@ Response rules (non-negotiable):
 
 # ─── Public interface ─────────────────────────────────────────────────────────
 
-def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
+def get_demo_system_prompt(venue_context: dict, prospect_name: str, demo_level: int = 1) -> str:
     """
-    System prompt for demo mode.
-    Same full venue data as the live app — teaser behaviour comes from the guardrail,
-    not from withholding data. Impressiveness requires real specificity.
+    System prompt for demo mode, gated by demo_level.
+
+    Level 1: M2 research only
+    Level 2: M2 + M3 research (music psychology, neuropsychology, environmental)
+    Level 3: M2 + M3 + SE research (neuroacoustics, show engineering, acoustics)
     """
     venue_name = venue_context.get("venue_name", "this venue")
-    return (
+    prompt = (
         _IDENTITY_GUARDRAIL
         + _build_demo_guardrail(venue_name, prospect_name)
         + build_venue_prompt(
@@ -885,6 +914,43 @@ def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
             drift_signals=venue_context.get("drift_signals"),
         )
     )
+
+    # NEW: Add M3 research for demo_level >= 2
+    if demo_level >= 2:
+        m3_intro = f"""
+
+════════════════════════════════════════════════════════
+M3 OPERATIONAL INSIGHTS (Music & Atmosphere Optimization)
+════════════════════════════════════════════════════════
+
+Based on real session data from {venue_name}:
+Recent sessions tracked: {venue_context.get("m3_kpi_summary", {}).get("sessions_with_kpi", 0)}
+Average environmental signal: {venue_context.get("m3_kpi_summary", {}).get("avg_signal_value", "N/A")}
+
+RESEARCH FOUNDATION (Music Psychology, Neuropsychology, Environmental Psychology):
+
+"""
+        prompt += m3_intro + _M3_RESEARCH_CACHE
+
+    # NEW: Add SE research for demo_level == 3
+    if demo_level >= 3:
+        se_intro = f"""
+
+════════════════════════════════════════════════════════
+PRISM 7-STAGE FRAMEWORK (Show Engineering & Neuroacoustics)
+════════════════════════════════════════════════════════
+
+Complete behavioral optimization system: evidence sweep → synthesis → orchestration.
+
+Prior show plans: {len(venue_context.get("m3_show_plans", []))}
+Finalized outcomes: {len(venue_context.get("m3_show_outcomes", []))}
+
+RESEARCH FOUNDATION (Neuroacoustics, Frequency Psychology, Crowd Dynamics):
+
+"""
+        prompt += se_intro + _SE_RESEARCH_CACHE
+
+    return prompt
 
 
 def get_system_prompt(tab: str, venue_context: dict) -> str:

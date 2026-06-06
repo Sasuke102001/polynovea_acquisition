@@ -61,6 +61,7 @@ export default function AdminDemoPanel({
   const [searching, setSearching]             = useState(false);
   const [prospectName, setProspectName]       = useState("");
   const [hours, setHours]                     = useState(72);
+  const [demoLevel, setDemoLevel]             = useState<1 | 2 | 3>(1);  // NEW
   const [generating, setGenerating]           = useState(false);
   const [error, setError]                     = useState<string | null>(null);
 
@@ -127,7 +128,7 @@ export default function AdminDemoPanel({
       const res = await fetch("/api/demo/generate", {
         method:  "POST",
         headers: { "Content-Type": "application/json", "X-Admin-Key": adminKey },
-        body: JSON.stringify({ venue_id: activeVenueId, prospect_name: prospectName.trim(), expires_hours: hours }),
+        body: JSON.stringify({ venue_id: activeVenueId, prospect_name: prospectName.trim(), expires_hours: hours, demo_level: demoLevel }),  // NEW: demo_level
       });
 
       if (res.status === 403) {
@@ -352,6 +353,26 @@ export default function AdminDemoPanel({
                       style={hours === h ? S.btnPrimary : S.btnMuted}
                     >
                       {h === 24 ? "24h" : h === 48 ? "48h" : h === 72 ? "72h" : "1 week"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Demo Level ── NEW */}
+              <div className="flex flex-col gap-2">
+                <label className="text-[9px] font-bold uppercase tracking-widest" style={S.label}>AI capability</label>
+                <div className="flex flex-col gap-1.5">
+                  {([1, 2, 3] as const).map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => setDemoLevel(level)}
+                      className="text-left px-3 py-2 rounded text-[11px] transition-all"
+                      style={demoLevel === level ? S.btnPrimary : S.btnMuted}
+                    >
+                      <p className="font-bold">Level {level}</p>
+                      <p className="text-[10px]" style={{ color: demoLevel === level ? "#E6D3A3" : "#71717A" }}>
+                        {level === 1 ? "M2 Council only" : level === 2 ? "Council + Prism Agent 1" : "Full Prism (7 agents)"}
+                      </p>
                     </button>
                   ))}
                 </div>

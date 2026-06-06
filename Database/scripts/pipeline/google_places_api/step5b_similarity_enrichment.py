@@ -29,12 +29,13 @@ DB_CONFIG = {
 }
 
 VECTOR_SQL = """
-    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source)
+    INSERT INTO venue_vectors (venue_id, source, fitness_vector, vector_source, vector_confidence)
     VALUES %s
     ON CONFLICT (venue_id, source) DO UPDATE SET
-        fitness_vector = EXCLUDED.fitness_vector,
-        vector_source  = EXCLUDED.vector_source,
-        last_computed  = CURRENT_TIMESTAMP;
+        fitness_vector    = EXCLUDED.fitness_vector,
+        vector_source     = EXCLUDED.vector_source,
+        vector_confidence = EXCLUDED.vector_confidence,
+        last_computed     = CURRENT_TIMESTAMP;
 """
 
 SIMILARITY_SQL = """
@@ -77,7 +78,8 @@ def load_city(cursor, city: str, lookup: dict) -> dict:
             skipped += 1
             continue
 
-        vector_rows.append((venue_id, 'google', fitness_vector, vector_source))
+        vector_rows.append((venue_id, 'google', fitness_vector, vector_source,
+                            entry.get('vector_confidence', 'behavioral_evidence')))
 
         for similar in entry.get('similar_venues_pool', []):
             sim_place_id = similar.get('place_id')

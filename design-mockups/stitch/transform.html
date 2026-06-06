@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transform Terminal - Polynovea Acquisition</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Public+Sans:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        background: "#0A0A0A",
+                        surface: "#18181B",
+                        "surface-border": "#27272A",
+                        gold: "#E6D3A3",
+                        "gold-dim": "rgba(230, 211, 163, 0.1)",
+                        emerald: "#10B981",
+                        amber: "#F59E0B",
+                        coral: "#F43F5E",
+                        muted: "#A1A1AA",
+                        primary: "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        headline: ["Clash Display", "sans-serif"],
+                        display: ["Public Sans"],
+                        body: ["Public Sans", "sans-serif"],
+                        label: ["Public Sans", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    animation: {
+                        'float-fast': 'float 3s ease-in-out infinite',
+                        'float-med': 'float 4s ease-in-out infinite',
+                        'float-slow': 'float 5s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'bob': 'bob 3s ease-in-out infinite',
+                        'flicker': 'flicker 2s linear infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0) translateZ(0)' },
+                            '50%': { transform: 'translateY(-10px) translateZ(10px)' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.3', transform: 'scale(1)' },
+                            '50%': { opacity: '0.6', transform: 'scale(1.05)' }
+                        },
+                        bob: {
+                            '0%, 100%': { transform: 'translateY(-5px)' },
+                            '50%': { transform: 'translateY(5px)' }
+                        },
+                        flicker: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.5' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #ffffff;
+            font-family: 'Public Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .matrix-container {
+            perspective: 1200px;
+            transform-style: preserve-3d;
+            box-shadow: inset 0 0 50px rgba(230, 211, 163, 0.05);
+        }
+
+        .matrix-grid {
+            transform: rotateX(15deg);
+            transition: transform 0.5s ease;
+        }
+
+        .venue-bubble-container {
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .venue-bubble-container:hover {
+            transform: translateZ(30px) scale(1.1);
+            z-index: 10;
+        }
+
+        .venue-tooltip {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .venue-bubble-container:hover .venue-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        /* Particle field background */
+        .particle-field-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: rgba(230, 211, 163, 0.5);
+            border-radius: 50%;
+        }
+
+        /* Helper for parallax */
+        .parallax-container {
+            perspective: 1px;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        .parallax-layer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        .parallax-layer-back {
+            transform: translateZ(-1px) scale(2);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen text-gray-200 parallax-container bg-[#0A0A0A]">
+<!-- Particle Background -->
+<div class="parallax-layer parallax-layer-back">
+<div class="particle-field-bg" id="particles"></div>
+</div>
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full flex flex-col py-8 z-40 bg-[#0A0A0A] dark:bg-[#0A0A0A] border-r border-[#E6D3A3]/10 h-screen w-64 flat no shadows">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold text-[#E6D3A3] uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-gold">local_police</span>
+                Polynovea
+            </h1>
+<p class="text-xs text-muted mt-1 uppercase tracking-widest font-label">Cinematic Intelligence</p>
+</div>
+<div class="flex-1 overflow-y-auto w-full">
+<ul class="space-y-1 w-full font-label text-label-md tracking-widest uppercase">
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                        Overview
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">groups</span>
+                        Audience
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">campaign</span>
+                        Marketing
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">compare_arrows</span>
+                        Competitors
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 bg-[#E6D3A3]/10 text-[#E6D3A3] border-r-4 border-[#E6D3A3] px-4 py-3 font-bold Active: scale-[0.98] transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+                        Transform
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">ads_click</span>
+                        Campaign
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 text-on-surface-variant/60 hover:text-[#E6D3A3] px-4 py-3 transition-all hover:bg-[#E6D3A3]/5 hover:translate-x-1 duration-300" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                        Deep Analysis
+                    </a>
+</li>
+</ul>
+</div>
+<div class="px-6 mt-auto pt-6 border-t border-surface-border">
+<button class="w-full py-2 bg-gold/10 text-gold hover:bg-gold hover:text-black transition-colors duration-300 font-label uppercase text-sm tracking-widest font-semibold border border-gold/30 rounded flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Analysis
+            </button>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 ml-64 p-8 min-h-screen relative z-10">
+<!-- Top Header & Tabs -->
+<header class="mb-12">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="font-headline text-3xl font-bold text-[#E6D3A3] tracking-wide">The Continental Core</h2>
+<p class="text-muted font-mono text-sm mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                        Financial District, New York City
+                    </p>
+</div>
+<div class="text-right">
+<p class="font-mono text-xs text-muted uppercase tracking-widest">System Status</p>
+<p class="font-mono text-sm text-emerald flex items-center gap-2 justify-end mt-1">
+<span class="w-2 h-2 rounded-full bg-emerald animate-pulse"></span>
+                        Active Synthesis
+                    </p>
+</div>
+</div>
+<!-- Horizontal Tab Bar (Secondary) -->
+<div class="border-b border-surface-border">
+<nav class="flex gap-8 font-label text-sm uppercase tracking-widest">
+<a class="py-3 text-muted hover:text-gold transition-colors" href="#">Overview</a>
+<a class="py-3 text-muted hover:text-gold transition-colors" href="#">Audience</a>
+<a class="py-3 text-muted hover:text-gold transition-colors" href="#">Marketing</a>
+<a class="py-3 text-muted hover:text-gold transition-colors" href="#">Competitors</a>
+<a class="py-3 text-gold border-b-2 border-gold font-bold" href="#">Transform</a>
+<a class="py-3 text-muted hover:text-gold transition-colors" href="#">Campaign</a>
+<a class="py-3 text-muted hover:text-gold transition-colors" href="#">Deep Analysis</a>
+</nav>
+</div>
+</header>
+<!-- 3D Opportunity Matrix -->
+<section class="mb-16">
+<h3 class="font-headline text-xl text-white mb-8 flex items-center gap-3">
+<span class="material-symbols-outlined text-gold">3d_rotation</span>
+                Opportunity Matrix
+            </h3>
+<div class="w-full h-[600px] bg-[#18181B] rounded-xl border border-surface-border relative overflow-hidden flex items-center justify-center matrix-container group">
+<!-- Decorative background elements -->
+<div class="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gold/20 via-transparent to-transparent"></div>
+<!-- Axes Labels -->
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-xs text-muted tracking-widest flex items-center gap-4 w-3/4 justify-between">
+<span>Low Effort</span>
+<span class="h-px bg-surface-border flex-1"></span>
+<span>X-Axis</span>
+<span class="h-px bg-surface-border flex-1"></span>
+<span>High Effort</span>
+</div>
+<div class="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xs text-muted tracking-widest flex flex-col items-center gap-4 h-3/4 justify-between -rotate-90 origin-center w-8">
+<span class="whitespace-nowrap">High Align</span>
+<span class="w-px bg-surface-border flex-1"></span>
+<span class="whitespace-nowrap">Y-Axis</span>
+<span class="w-px bg-surface-border flex-1"></span>
+<span class="whitespace-nowrap">Low Align</span>
+</div>
+<!-- 3D Grid -->
+<div class="w-3/4 h-3/4 border border-surface-border/50 relative matrix-grid grid grid-cols-2 grid-rows-2 shadow-2xl bg-black/40 backdrop-blur-sm rounded-lg">
+<!-- Crosshairs -->
+<div class="absolute top-0 bottom-0 left-1/2 w-px bg-gold/30 -translate-x-1/2 shadow-[0_0_10px_rgba(230,211,163,0.5)]"></div>
+<div class="absolute left-0 right-0 top-1/2 h-px bg-gold/30 -translate-y-1/2 shadow-[0_0_10px_rgba(230,211,163,0.5)]"></div>
+<!-- Quadrants -->
+<div class="relative border-r border-b border-surface-border/30 p-4">
+<span class="absolute top-4 left-4 font-label text-xs uppercase tracking-widest text-gold/50">Role Model</span>
+<!-- Bubble: The Velvet Room -->
+<div class="absolute top-[30%] left-[40%] venue-bubble-container cursor-pointer">
+<div class="venue-bubble animate-bob" style="animation-delay: 0.2s;">
+<div class="px-4 py-2 bg-gold/10 border border-gold/50 rounded-full backdrop-blur-md text-gold font-headline text-sm shadow-[0_0_15px_rgba(230,211,163,0.2)] flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
+                                    The Velvet Room
+                                </div>
+</div>
+<!-- Tooltip -->
+<div class="venue-tooltip absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 bg-[#18181B] border border-gold/30 p-3 rounded shadow-xl">
+<div class="font-mono text-xs text-muted mb-2 border-b border-surface-border pb-2">Status Analysis</div>
+<div class="flex justify-between items-center text-sm font-headline">
+<span class="font-mono text-white">Alignment</span>
+<span class="text-gold font-mono">94%</span>
+</div>
+<div class="flex justify-between items-center text-sm font-headline mt-1">
+<span class="font-mono text-white">Effort</span>
+<span class="text-white font-mono">Low</span>
+</div>
+</div>
+</div>
+</div>
+<div class="relative border-b border-surface-border/30 p-4">
+<span class="absolute top-4 right-4 font-label text-xs uppercase tracking-widest text-emerald/50">Bridge</span>
+<!-- Bubble: Gourmet Echo -->
+<div class="absolute top-[60%] left-[20%] venue-bubble-container cursor-pointer">
+<div class="venue-bubble animate-bob" style="animation-delay: 0.5s;">
+<div class="px-4 py-2 bg-emerald/10 border border-emerald/50 rounded-full backdrop-blur-md text-emerald font-headline text-sm shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald"></span>
+                                    Gourmet Echo
+                                </div>
+</div>
+<!-- Tooltip -->
+<div class="venue-tooltip absolute top-full left-1/2 -translate-x-1/2 mt-3 w-48 bg-[#18181B] border border-emerald/30 p-3 rounded shadow-xl">
+<div class="font-mono text-xs text-muted mb-2 border-b border-surface-border pb-2">Status Analysis</div>
+<div class="flex justify-between items-center text-sm font-headline">
+<span class="font-mono text-white">Alignment</span>
+<span class="text-emerald font-mono">82%</span>
+</div>
+<div class="flex justify-between items-center text-sm font-headline mt-1">
+<span class="font-mono text-white">Effort</span>
+<span class="text-white font-mono">Med</span>
+</div>
+</div>
+</div>
+</div>
+<div class="relative border-r border-surface-border/30 p-4">
+<span class="absolute bottom-4 left-4 font-label text-xs uppercase tracking-widest text-amber/50">Transition</span>
+<!-- Bubble: Brew Kinetics -->
+<div class="absolute top-[20%] left-[60%] venue-bubble-container cursor-pointer">
+<div class="venue-bubble animate-bob" style="animation-delay: 0.8s;">
+<div class="px-4 py-2 bg-amber/10 border border-amber/50 rounded-full backdrop-blur-md text-amber font-headline text-sm shadow-[0_0_15px_rgba(245,158,11,0.2)] flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amber"></span>
+                                    Brew Kinetics
+                                </div>
+</div>
+<div class="venue-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 bg-[#18181B] border border-amber/30 p-3 rounded shadow-xl">
+<div class="font-mono text-xs text-muted mb-2 border-b border-surface-border pb-2">Status Analysis</div>
+<div class="flex justify-between items-center text-sm font-headline">
+<span class="font-mono text-white">Alignment</span>
+<span class="text-amber font-mono">45%</span>
+</div>
+<div class="flex justify-between items-center text-sm font-headline mt-1">
+<span class="font-mono text-white">Effort</span>
+<span class="text-white font-mono">Low</span>
+</div>
+</div>
+</div>
+</div>
+<div class="relative p-4">
+<span class="absolute bottom-4 right-4 font-label text-xs uppercase tracking-widest text-muted/50">Pure Target</span>
+<!-- Bubble: Neon Distill -->
+<div class="absolute top-[50%] left-[50%] venue-bubble-container cursor-pointer">
+<div class="venue-bubble animate-bob" style="animation-delay: 1.1s;">
+<div class="px-4 py-2 bg-muted/10 border border-muted/50 rounded-full backdrop-blur-md text-gray-300 font-headline text-sm shadow-[0_0_15px_rgba(161,161,170,0.2)] flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-muted"></span>
+                                    Neon Distill
+                                </div>
+</div>
+<div class="venue-tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 bg-[#18181B] border border-muted/30 p-3 rounded shadow-xl">
+<div class="font-mono text-xs text-muted mb-2 border-b border-surface-border pb-2">Status Analysis</div>
+<div class="flex justify-between items-center text-sm font-headline">
+<span class="font-mono text-white">Alignment</span>
+<span class="text-muted font-mono">20%</span>
+</div>
+<div class="flex justify-between items-center text-sm font-headline mt-1">
+<span class="font-mono text-white">Effort</span>
+<span class="text-white font-mono">High</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Ranked Opportunity List -->
+<section>
+<h3 class="font-headline text-2xl text-gold font-bold mb-6 tracking-wide uppercase border-b border-surface-border pb-2 inline-block">Strategic Opportunities</h3>
+<div class="grid grid-cols-1 gap-4">
+<!-- Card 1: Quick Win -->
+<div class="bg-[#18181B] border border-surface-border rounded-lg p-5 flex items-center relative overflow-hidden opacity-0 animate-slide-up stagger-1 group hover:border-emerald/50 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald"></div>
+<div class="w-32 shrink-0">
+<span class="px-2 py-1 bg-emerald/10 text-emerald border border-emerald/20 rounded font-mono text-[10px] tracking-widest uppercase">Quick Win</span>
+</div>
+<div class="flex-1 px-6 border-l border-surface-border">
+<h4 class="font-headline text-lg font-semibold text-white group-hover:text-emerald transition-colors">The Velvet Room</h4>
+<p class="text-sm text-muted mt-1 font-body">Immediate conversion potential. High aesthetic overlap with target demographic. Minimal operational pivot required.</p>
+</div>
+<div class="w-32 shrink-0 text-right flex flex-col items-end">
+<span class="font-mono text-2xl text-emerald font-bold">94%</span>
+<span class="font-mono text-[10px] text-muted uppercase tracking-widest">Alignment Match</span>
+</div>
+<button class="ml-6 w-10 h-10 rounded-full border border-surface-border flex items-center justify-center text-muted hover:text-white hover:border-white transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Card 2: Major Initiative -->
+<div class="bg-[#18181B] border border-surface-border rounded-lg p-5 flex items-center relative overflow-hidden opacity-0 animate-slide-up stagger-2 group hover:border-amber/50 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-amber"></div>
+<div class="w-32 shrink-0">
+<span class="px-2 py-1 bg-amber/10 text-amber border border-amber/20 rounded font-mono text-[10px] tracking-widest uppercase">Major Initiative</span>
+</div>
+<div class="flex-1 px-6 border-l border-surface-border">
+<h4 class="font-headline text-lg font-semibold text-white group-hover:text-amber transition-colors">Gourmet Echo</h4>
+<p class="text-sm text-muted mt-1 font-body">Requires menu restructure and interior refresh, but audience density in proximity justifies capital expenditure.</p>
+</div>
+<div class="w-32 shrink-0 text-right flex flex-col items-end">
+<span class="font-mono text-2xl text-amber font-bold">82%</span>
+<span class="font-mono text-[10px] text-muted uppercase tracking-widest">Alignment Match</span>
+</div>
+<button class="ml-6 w-10 h-10 rounded-full border border-surface-border flex items-center justify-center text-muted hover:text-white hover:border-white transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Card 3: Strategic Pivot -->
+<div class="bg-[#18181B] border border-surface-border rounded-lg p-5 flex items-center relative overflow-hidden opacity-0 animate-slide-up stagger-3 group hover:border-coral/50 transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-coral"></div>
+<div class="w-32 shrink-0">
+<span class="px-2 py-1 bg-coral/10 text-coral border border-coral/20 rounded font-mono text-[10px] tracking-widest uppercase">Strategic Pivot</span>
+</div>
+<div class="flex-1 px-6 border-l border-surface-border">
+<h4 class="font-headline text-lg font-semibold text-white group-hover:text-coral transition-colors">Brew Kinetics</h4>
+<p class="text-sm text-muted mt-1 font-body">Low current alignment but located in rapid-gentrification zone. High effort/high reward long-term play.</p>
+</div>
+<div class="w-32 shrink-0 text-right flex flex-col items-end">
+<span class="font-mono text-2xl text-coral font-bold">45%</span>
+<span class="font-mono text-[10px] text-muted uppercase tracking-widest">Alignment Match</span>
+</div>
+<button class="ml-6 w-10 h-10 rounded-full border border-surface-border flex items-center justify-center text-muted hover:text-white hover:border-white transition-colors">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<script>
+        // Optional vanilla JS for adding subtle interactivity
+        document.addEventListener('mousemove', (e) => {
+            const matrix = document.querySelector('.matrix-grid');
+            if(!matrix) return;
+            
+            // Subtle parallax effect based on mouse position within the matrix container
+            const container = document.querySelector('.matrix-container');
+            const rect = container.getBoundingClientRect();
+            
+            if (e.clientX >= rect.left && e.clientX <= rect.right && 
+                e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                
+                // Add slight rotation based on cursor
+                matrix.style.transform = `rotateX(${15 - y * 10}deg) rotateY(${-5 + x * 10}deg)`;
+            } else {
+                // Reset to default
+                matrix.style.transform = `rotateX(15deg) rotateY(0deg)`;
+            }
+        });
+
+        // Generate particles
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle', 'animate-flicker');
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 2}s`;
+            
+            // Add slight float animation to particles
+            particle.style.animation = `flicker ${1 + Math.random() * 2}s linear infinite, bob ${2 + Math.random() * 3}s ease-in-out infinite`;
+            particle.style.animationDelay = `${Math.random() * 2}s`;
+
+            particleContainer.appendChild(particle);
+        }
+    </script>
+</body></html>
