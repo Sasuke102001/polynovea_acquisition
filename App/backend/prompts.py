@@ -24,6 +24,9 @@ _PIPELINE_OUT  = _RESEARCH_ROOT / "research_pipeline-M2" / "output"
 # M2 behavioral research lives at research/ (flat files)
 _RESEARCH_DIR  = _RESEARCH_ROOT if _RESEARCH_ROOT.exists() else _BACKEND_DIR / "research"
 
+# M3 neuroscience/behavioral research lives at research/research/
+_M3_RESEARCH_DIR = _RESEARCH_ROOT / "research"
+
 
 def _load(filename: str) -> str:
     path = _RESEARCH_DIR / filename
@@ -31,6 +34,14 @@ def _load(filename: str) -> str:
         return path.read_text(encoding="utf-8")
     except Exception:
         return f"[{filename} not found — place file in research/ folder]"
+
+
+def _load_m3(filename: str) -> str:
+    path = _M3_RESEARCH_DIR / filename
+    try:
+        return path.read_text(encoding="utf-8")
+    except Exception:
+        return f"[M3/{filename} not found]"
 
 
 def _load_json(path: pathlib.Path):
@@ -77,6 +88,14 @@ _MASTER_OPERATING_DOC   = _load("Polynovea_Master_Operating_Document_FINAL.md")
 _MARKET_INTEL_PERPLEXITY = _load("india_market_intelligence_perplexity.md")
 _ARCHETYPE_VALIDATION   = _load("archetype_segment_validation_kimi.md")
 _AD_BRIEF_RESEARCH      = _load("india_fb_ad_brief_generator_research.md")
+
+# ─── M3 behavioral/neuroscience research (acquisition-relevant subset) ───────
+# 4 files chosen for hospitality acquisition context — NOT show engineering.
+# Total ~104KB; combined with M2 payload keeps Prism well under 200k char cap.
+_M3_HOSPITALITY_SPEND   = _load_m3("hospitality_spending_behavioral_triggers.md")
+_M3_IDENTITY_SOCIAL     = _load_m3("identity_signaling_social_status.md")
+_M3_EMOTIONAL_LOYALTY   = _load_m3("emotional_memory_loyalty_mechanisms.md")
+_M3_CULTURAL_DEMO       = _load_m3("cultural_demographic_effects.md")
 
 
 # ─── Structured claims index (from research_pipeline/output/) ────────────────
@@ -831,10 +850,33 @@ def get_demo_system_prompt(venue_context: dict, prospect_name: str) -> str:
     )
 
 
+_M3_RESEARCH_SECTION = f"""
+══════════════════════════════════════════════════════════════════
+M3 BEHAVIORAL RESEARCH — HOSPITALITY SPENDING TRIGGERS
+══════════════════════════════════════════════════════════════════
+{_M3_HOSPITALITY_SPEND}
+
+══════════════════════════════════════════════════════════════════
+M3 BEHAVIORAL RESEARCH — IDENTITY SIGNALING & SOCIAL STATUS
+══════════════════════════════════════════════════════════════════
+{_M3_IDENTITY_SOCIAL}
+
+══════════════════════════════════════════════════════════════════
+M3 BEHAVIORAL RESEARCH — EMOTIONAL MEMORY & LOYALTY MECHANISMS
+══════════════════════════════════════════════════════════════════
+{_M3_EMOTIONAL_LOYALTY}
+
+══════════════════════════════════════════════════════════════════
+M3 BEHAVIORAL RESEARCH — CULTURAL & DEMOGRAPHIC EFFECTS
+══════════════════════════════════════════════════════════════════
+{_M3_CULTURAL_DEMO}
+"""
+
+
 def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
     """System prompt for Prism demo calls.
-    Tab-aware injection keeps this to venue data + claims/archetypes + 2 M2 prose files,
-    staying well under Llama Maverick's 131k token limit."""
+    Venue data + M2 claims/archetypes + 2 M2 prose files (tab-aware) +
+    4 M3 behavioral research files (~104KB). Total ~180KB, under Prism's 200k char cap."""
     venue_name = venue_context.get("venue_name", "this venue")
     return (
         _IDENTITY_GUARDRAIL
@@ -858,6 +900,7 @@ def get_prism_system_prompt(venue_context: dict, prospect_name: str) -> str:
             mechanisms=venue_context.get("mechanisms"),
             drift_signals=venue_context.get("drift_signals"),
         )
+        + _M3_RESEARCH_SECTION
     )
 
 
