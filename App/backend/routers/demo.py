@@ -35,40 +35,81 @@ _DEFAULT_EXPIRES_HOURS = 72
 
 # ─── Supabase demo logging ─────────────────────────────────────────────────────
 
+def _supabase_headers() -> tuple[str, str, dict] | None:
+    """Return (url, key, headers) or None if Supabase is not configured."""
+    url = os.getenv("SUPABASE_URL", "").rstrip("/")
+    key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY", "")
+    if not url or not key:
+        return None
+    return url, key, {
+        "apikey":        key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type":  "application/json",
+    }
+
+
 async def log_demo_chat(
     venue_id: int,
     venue_name: str,
     prospect_name: str,
     question: str,
     response: str,
+    demo_mode: str = "single_model",
 ) -> None:
     """Fire-and-forget: log demo chat exchange to demo_chat_logs table."""
+    creds = _supabase_headers()
+    if not creds:
+        return
+    url, _, headers = creds
     try:
-        supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
-        supabase_key = os.getenv("SUPABASE_SECRET_KEY") or os.getenv("SUPABASE_ANON_KEY", "")
-        if not supabase_url or not supabase_key:
-            return
-
-        headers = {
-            "apikey":        supabase_key,
-            "Authorization": f"Bearer {supabase_key}",
-            "Content-Type":  "application/json",
-        }
-        payload = {
-            "venue_id":      str(venue_id),
-            "venue_name":    venue_name,
-            "prospect_name": prospect_name,
-            "question":      question,
-            "response":      response,
-        }
         async with httpx.AsyncClient(timeout=10) as client:
             await client.post(
-                f"{supabase_url}/rest/v1/demo_chat_logs",
-                json=payload,
+                f"{url}/rest/v1/demo_chat_logs",
+                json={
+                    "venue_id":      str(venue_id),
+                    "venue_name":    venue_name,
+                    "prospect_name": prospect_name,
+                    "question":      question,
+                    "response":      response,
+                    "demo_mode":     demo_mode,
+                },
                 headers=headers,
             )
     except Exception as e:
-        print(f"[demo] Supabase logging failed: {e}")
+        print(f"[demo] demo_chat_logs write failed: {e}")
+
+
+async def log_prism_session(
+    venue_id: int,
+    venue_name: str,
+    prospect_name: str,
+    demo_level: int,
+    question: str,
+    full_response: str,
+    duration_ms: int | None,
+) -> None:
+    """Fire-and-forget: log a completed Prism pipeline run to prism_sessions."""
+    creds = _supabase_headers()
+    if not creds:
+        return
+    url, _, headers = creds
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(
+                f"{url}/rest/v1/prism_sessions",
+                json={
+                    "venue_id":        str(venue_id),
+                    "venue_name":      venue_name,
+                    "prospect_name":   prospect_name,
+                    "demo_level":      demo_level,
+                    "question":        question,
+                    "full_response":   full_response,
+                    "duration_ms":     duration_ms,
+                },
+                headers=headers,
+            )
+    except Exception as e:
+        print(f"[demo] prism_sessions write failed: {e}")
 
 
 def _secret() -> str:
@@ -269,7 +310,10 @@ async def demo_chat(token: str, req: DemoChatRequest):
     prism_system_prompt = get_prism_system_prompt(context, prospect)
 
     async def _generate() -> AsyncGenerator[str, None]:
+        import time as _time
         buffer: list[str] = []
+        prism_buffer: list[str] = []
+        prism_start: float | None = None
         try:
             if demo_level == 1:
                 async for chunk in stream_from_nvidia(system_prompt, req.question, "overview"):
@@ -284,8 +328,10 @@ async def demo_chat(token: str, req: DemoChatRequest):
 
             elif demo_level == 3:
                 yield "## Prism\n\n"
+                prism_start = _time.monotonic()
                 async for chunk in call_m3_prism(prism_system_prompt, req.question, venue_id=venue_id):
                     buffer.append(chunk)
+                    prism_buffer.append(chunk)
                     yield chunk
 
             elif demo_level == 4:
@@ -295,14 +341,17 @@ async def demo_chat(token: str, req: DemoChatRequest):
                     yield chunk
 
                 yield "\n\n---\n\n## Prism\n\n"
+                prism_start = _time.monotonic()
                 async for chunk in call_m3_prism(prism_system_prompt, req.question, venue_id=venue_id):
                     buffer.append(chunk)
+                    prism_buffer.append(chunk)
                     yield chunk
 
         except Exception as exc:
             yield f"\n\n[Error: {exc}]"
         finally:
             full_response = "".join(buffer)
+            mode = _mode_label(demo_level)
             if full_response:
                 asyncio.create_task(
                     log_demo_chat(
@@ -311,6 +360,20 @@ async def demo_chat(token: str, req: DemoChatRequest):
                         prospect,
                         req.question,
                         full_response,
+                        demo_mode=mode,
+                    )
+                )
+            if prism_buffer:
+                duration = int((_time.monotonic() - prism_start) * 1000) if prism_start else None
+                asyncio.create_task(
+                    log_prism_session(
+                        venue_id,
+                        context["venue_name"],
+                        prospect,
+                        demo_level,
+                        req.question,
+                        "".join(prism_buffer),
+                        duration,
                     )
                 )
 
