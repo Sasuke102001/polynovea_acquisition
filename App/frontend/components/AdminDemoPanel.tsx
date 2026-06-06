@@ -61,7 +61,7 @@ export default function AdminDemoPanel({
   const [searching, setSearching]             = useState(false);
   const [prospectName, setProspectName]       = useState("");
   const [hours, setHours]                     = useState(72);
-  const [demoLevel, setDemoLevel]             = useState<1 | 2 | 3>(1);  // NEW
+  const [demoLevel, setDemoLevel]             = useState<1 | 2 | 3 | 4>(1);
   const [generating, setGenerating]           = useState(false);
   const [error, setError]                     = useState<string | null>(null);
 
@@ -362,7 +362,7 @@ export default function AdminDemoPanel({
               <div className="flex flex-col gap-2">
                 <label className="text-[9px] font-bold uppercase tracking-widest" style={S.label}>AI capability</label>
                 <div className="flex flex-col gap-1.5">
-                  {([1, 2, 3] as const).map((level) => (
+                  {([1, 2, 3, 4] as const).map((level) => (
                     <button
                       key={level}
                       onClick={() => setDemoLevel(level)}
@@ -371,7 +371,13 @@ export default function AdminDemoPanel({
                     >
                       <p className="font-bold">Level {level}</p>
                       <p className="text-[10px]" style={{ color: demoLevel === level ? "#E6D3A3" : "#71717A" }}>
-                        {level === 1 ? "M2 Council only" : level === 2 ? "Council + Prism Agent 1" : "Full Prism (7 agents)"}
+                        {level === 1
+                          ? "1 AI model"
+                          : level === 2
+                          ? "Council"
+                          : level === 3
+                          ? "Prism"
+                          : "Council + Prism"}
                       </p>
                     </button>
                   ))}

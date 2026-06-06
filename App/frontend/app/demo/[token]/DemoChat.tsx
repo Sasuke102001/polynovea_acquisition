@@ -14,6 +14,21 @@ interface Message {
   content: string;
 }
 
+function modeBadge(level: number): { label: string; background: string; border: string; color: string } {
+  switch (level) {
+    case 1:
+      return { label: "1 AI Model", background: "rgba(59,130,246,0.2)", border: "1px solid rgba(59,130,246,0.4)", color: "#60a5fa" };
+    case 2:
+      return { label: "Council", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", color: "#d8b4fe" };
+    case 3:
+      return { label: "Prism", background: "rgba(234,179,8,0.2)", border: "1px solid rgba(234,179,8,0.4)", color: "#eab308" };
+    case 4:
+      return { label: "Council + Prism", background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.35)", color: "#34d399" };
+    default:
+      return { label: `Level ${level}`, background: "rgba(113,113,122,0.2)", border: "1px solid rgba(113,113,122,0.35)", color: "#a1a1aa" };
+  }
+}
+
 // ─── Lightweight markdown renderer (same as ChatDrawer) ──────────────────────
 
 function renderMarkdown(text: string): React.ReactNode {
@@ -137,6 +152,7 @@ export default function DemoChat({ token }: DemoChatProps) {
   const [error, setError]           = useState<string | null>(null);
   const messagesEndRef              = useRef<HTMLDivElement>(null);
   const inputRef                    = useRef<HTMLInputElement>(null);
+  const badge                       = venue ? modeBadge(venue.demo_level) : null;
 
   // ── Verify token on mount ────────────────────────────────────────────────
   useEffect(() => {
@@ -257,12 +273,12 @@ export default function DemoChat({ token }: DemoChatProps) {
               <span
                 className="text-[10px] font-bold px-2 py-1 rounded"
                 style={{
-                  background: venue.demo_level === 1 ? "rgba(59,130,246,0.2)" : venue.demo_level === 2 ? "rgba(168,85,247,0.2)" : "rgba(234,179,8,0.2)",
-                  border: venue.demo_level === 1 ? "1px solid rgba(59,130,246,0.4)" : venue.demo_level === 2 ? "1px solid rgba(168,85,247,0.4)" : "1px solid rgba(234,179,8,0.4)",
-                  color: venue.demo_level === 1 ? "#60a5fa" : venue.demo_level === 2 ? "#d8b4fe" : "#eab308",
+                  background: badge?.background,
+                  border: badge?.border,
+                  color: badge?.color,
                 }}
               >
-                Level {venue.demo_level}
+                {badge?.label}
               </span>
             </div>
             <p className="text-[11px]" style={{ color: "#71717A" }}>
