@@ -19,7 +19,6 @@ import pathlib
 _BACKEND_DIR   = pathlib.Path(__file__).parent            # App/backend/
 _PROJECT_ROOT  = _BACKEND_DIR.parent.parent               # project root
 _RESEARCH_ROOT = _PROJECT_ROOT / "research"               # shared research repo checkout
-_PIPELINE_OUT  = _RESEARCH_ROOT / "research_pipeline-M2" / "output"
 
 # M2 flat .md files — CI/CD copies research_cache/m2/* → App/backend/research/
 _RESEARCH_DIR  = _RESEARCH_ROOT if _RESEARCH_ROOT.exists() else _BACKEND_DIR / "research"
