@@ -1,0 +1,657 @@
+{
+  "frozen_at": "2026-06-10T18:13:48.815380+00:00",
+  "tolerance": 0.03,
+  "source": "blended",
+  "venues": {
+    "434": {
+      "name": "Ooh Pitara Bar & Kitchen",
+      "scores": {
+        "fitness_for_office_lunch": 0.143,
+        "fitness_for_repeat_habit": 0.279,
+        "fitness_for_social_dwell": 0.346,
+        "fitness_for_group_energy": 0.312,
+        "fitness_for_destination_visit": 0.123,
+        "operational_quality": 0.58,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.586
+      }
+    },
+    "477": {
+      "name": "Basil & Beans",
+      "scores": {
+        "fitness_for_office_lunch": 0.146,
+        "fitness_for_repeat_habit": 0.292,
+        "fitness_for_social_dwell": 0.441,
+        "fitness_for_group_energy": 0.319,
+        "fitness_for_destination_visit": 0.195,
+        "operational_quality": 0.591,
+        "retention_strength": 0.585,
+        "monetization_potential": 0.0
+      }
+    },
+    "1976": {
+      "name": "Waves - The HighTide Club",
+      "scores": {
+        "fitness_for_office_lunch": 0.146,
+        "fitness_for_repeat_habit": 0.171,
+        "fitness_for_social_dwell": 0.375,
+        "fitness_for_group_energy": 0.316,
+        "fitness_for_destination_visit": 0.165,
+        "operational_quality": 0.577,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.571
+      }
+    },
+    "5729": {
+      "name": "Barrels & Brew - Lounge Bar",
+      "scores": {
+        "fitness_for_office_lunch": 0.144,
+        "fitness_for_repeat_habit": 0.234,
+        "fitness_for_social_dwell": 0.289,
+        "fitness_for_group_energy": 0.264,
+        "fitness_for_destination_visit": 0.165,
+        "operational_quality": 0.577,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.579
+      }
+    },
+    "87": {
+      "name": "The Union Bar and Eating House",
+      "scores": {
+        "fitness_for_office_lunch": 0.151,
+        "fitness_for_repeat_habit": 0.288,
+        "fitness_for_social_dwell": 0.351,
+        "fitness_for_group_energy": 0.322,
+        "fitness_for_destination_visit": 0.096,
+        "operational_quality": 0.589,
+        "retention_strength": 0.575,
+        "monetization_potential": 0.573
+      }
+    },
+    "659": {
+      "name": "PierONE, MIDC Rabale (By Monarch)",
+      "scores": {
+        "fitness_for_office_lunch": 0.145,
+        "fitness_for_repeat_habit": 0.171,
+        "fitness_for_social_dwell": 0.345,
+        "fitness_for_group_energy": 0.316,
+        "fitness_for_destination_visit": 0.123,
+        "operational_quality": 0.578,
+        "retention_strength": 0.571,
+        "monetization_potential": 0.571
+      }
+    },
+    "1467": {
+      "name": "EPITOME - Global Dining & Bar",
+      "scores": {
+        "fitness_for_office_lunch": 0.285,
+        "fitness_for_repeat_habit": 0.284,
+        "fitness_for_social_dwell": 0.287,
+        "fitness_for_group_energy": 0.314,
+        "fitness_for_destination_visit": 0.19,
+        "operational_quality": 0.575,
+        "retention_strength": 0.57,
+        "monetization_potential": 0.0
+      }
+    },
+    "2094": {
+      "name": "Anant Snacks",
+      "scores": {
+        "fitness_for_office_lunch": 0.283,
+        "fitness_for_repeat_habit": 0.292,
+        "fitness_for_social_dwell": 0.198,
+        "fitness_for_group_energy": 0.156,
+        "fitness_for_destination_visit": 0.091,
+        "operational_quality": 0.569,
+        "retention_strength": 0.571,
+        "monetization_potential": 0.0
+      }
+    },
+    "5702": {
+      "name": "De Aura - Global Dining and Bar",
+      "scores": {
+        "fitness_for_office_lunch": 0.294,
+        "fitness_for_repeat_habit": 0.175,
+        "fitness_for_social_dwell": 0.295,
+        "fitness_for_group_energy": 0.371,
+        "fitness_for_destination_visit": 0.099,
+        "operational_quality": 0.59,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.59
+      }
+    },
+    "5945": {
+      "name": "Arena lounge",
+      "scores": {
+        "fitness_for_office_lunch": 0.146,
+        "fitness_for_repeat_habit": 0.299,
+        "fitness_for_social_dwell": 0.289,
+        "fitness_for_group_energy": 0.311,
+        "fitness_for_destination_visit": 0.097,
+        "operational_quality": 0.576,
+        "retention_strength": 0.585,
+        "monetization_potential": 0.585
+      }
+    },
+    "53": {
+      "name": "The Atrangii House",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.239,
+        "fitness_for_social_dwell": 0.171,
+        "fitness_for_group_energy": 0.183,
+        "fitness_for_destination_visit": 0.097,
+        "operational_quality": 0.586,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.0
+      }
+    },
+    "70": {
+      "name": "ZENZIBU DA SKY LOUNGE",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.135,
+        "fitness_for_social_dwell": 0.335,
+        "fitness_for_group_energy": 0.262,
+        "fitness_for_destination_visit": 0.201,
+        "operational_quality": 0.561,
+        "retention_strength": 0.542,
+        "monetization_potential": 0.0
+      }
+    },
+    "97": {
+      "name": "Tipsy Bro - Rooftop & Lounge Bar",
+      "scores": {
+        "fitness_for_office_lunch": 0.147,
+        "fitness_for_repeat_habit": 0.196,
+        "fitness_for_social_dwell": 0.293,
+        "fitness_for_group_energy": 0.319,
+        "fitness_for_destination_visit": 0.168,
+        "operational_quality": 0.588,
+        "retention_strength": 0.584,
+        "monetization_potential": 0.582
+      }
+    },
+    "1010": {
+      "name": "Dome",
+      "scores": {
+        "fitness_for_office_lunch": 0.15,
+        "fitness_for_repeat_habit": 0.3,
+        "fitness_for_social_dwell": 0.239,
+        "fitness_for_group_energy": 0.21,
+        "fitness_for_destination_visit": 0.211,
+        "operational_quality": 0.586,
+        "retention_strength": 0.601,
+        "monetization_potential": 0.6
+      }
+    },
+    "5732": {
+      "name": "Thane Pub Exchange",
+      "scores": {
+        "fitness_for_office_lunch": 0.139,
+        "fitness_for_repeat_habit": 0.139,
+        "fitness_for_social_dwell": 0.164,
+        "fitness_for_group_energy": 0.317,
+        "fitness_for_destination_visit": 0.278,
+        "operational_quality": 0.582,
+        "retention_strength": 0.557,
+        "monetization_potential": 0.554
+      }
+    },
+    "111": {
+      "name": "Love & Latte Vashi",
+      "scores": {
+        "fitness_for_office_lunch": 0.297,
+        "fitness_for_repeat_habit": 0.284,
+        "fitness_for_social_dwell": 0.234,
+        "fitness_for_group_energy": 0.192,
+        "fitness_for_destination_visit": 0.29,
+        "operational_quality": 0.586,
+        "retention_strength": 0.58,
+        "monetization_potential": 0.0
+      }
+    },
+    "525": {
+      "name": "Upper Deck Restaurant Bar Banquets",
+      "scores": {
+        "fitness_for_office_lunch": 0.199,
+        "fitness_for_repeat_habit": 0.196,
+        "fitness_for_social_dwell": 0.284,
+        "fitness_for_group_energy": 0.205,
+        "fitness_for_destination_visit": 0.092,
+        "operational_quality": 0.569,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.556
+      }
+    },
+    "1005": {
+      "name": "HYDE",
+      "scores": {
+        "fitness_for_office_lunch": 0.143,
+        "fitness_for_repeat_habit": 0.192,
+        "fitness_for_social_dwell": 0.286,
+        "fitness_for_group_energy": 0.311,
+        "fitness_for_destination_visit": 0.095,
+        "operational_quality": 0.573,
+        "retention_strength": 0.573,
+        "monetization_potential": 0.567
+      }
+    },
+    "1081": {
+      "name": "Verandah, Mumbai",
+      "scores": {
+        "fitness_for_office_lunch": 0.143,
+        "fitness_for_repeat_habit": 0.143,
+        "fitness_for_social_dwell": 0.375,
+        "fitness_for_group_energy": 0.205,
+        "fitness_for_destination_visit": 0.123,
+        "operational_quality": 0.574,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.576
+      }
+    },
+    "1130": {
+      "name": "KMC Bar & Bistro, Fort",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.146,
+        "fitness_for_social_dwell": 0.291,
+        "fitness_for_group_energy": 0.258,
+        "fitness_for_destination_visit": 0.167,
+        "operational_quality": 0.582,
+        "retention_strength": 0.587,
+        "monetization_potential": 0.586
+      }
+    },
+    "1567": {
+      "name": "Butterfly High",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.244,
+        "fitness_for_social_dwell": 0.298,
+        "fitness_for_group_energy": 0.214,
+        "fitness_for_destination_visit": 0.127,
+        "operational_quality": 0.59,
+        "retention_strength": 0.595,
+        "monetization_potential": 0.596
+      }
+    },
+    "1572": {
+      "name": "Not Just Tamasha",
+      "scores": {
+        "fitness_for_office_lunch": 0.229,
+        "fitness_for_repeat_habit": 0.282,
+        "fitness_for_social_dwell": 0.295,
+        "fitness_for_group_energy": 0.268,
+        "fitness_for_destination_visit": 0.188,
+        "operational_quality": 0.575,
+        "retention_strength": 0.565,
+        "monetization_potential": 0.564
+      }
+    },
+    "1583": {
+      "name": "Cafe Free India",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.289,
+        "fitness_for_social_dwell": 0.287,
+        "fitness_for_group_energy": 0.31,
+        "fitness_for_destination_visit": 0.121,
+        "operational_quality": 0.573,
+        "retention_strength": 0.577,
+        "monetization_potential": 0.578
+      }
+    },
+    "1721": {
+      "name": "Rivaaz Restaurant by The Sahil Hotel",
+      "scores": {
+        "fitness_for_office_lunch": 0.144,
+        "fitness_for_repeat_habit": 0.236,
+        "fitness_for_social_dwell": 0.201,
+        "fitness_for_group_energy": 0.266,
+        "fitness_for_destination_visit": 0.192,
+        "operational_quality": 0.58,
+        "retention_strength": 0.578,
+        "monetization_potential": 0.578
+      }
+    },
+    "1924": {
+      "name": "The Museum Cafe",
+      "scores": {
+        "fitness_for_office_lunch": 0.276,
+        "fitness_for_repeat_habit": 0.285,
+        "fitness_for_social_dwell": 0.139,
+        "fitness_for_group_energy": 0.146,
+        "fitness_for_destination_visit": 0.146,
+        "operational_quality": 0.558,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.0
+      }
+    },
+    "5722": {
+      "name": "The DanSing Bottle",
+      "scores": {
+        "fitness_for_office_lunch": 0.144,
+        "fitness_for_repeat_habit": 0.17,
+        "fitness_for_social_dwell": 0.341,
+        "fitness_for_group_energy": 0.263,
+        "fitness_for_destination_visit": 0.094,
+        "operational_quality": 0.576,
+        "retention_strength": 0.566,
+        "monetization_potential": 0.566
+      }
+    },
+    "102": {
+      "name": "Roar",
+      "scores": {
+        "fitness_for_office_lunch": 0.147,
+        "fitness_for_repeat_habit": 0.294,
+        "fitness_for_social_dwell": 0.205,
+        "fitness_for_group_energy": 0.322,
+        "fitness_for_destination_visit": 0.098,
+        "operational_quality": 0.591,
+        "retention_strength": 0.586,
+        "monetization_potential": 0.584
+      }
+    },
+    "172": {
+      "name": "DADDY BY LORD OF THE DRINKS - Navi Mumbai ( Indra Hospitality)",
+      "scores": {
+        "fitness_for_office_lunch": 0.147,
+        "fitness_for_repeat_habit": 0.141,
+        "fitness_for_social_dwell": 0.201,
+        "fitness_for_group_energy": 0.267,
+        "fitness_for_destination_visit": 0.207,
+        "operational_quality": 0.578,
+        "retention_strength": 0.567,
+        "monetization_potential": 0.578
+      }
+    },
+    "183": {
+      "name": "The Tavern TLS",
+      "scores": {
+        "fitness_for_office_lunch": 0.297,
+        "fitness_for_repeat_habit": 0.395,
+        "fitness_for_social_dwell": 0.206,
+        "fitness_for_group_energy": 0.212,
+        "fitness_for_destination_visit": 0.147,
+        "operational_quality": 0.593,
+        "retention_strength": 0.594,
+        "monetization_potential": 0.0
+      }
+    },
+    "199": {
+      "name": "Sailors' Cafe",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.171,
+        "fitness_for_social_dwell": 0.346,
+        "fitness_for_group_energy": 0.314,
+        "fitness_for_destination_visit": 0.0,
+        "operational_quality": 0.578,
+        "retention_strength": 0.58,
+        "monetization_potential": 0.0
+      }
+    },
+    "222": {
+      "name": "Nightingale",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.0,
+        "fitness_for_social_dwell": 0.263,
+        "fitness_for_group_energy": 0.295,
+        "fitness_for_destination_visit": 0.152,
+        "operational_quality": 0.534,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.0
+      }
+    },
+    "245": {
+      "name": "Papa's",
+      "scores": {
+        "fitness_for_office_lunch": 0.288,
+        "fitness_for_repeat_habit": 0.172,
+        "fitness_for_social_dwell": 0.291,
+        "fitness_for_group_energy": 0.143,
+        "fitness_for_destination_visit": 0.191,
+        "operational_quality": 0.578,
+        "retention_strength": 0.572,
+        "monetization_potential": 0.572
+      }
+    },
+    "266": {
+      "name": "Love & Latte Nerul",
+      "scores": {
+        "fitness_for_office_lunch": 0.148,
+        "fitness_for_repeat_habit": 0.24,
+        "fitness_for_social_dwell": 0.204,
+        "fitness_for_group_energy": 0.16,
+        "fitness_for_destination_visit": 0.126,
+        "operational_quality": 0.589,
+        "retention_strength": 0.591,
+        "monetization_potential": 0.0
+      }
+    },
+    "430": {
+      "name": "Chop Chop",
+      "scores": {
+        "fitness_for_office_lunch": 0.297,
+        "fitness_for_repeat_habit": 0.145,
+        "fitness_for_social_dwell": 0.162,
+        "fitness_for_group_energy": 0.161,
+        "fitness_for_destination_visit": 0.126,
+        "operational_quality": 0.588,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.0
+      }
+    },
+    "497": {
+      "name": "Blend and Brew",
+      "scores": {
+        "fitness_for_office_lunch": 0.284,
+        "fitness_for_repeat_habit": 0.36,
+        "fitness_for_social_dwell": 0.142,
+        "fitness_for_group_energy": 0.0,
+        "fitness_for_destination_visit": 0.164,
+        "operational_quality": 0.575,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.568
+      }
+    },
+    "595": {
+      "name": "Nisarga Restaurant & Bar",
+      "scores": {
+        "fitness_for_office_lunch": 0.145,
+        "fitness_for_repeat_habit": 0.173,
+        "fitness_for_social_dwell": 0.146,
+        "fitness_for_group_energy": 0.209,
+        "fitness_for_destination_visit": 0.194,
+        "operational_quality": 0.585,
+        "retention_strength": 0.581,
+        "monetization_potential": 0.0
+      }
+    },
+    "979": {
+      "name": "Koyla - Ethnic Cuisine",
+      "scores": {
+        "fitness_for_office_lunch": 0.255,
+        "fitness_for_repeat_habit": 0.277,
+        "fitness_for_social_dwell": 0.145,
+        "fitness_for_group_energy": 0.145,
+        "fitness_for_destination_visit": 0.122,
+        "operational_quality": 0.568,
+        "retention_strength": 0.555,
+        "monetization_potential": 0.0
+      }
+    },
+    "1234": {
+      "name": "Lion Heart Lounge",
+      "scores": {
+        "fitness_for_office_lunch": 0.301,
+        "fitness_for_repeat_habit": 0.136,
+        "fitness_for_social_dwell": 0.26,
+        "fitness_for_group_energy": 0.272,
+        "fitness_for_destination_visit": 0.091,
+        "operational_quality": 0.575,
+        "retention_strength": 0.544,
+        "monetization_potential": 0.0
+      }
+    },
+    "1560": {
+      "name": "Brunch & Cake Mumbai",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.143,
+        "fitness_for_social_dwell": 0.285,
+        "fitness_for_group_energy": 0.203,
+        "fitness_for_destination_visit": 0.163,
+        "operational_quality": 0.569,
+        "retention_strength": 0.571,
+        "monetization_potential": 0.0
+      }
+    },
+    "1604": {
+      "name": "YAZU - Pan Asian Supper Club Lower Parel",
+      "scores": {
+        "fitness_for_office_lunch": 0.294,
+        "fitness_for_repeat_habit": 0.197,
+        "fitness_for_social_dwell": 0.204,
+        "fitness_for_group_energy": 0.159,
+        "fitness_for_destination_visit": 0.169,
+        "operational_quality": 0.589,
+        "retention_strength": 0.584,
+        "monetization_potential": 0.584
+      }
+    },
+    "1671": {
+      "name": "Bira 91 Taproom - Kamala Mills",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.143,
+        "fitness_for_social_dwell": 0.23,
+        "fitness_for_group_energy": 0.251,
+        "fitness_for_destination_visit": 0.162,
+        "operational_quality": 0.565,
+        "retention_strength": 0.575,
+        "monetization_potential": 0.574
+      }
+    },
+    "1841": {
+      "name": "Vithal's Family Restaurant and Bar",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.167,
+        "fitness_for_social_dwell": 0.196,
+        "fitness_for_group_energy": 0.201,
+        "fitness_for_destination_visit": 0.161,
+        "operational_quality": 0.558,
+        "retention_strength": 0.546,
+        "monetization_potential": 0.0
+      }
+    },
+    "1993": {
+      "name": "Cosmic Buns",
+      "scores": {
+        "fitness_for_office_lunch": 0.143,
+        "fitness_for_repeat_habit": 0.34,
+        "fitness_for_social_dwell": 0.144,
+        "fitness_for_group_energy": 0.143,
+        "fitness_for_destination_visit": 0.192,
+        "operational_quality": 0.574,
+        "retention_strength": 0.576,
+        "monetization_potential": 0.0
+      }
+    },
+    "2794": {
+      "name": "TAP Resto Bar Juhu",
+      "scores": {
+        "fitness_for_office_lunch": 0.292,
+        "fitness_for_repeat_habit": 0.39,
+        "fitness_for_social_dwell": 0.442,
+        "fitness_for_group_energy": 0.295,
+        "fitness_for_destination_visit": 0.296,
+        "operational_quality": 0.587,
+        "retention_strength": 0.586,
+        "monetization_potential": 0.0
+      }
+    },
+    "5579": {
+      "name": "Double Deck Lounge",
+      "scores": {
+        "fitness_for_office_lunch": 0.229,
+        "fitness_for_repeat_habit": 0.142,
+        "fitness_for_social_dwell": 0.197,
+        "fitness_for_group_energy": 0.259,
+        "fitness_for_destination_visit": 0.142,
+        "operational_quality": 0.569,
+        "retention_strength": 0.57,
+        "monetization_potential": 0.569
+      }
+    },
+    "5724": {
+      "name": "Vee Elevated Evenings | Rooftop Restaurant in Thane",
+      "scores": {
+        "fitness_for_office_lunch": 0.138,
+        "fitness_for_repeat_habit": 0.286,
+        "fitness_for_social_dwell": 0.244,
+        "fitness_for_group_energy": 0.121,
+        "fitness_for_destination_visit": 0.244,
+        "operational_quality": 0.539,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.539
+      }
+    },
+    "5735": {
+      "name": "Makhol Premium Lounge",
+      "scores": {
+        "fitness_for_office_lunch": 0.146,
+        "fitness_for_repeat_habit": 0.238,
+        "fitness_for_social_dwell": 0.293,
+        "fitness_for_group_energy": 0.267,
+        "fitness_for_destination_visit": 0.097,
+        "operational_quality": 0.584,
+        "retention_strength": 0.0,
+        "monetization_potential": 0.582
+      }
+    },
+    "5787": {
+      "name": "MOKO KITCHEN & LOUNGE",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.239,
+        "fitness_for_social_dwell": 0.297,
+        "fitness_for_group_energy": 0.212,
+        "fitness_for_destination_visit": 0.1,
+        "operational_quality": 0.592,
+        "retention_strength": 0.596,
+        "monetization_potential": 0.0
+      }
+    },
+    "60": {
+      "name": "Amar Fast Food & Restaurant",
+      "scores": {
+        "fitness_for_office_lunch": 0.257,
+        "fitness_for_repeat_habit": 0.279,
+        "fitness_for_social_dwell": 0.146,
+        "fitness_for_group_energy": 0.0,
+        "fitness_for_destination_visit": 0.123,
+        "operational_quality": 0.571,
+        "retention_strength": 0.557,
+        "monetization_potential": 0.0
+      }
+    },
+    "61": {
+      "name": "Toy vuilla Luxuries Club",
+      "scores": {
+        "fitness_for_office_lunch": 0.0,
+        "fitness_for_repeat_habit": 0.0,
+        "fitness_for_social_dwell": 0.357,
+        "fitness_for_group_energy": 0.305,
+        "fitness_for_destination_visit": 0.089,
+        "operational_quality": 0.555,
+        "retention_strength": 0.535,
+        "monetization_potential": 0.533
+      }
+    }
+  }
+}
