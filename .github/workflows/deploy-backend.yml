@@ -30,7 +30,7 @@ jobs:
             if [ -d research_cache/.git ]; then
               cd research_cache && git pull origin main && cd ~/polynovea_acquisition
             else
-              git clone https://${{ secrets.RESEARCH_PAT }}@github.com/Sasuke102101/research.git research_cache
+              git clone https://${{ secrets.RESEARCH_PAT }}@github.com/Sasuke102001/research.git research_cache
             fi
 
             # Extract M2, M3, SE research into backend folders
