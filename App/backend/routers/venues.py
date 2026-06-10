@@ -1,6 +1,6 @@
 """
 routers/venues.py
-GET /api/venues/search  ->  SearchResponse   (Screen 1 -- Venue Search)
+GET /api/venues/search  →  SearchResponse   (Screen 1 — Venue Search)
 """
 
 from fastapi import APIRouter, Query
