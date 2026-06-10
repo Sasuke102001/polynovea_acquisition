@@ -22,6 +22,8 @@ export interface FitnessDimension {
   key: string;
   label: string;
   score: number;
+  city_median?: number;
+  percentile_band?: string;  // "top_quartile" | "middle" | "bottom_quartile"
 }
 
 export interface DeltaBar {
@@ -47,6 +49,7 @@ export interface VenueCard {
   top_segments: string[];
   top_archetypes: ArchetypeChip[];
   health_score: number;
+  energy_band?: string;  // "HIGH" | "MEDIUM" | "LOW"
 }
 
 export interface SearchResponse {
@@ -121,6 +124,15 @@ export interface InsightCard {
   priority_tier: string;
 }
 
+export interface BehavioralPosition {
+  state_energy: number;
+  energy_band: string;       // "HIGH" | "MEDIUM" | "LOW"
+  signature_family: string;  // "social_dwell-group_energy"
+  niche_saturation: number;
+  is_anomaly: boolean;
+  district_size: number;
+}
+
 export interface OverviewResponse {
   venue: VenueHeader;
   fitness_radar: { dimensions: FitnessDimension[] };
@@ -128,6 +140,7 @@ export interface OverviewResponse {
   health_score: HealthScore;
   working_for_you: InsightCard[];
   gaps_to_close: InsightCard[];
+  behavioral_position?: BehavioralPosition;
 }
 
 export async function getOverview(venueId: string | number): Promise<OverviewResponse> {

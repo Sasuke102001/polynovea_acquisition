@@ -78,13 +78,15 @@ export default async function OverviewPage({
     );
   }
 
-  const { venue, fitness_radar, customer_profile, health_score, working_for_you, gaps_to_close } = data;
+  const { venue, fitness_radar, customer_profile, health_score, working_for_you, gaps_to_close, behavioral_position } = data;
 
   // Use all dimensions from API, with canonical label override where available
   const orbs = fitness_radar.dimensions.map((d) => ({
     key: d.key,
     label: ORB_META[d.key] ?? d.label,
     score: d.score,
+    city_median: d.city_median,
+    percentile_band: d.percentile_band,
   }));
 
   // All segments (up to 3)
@@ -151,10 +153,65 @@ export default async function OverviewPage({
               boxShadow: "0 24px 48px -12px rgba(0,0,0,0.7)",
             }}
           >
-            {orbs.map((o) => (
-              <ScoreOrb key={o.key} label={o.label} score={o.score} />
-            ))}
+            {orbs.map((o) => {
+              const bandColor = o.percentile_band === "top_quartile" ? "#10B981" : o.percentile_band === "bottom_quartile" ? "#FB7185" : "#52525B";
+              const bandLabel = o.percentile_band === "top_quartile" ? "↑ Top 25%" : o.percentile_band === "bottom_quartile" ? "↓ Bot 25%" : "─ Median";
+              return (
+                <div key={o.key} className="flex flex-col items-center gap-1.5">
+                  <ScoreOrb label={o.label} score={o.score} />
+                  {o.percentile_band && (
+                    <span
+                      className="text-[8px] font-bold tracking-widest"
+                      style={{ fontFamily: "'JetBrains Mono', monospace", color: bandColor }}
+                    >
+                      {bandLabel}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
+
+          {/* Behavioral Position Strip */}
+          {behavioral_position && (() => {
+            const eb = behavioral_position.energy_band;
+            const ebColor = eb === "HIGH" ? "#10B981" : eb === "MEDIUM" ? "#F59E0B" : "#71717A";
+            const ebBg = eb === "HIGH" ? "rgba(16,185,129,0.08)" : eb === "MEDIUM" ? "rgba(245,158,11,0.08)" : "rgba(113,113,122,0.08)";
+            const sigLabel = behavioral_position.signature_family.split("-").map(s => s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())).join(" · ");
+            const satPct = Math.round(behavioral_position.niche_saturation * 100);
+            return (
+              <div
+                className="rounded-xl px-5 py-3 flex flex-wrap items-center gap-x-5 gap-y-2"
+                style={{ background: "rgba(24,24,27,0.4)", border: "1px solid rgba(39,39,42,0.5)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#52525B" }}>Energy</span>
+                  <span
+                    className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded"
+                    style={{ fontFamily: "'JetBrains Mono', monospace", background: ebBg, border: `1px solid ${ebColor}40`, color: ebColor }}
+                  >
+                    {eb}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#52525B" }}>Signature</span>
+                  <span className="text-[9px] font-medium" style={{ color: "#A1A1AA" }}>{sigLabel}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#52525B" }}>Niche</span>
+                  <span className="text-[9px] font-mono" style={{ color: satPct >= 60 ? "#FB7185" : satPct >= 35 ? "#F59E0B" : "#10B981" }}>{satPct}% saturated</span>
+                </div>
+                {behavioral_position.is_anomaly && (
+                  <span
+                    className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded"
+                    style={{ fontFamily: "'JetBrains Mono', monospace", background: "rgba(230,211,163,0.08)", border: "1px solid rgba(230,211,163,0.25)", color: "#E6D3A3" }}
+                  >
+                    ✦ Standout
+                  </span>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Working For You + Gaps To Close */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">

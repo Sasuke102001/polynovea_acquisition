@@ -9,6 +9,7 @@ from database import get_pool
 from models import (
     OverviewResponse, VenueHeader, FitnessRadar, FitnessDimension,
     CustomerProfile, SegmentRow, ArchetypeBar, HealthScore, InsightCard,
+    BehavioralPosition,
 )
 from routers.utils import (
     map_venue_types, make_archetype_chip,
@@ -116,7 +117,6 @@ async def get_overview(venue_id: int = Path(...)):
         )
 
         # ── Primitives fallback (for working_for_you waterfall tier 2) ────────
-        # Only needed if recommended=true interventions are sparse.
         primitives_rows = await conn.fetch(
             """
             SELECT primitive_id, score
@@ -128,12 +128,46 @@ async def get_overview(venue_id: int = Path(...)):
             venue_id,
         )
 
-    # ── Build radar ───────────────────────────────────────────────────────────
+        # ── Behavioral market position ────────────────────────────────────────
+        bmp_row = await conn.fetchrow(
+            """
+            SELECT state_energy, energy_band, signature_family,
+                   niche_saturation, is_anomaly, district_size
+            FROM   venue_behavioral_market_position
+            WHERE  venue_id = $1
+            """,
+            venue_id,
+        )
+
+        # ── City baselines for relative scoring ──────────────────────────────
+        city_name = venue["city"]
+        baseline_rows = await conn.fetch(
+            """
+            SELECT dimension, median, p25, p75
+            FROM   city_dimension_baselines
+            WHERE  city = $1 AND source = 'blended'
+            """,
+            city_name,
+        )
+        baselines: dict[str, dict] = {r["dimension"]: dict(r) for r in baseline_rows}
+
+    # ── Build radar with city baselines ──────────────────────────────────────
+    def _percentile_band(score: float, bl: dict | None) -> str | None:
+        if not bl:
+            return None
+        if score >= float(bl["p75"] or 0):
+            return "top_quartile"
+        if score <= float(bl["p25"] or 0):
+            return "bottom_quartile"
+        return "middle"
+
     radar = FitnessRadar(dimensions=[
         FitnessDimension(
             key=dim,
             label=DIM_LABELS[dim],
             score=float(fd[dim] or 0.0),
+            city_median=round(float(baselines[dim]["median"]), 3) if dim in baselines else None,
+            percentile_band=_percentile_band(float(fd[dim] or 0.0), baselines.get(dim)),
         )
         for dim in RADAR_DIMS
     ])
@@ -251,6 +285,17 @@ async def get_overview(venue_id: int = Path(...)):
                 priority_tier="LOW",
             ))
 
+    behavioral_position = None
+    if bmp_row:
+        behavioral_position = BehavioralPosition(
+            state_energy=float(bmp_row["state_energy"] or 0.0),
+            energy_band=bmp_row["energy_band"] or "LOW",
+            signature_family=bmp_row["signature_family"] or "",
+            niche_saturation=float(bmp_row["niche_saturation"] or 0.0),
+            is_anomaly=bool(bmp_row["is_anomaly"]),
+            district_size=int(bmp_row["district_size"] or 0),
+        )
+
     return OverviewResponse(
         venue=VenueHeader(
             id=venue["id"],
@@ -267,4 +312,5 @@ async def get_overview(venue_id: int = Path(...)):
         health_score=health,
         working_for_you=working,
         gaps_to_close=gaps,
+        behavioral_position=behavioral_position,
     )

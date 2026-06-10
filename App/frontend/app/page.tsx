@@ -109,8 +109,25 @@ function VenueCardItem({ venue }: { venue: VenueCard }) {
           )}
         </div>
 
-        <div className="flex-shrink-0 pt-1">
+        <div className="flex-shrink-0 pt-1 flex flex-col items-center gap-2">
           <ScoreRing score={venue.health_score} size={72} />
+          {venue.energy_band && (
+            <span
+              className="px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded"
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                background: venue.energy_band === "HIGH"
+                  ? "rgba(16,185,129,0.12)"
+                  : venue.energy_band === "MEDIUM"
+                  ? "rgba(245,158,11,0.12)"
+                  : "rgba(113,113,122,0.12)",
+                border: `1px solid ${venue.energy_band === "HIGH" ? "rgba(16,185,129,0.3)" : venue.energy_band === "MEDIUM" ? "rgba(245,158,11,0.3)" : "rgba(113,113,122,0.3)"}`,
+                color: venue.energy_band === "HIGH" ? "#10B981" : venue.energy_band === "MEDIUM" ? "#F59E0B" : "#71717A",
+              }}
+            >
+              {venue.energy_band}
+            </span>
+          )}
         </div>
       </article>
     </Link>

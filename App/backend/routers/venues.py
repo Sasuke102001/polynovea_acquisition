@@ -64,6 +64,7 @@ async def search_venues(
                 fd.fitness_for_social_dwell,
                 fd.fitness_for_group_energy,
                 fd.retention_strength,
+                bmp.energy_band,
                 ARRAY(
                     SELECT segment_id
                     FROM   venue_demographic_scores
@@ -80,6 +81,7 @@ async def search_venues(
                         ORDER BY CASE source WHEN 'blended' THEN 0 WHEN 'google' THEN 1 ELSE 2 END
                         LIMIT 1
                     )
+            LEFT JOIN venue_behavioral_market_position bmp ON bmp.venue_id = v.id
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
               AND  ($3::text = '' OR v.types @> to_jsonb($3::text))
@@ -117,6 +119,7 @@ async def search_venues(
             top_segments=seg_labels,
             top_archetypes=[make_archetype_chip(n) for n in arc_names],
             health_score=health_score,
+            energy_band=r["energy_band"],
         ))
 
     return SearchResponse(venues=cards, total=total, limit=limit, offset=offset)

@@ -19,6 +19,8 @@ class FitnessDimension(BaseModel):
     key: str                 # "fitness_for_office_lunch"
     label: str               # "Office Lunch"
     score: float             # 0.0 – 1.0
+    city_median: float | None = None
+    percentile_band: str | None = None   # "top_quartile" | "middle" | "bottom_quartile"
 
 
 class DeltaBar(BaseModel):
@@ -44,6 +46,7 @@ class VenueCard(BaseModel):
     top_segments: list[str]       # top 2 segment display names
     top_archetypes: list[ArchetypeChip]   # top 2
     health_score: int             # 0–100 composite of operational_quality + retention_strength
+    energy_band: str | None = None   # "HIGH" | "MEDIUM" | "LOW"
 
 
 class SearchResponse(BaseModel):
@@ -101,6 +104,15 @@ class InsightCard(BaseModel):
     priority_tier: str       # CRITICAL / HIGH / MEDIUM / LOW  (for working: blank)
 
 
+class BehavioralPosition(BaseModel):
+    state_energy: float
+    energy_band: str          # "HIGH" | "MEDIUM" | "LOW"
+    signature_family: str     # "social_dwell-group_energy"
+    niche_saturation: float   # 0–1
+    is_anomaly: bool
+    district_size: int
+
+
 class OverviewResponse(BaseModel):
     venue: VenueHeader
     fitness_radar: FitnessRadar
@@ -108,6 +120,7 @@ class OverviewResponse(BaseModel):
     health_score: HealthScore
     working_for_you: list[InsightCard]   # top 3 recommended=true interventions
     gaps_to_close: list[InsightCard]     # top 3 recommended=false interventions
+    behavioral_position: BehavioralPosition | None = None
 
 
 # ─── Screen 2 — Competitors Tab ──────────────────────────────────────────────
