@@ -21,47 +21,78 @@ sys.stdout.reconfigure(encoding='utf-8')
 SCRIPTS_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Ordered list: (step_number, path_relative_to_scripts_dir, description)
-# ── Reference data ──────────────────────────────────────────────────────────
+# Full dependency order. See Database/LOADER_RUN_ORDER.md for the rationale.
 PIPELINE = [
-    (1,  'reference/load_venues.py',                                    'Venues'),
+# ── Schema (idempotent migrations, always first) ─────────────────────────────
+    (1,  'utils/apply_migrations.py',                                   'Apply SQL migrations (001, 002, ...)'),
+
+# ── Reference data ────────────────────────────────────────────────────────────
+    (2,  'reference/load_venues.py',                                    'Venues'),
 
 # ── Google Places API pipeline ───────────────────────────────────────────────
-    (2,  'pipeline/google_places_api/step3_signals_extraction.py',      'Google primitives (54 signals)'),
-    (3,  'pipeline/google_places_api/step4_cluster_and_patterns.py',    'Google behavioral clusters + patterns'),
-    (4,  'pipeline/google_places_api/step4b_governance.py',             'Google data quality + drift signals'),
-    (5,  'pipeline/google_places_api/step4b_pattern_scores.py',         'Google pattern scores'),
-    (6,  'pipeline/google_places_api/step5_fitness_scores.py',          'Google fitness scores'),
-    (7,  'pipeline/google_places_api/step5b_similarity_enrichment.py',  'Google venue vectors + similarity pairs'),
-    (8,  'pipeline/google_places_api/step6_mechanisms_and_interventions.py', 'Google step6 → mechanisms + interventions'),
+    (3,  'pipeline/google_places_api/step3_signals_extraction.py',      'Google primitives (54 signals)'),
+    (4,  'pipeline/google_places_api/step4_cluster_and_patterns.py',    'Google behavioral clusters + patterns'),
+    (5,  'pipeline/google_places_api/step4b_governance.py',             'Google data quality + drift signals'),
+    (6,  'pipeline/google_places_api/step4b_pattern_scores.py',         'Google pattern scores'),
+    (7,  'pipeline/google_places_api/step5_fitness_scores.py',          'Google fitness scores'),
+    (8,  'pipeline/google_places_api/step5b_similarity_enrichment.py',  'Google venue vectors + similarity pairs'),
+    (9,  'pipeline/google_places_api/step6_mechanisms_and_interventions.py', 'Google step6 → mechanisms + interventions'),
 
 # ── MagicPin upper pipeline ───────────────────────────────────────────────────
-    (9,  'pipeline/magicpin_upper/step3_signals_extraction.py',         'MagicPin primitives'),
-    (10, 'pipeline/magicpin_upper/step4_cluster_and_patterns.py',       'MagicPin patterns + clusters'),
-    (11, 'pipeline/magicpin_upper/step4b_governance.py',                'MagicPin governance'),
-    (12, 'pipeline/magicpin_upper/step4b_pattern_scores.py',            'MagicPin pattern scores'),
-    (13, 'pipeline/magicpin_upper/step5b_similarity_enrichment.py',     'MagicPin vectors + similarity'),
-    (14, 'pipeline/magicpin_upper/step6_fitness_and_interventions.py',  'MagicPin fitness + interventions'),
+    (10, 'pipeline/magicpin_upper/step3_signals_extraction.py',         'MagicPin primitives'),
+    (11, 'pipeline/magicpin_upper/step4_cluster_and_patterns.py',       'MagicPin patterns + clusters'),
+    (12, 'pipeline/magicpin_upper/step4b_governance.py',                'MagicPin governance'),
+    (13, 'pipeline/magicpin_upper/step4b_pattern_scores.py',            'MagicPin pattern scores'),
+    (14, 'pipeline/magicpin_upper/step5b_similarity_enrichment.py',     'MagicPin vectors + similarity'),
+    (15, 'pipeline/magicpin_upper/step6_fitness_and_interventions.py',  'MagicPin fitness + interventions'),
 
-# ── Blend ─────────────────────────────────────────────────────────────────────
-    (15, 'blend/blend_fitness.py',                                      'Blend all sources → source=blended'),
+# ── Google Reviews pipeline (was missing from the runner) ─────────────────────
+    (16, 'pipeline/google_reviews/step3_primitives.py',                 'Google Reviews primitives'),
+    (17, 'pipeline/google_reviews/step3b_subdimension_loader.py',       'Google Reviews sub-dimension scores'),
+    (18, 'pipeline/google_reviews/step4_cluster_and_patterns.py',       'Google Reviews patterns + clusters'),
+    (19, 'pipeline/google_reviews/step4b_governance.py',                'Google Reviews governance'),
+    (20, 'pipeline/google_reviews/step4b_pattern_scores.py',            'Google Reviews pattern scores'),
+    (21, 'pipeline/google_reviews/step5b_similarity_loader.py',         'Google Reviews vectors + similarity'),
+    (22, 'pipeline/google_reviews/step6_fitness_and_interventions.py',  'Google Reviews fitness + interventions'),
+
+# ── Blend (after ALL sources are loaded) ─────────────────────────────────────
+    (23, 'blend/blend_fitness.py',                                      'Blend all sources → source=blended (+confidence)'),
 
 # ── Static / reference data (run once) ───────────────────────────────────────
-    (16, 'reference/load_surveys.py',                                   'Survey responses + archetypes'),
-    (17, 'reference/load_marketing_engine.py',                          'Marketing engine lookup tables'),
-    (18, 'reference/load_demographics.py',                              'Demographic segments & archetype mappings'),
+    (24, 'reference/load_surveys.py',                                   'Survey responses + archetypes'),
+    (25, 'reference/load_marketing_engine.py',                          'Marketing engine lookup tables'),
+    (26, 'reference/load_demographics.py',                              'Demographic segments & archetype mappings'),
 
-# ── Compute (run after all sources loaded) ────────────────────────────────────
-    (19, 'compute/compute_venue_demographics.py',                       'Venue→segment scores + similarity rank'),
-    (20, 'compute/compute_fitness_deltas.py',                           'Delta rules + pre-computed similarity deltas'),
+# ── Compute (after blend) ────────────────────────────────────────────────────
+    (27, 'compute/compute_venue_demographics.py',                       'Venue→segment scores + similarity rank'),
+    (28, 'compute/compute_fitness_deltas.py',                           'Delta rules + pre-computed similarity deltas'),
+    (29, 'compute/train_behavioral_association_rules.py',               'BHIF association-rule artifact'),
+    (30, 'compute/compute_behavioral_market_positions.py',              'Behavioral districts + anomaly/entropy/saturation'),
+    (31, 'compute/compute_city_baselines.py',                           'Per-city robust baselines (relative scoring)'),
+
+# ── Verify (soft — never aborts the pipeline) ────────────────────────────────
+    (32, 'utils/golden_check.py',                                       'Golden-set regression guard (soft)'),
 ]
+
+# Steps whose failure must NOT abort the pipeline (advisory checks).
+SOFT_STEPS = {'utils/golden_check.py'}
 
 
 def load_and_run(filepath: str) -> None:
     path = os.path.join(SCRIPTS_DIR, filepath)
     spec = importlib.util.spec_from_file_location('module', path)
     mod  = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    mod.main()
+    # Isolate argv: several loaders parse args at MODULE level (e.g. google_reviews
+    # REGIONS = parse_args()...). Without this they'd swallow run_pipeline's own
+    # --from/--only flags and crash on import. We hand them just the script name
+    # so they fall back to their default arguments.
+    saved_argv = sys.argv
+    sys.argv = [path]
+    try:
+        spec.loader.exec_module(mod)
+        mod.main()
+    finally:
+        sys.argv = saved_argv
 
 
 def check_env() -> bool:
@@ -106,11 +137,23 @@ def main():
         step_start = time.time()
         try:
             load_and_run(filepath)
+        except SystemExit as e:
+            # Soft steps (e.g. golden check) may sys.exit(1) on drift/no-snapshot.
+            # Treat as advisory when the step is in SOFT_STEPS; otherwise abort.
+            if filepath in SOFT_STEPS:
+                print(f"  [SOFT WARN] {filepath} reported a non-zero status (advisory, continuing)")
+            else:
+                print(f"\n[PIPELINE ERROR] {filepath} exited: {e}")
+                print(f"  Resume with: python utils/run_pipeline.py --from {num}\n")
+                sys.exit(1)
         except Exception as e:
-            print(f"\n[PIPELINE ERROR] {filepath} failed: {e}")
-            print("Stopping pipeline. Fix the error and resume with:")
-            print(f"  python utils/run_pipeline.py --from {num}\n")
-            sys.exit(1)
+            if filepath in SOFT_STEPS:
+                print(f"  [SOFT WARN] {filepath} errored (advisory, continuing): {e}")
+            else:
+                print(f"\n[PIPELINE ERROR] {filepath} failed: {e}")
+                print("Stopping pipeline. Fix the error and resume with:")
+                print(f"  python utils/run_pipeline.py --from {num}\n")
+                sys.exit(1)
         elapsed = round(time.time() - step_start, 1)
         print(f"  Done in {elapsed}s")
 

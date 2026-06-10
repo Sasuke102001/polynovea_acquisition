@@ -8,7 +8,7 @@
 // Client components (browser): use relative URL so Vercel rewrite proxies to EC2 (avoids HTTPS→HTTP block).
 const API_BASE =
   typeof window === "undefined"
-    ? (process.env.BACKEND_URL ?? "http://43.205.229.130:8000")
+    ? (process.env.BACKEND_URL ?? "http://localhost:8000")
     : "";
 
 // ─── Shared atoms ─────────────────────────────────────────────────────────────
@@ -59,6 +59,7 @@ export interface SearchResponse {
 export async function searchVenues(
   q: string,
   city?: string,
+  venueType?: string,
   limit = 20,
   offset = 0,
 ): Promise<SearchResponse> {
@@ -68,6 +69,7 @@ export async function searchVenues(
     offset: String(offset),
   });
   if (city) params.set("city", city);
+  if (venueType) params.set("venue_type", venueType);
   const res = await fetch(`${API_BASE}/api/venues/search?${params}`, {
     cache: "no-store",
   });

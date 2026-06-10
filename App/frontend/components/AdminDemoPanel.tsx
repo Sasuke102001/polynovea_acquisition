@@ -18,10 +18,13 @@ interface GeneratedToken {
   url: string;
   generatedAt: string;
   expiresHours: number;
+  demoLevel: 1 | 2 | 3 | 4;
 }
 
 const STORAGE_KEY  = "polynovea_admin_key";
 const HISTORY_KEY  = "polynovea_demo_history";
+const DEFAULT_EXPIRES_HOURS = 720;
+const HOUR_PRESETS = [168, 336, 720, 2160];
 
 // ─── Shared style tokens ──────────────────────────────────────────────────────
 
@@ -60,7 +63,7 @@ export default function AdminDemoPanel({
   const [selectedVenue, setSelectedVenue]     = useState<VenueResult | null>(null);
   const [searching, setSearching]             = useState(false);
   const [prospectName, setProspectName]       = useState("");
-  const [hours, setHours]                     = useState(72);
+  const [hours, setHours]                     = useState(DEFAULT_EXPIRES_HOURS);
   const [demoLevel, setDemoLevel]             = useState<1 | 2 | 3 | 4>(1);
   const [generating, setGenerating]           = useState(false);
   const [error, setError]                     = useState<string | null>(null);
@@ -150,7 +153,7 @@ export default function AdminDemoPanel({
       const token: GeneratedToken = {
         venueId: activeVenueId, venueName: activeVenueName,
         prospectName: prospectName.trim(), url: data.demo_url,
-        generatedAt: new Date().toISOString(), expiresHours: hours,
+        generatedAt: new Date().toISOString(), expiresHours: hours, demoLevel,
       };
 
       setResult(token);
@@ -158,7 +161,7 @@ export default function AdminDemoPanel({
       setHistory(updated);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
       setProspectName("");
-      setHours(72);
+      setHours(DEFAULT_EXPIRES_HOURS);
     } catch {
       setError("Could not reach the server.");
     } finally {
@@ -345,17 +348,28 @@ export default function AdminDemoPanel({
               <div className="flex flex-col gap-2">
                 <label className="text-[9px] font-bold uppercase tracking-widest" style={S.label}>Link expiry</label>
                 <div className="flex gap-1.5 flex-wrap">
-                  {[24, 48, 72, 168].map((h) => (
+                  {HOUR_PRESETS.map((h) => (
                     <button
                       key={h}
                       onClick={() => setHours(h)}
                       className="px-2.5 py-1 rounded text-[12px] font-bold transition-all"
                       style={hours === h ? S.btnPrimary : S.btnMuted}
                     >
-                      {h === 24 ? "24h" : h === 48 ? "48h" : h === 72 ? "72h" : "1 week"}
+                      {h === 168 ? "1 week" : h === 336 ? "2 weeks" : h === 720 ? "1 month" : "3 months"}
                     </button>
                   ))}
                 </div>
+                <input
+                  type="number"
+                  min={1}
+                  max={8760}
+                  value={hours}
+                  onChange={(e) => setHours(Math.max(1, Number(e.target.value) || DEFAULT_EXPIRES_HOURS))}
+                  className="w-full rounded-lg px-3 py-2.5 text-[13px] focus:outline-none transition-all"
+                  style={S.input}
+                  onFocus={(e) => (e.target.style.borderColor = "rgba(230,211,163,0.4)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(39,39,42,0.8)")}
+                />
               </div>
 
               {/* ── Demo Level ── NEW */}
@@ -408,7 +422,7 @@ export default function AdminDemoPanel({
                 <div className="rounded-xl p-4 flex flex-col gap-3" style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.2)" }}>
                   <p className="text-[13px] font-bold flex items-center gap-1.5" style={{ color: "#10B981" }}>
                     <span className="material-symbols-outlined text-[15px]">check_circle</span>
-                    {result.prospectName} · {result.expiresHours}h
+                    {result.prospectName} · {result.expiresHours}h · L{result.demoLevel}
                   </p>
                   <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={S.card}>
                     <p className="flex-1 text-[10px] break-all" style={{ fontFamily: "'JetBrains Mono', monospace", color: "#A1A1AA" }}>{result.url}</p>
@@ -443,7 +457,7 @@ export default function AdminDemoPanel({
                     <div key={idx} className="rounded-lg px-3 py-2.5 flex items-center gap-3" style={S.card}>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-medium truncate" style={{ color: "#F5F5F5" }}>{h.prospectName}</p>
-                        <p className="text-[11px] truncate" style={{ color: "#71717A" }}>{h.venueName} · {h.expiresHours}h</p>
+                        <p className="text-[11px] truncate" style={{ color: "#71717A" }}>{h.venueName} · {h.expiresHours}h · L{h.demoLevel ?? 1}</p>
                       </div>
                       <button
                         onClick={() => copyUrl(h.url)}

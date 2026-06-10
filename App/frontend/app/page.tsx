@@ -13,6 +13,23 @@ const CITY_FILTERS = [
   { label: "Thane",       value: "Thane" },
 ];
 
+const TYPE_OPTIONS = [
+  { label: "All Types",       value: "" },
+  { label: "Restaurant",      value: "restaurant" },
+  { label: "Café",            value: "cafe" },
+  { label: "Bar",             value: "bar" },
+  { label: "Night Club",      value: "night_club" },
+  { label: "Pub",             value: "pub" },
+  { label: "Bakery",          value: "bakery" },
+  { label: "Coffee Shop",     value: "coffee_shop" },
+  { label: "Fine Dining",     value: "fine_dining_restaurant" },
+  { label: "Fast Food",       value: "fast_food_restaurant" },
+  { label: "Dessert Shop",    value: "dessert_shop" },
+  { label: "Hookah Bar",      value: "hookah_bar" },
+  { label: "Wine Bar",        value: "wine_bar" },
+  { label: "Cocktail Bar",    value: "cocktail_bar" },
+];
+
 // ─── Venue card ───────────────────────────────────────────────────────────────
 
 function VenueCardItem({ venue }: { venue: VenueCard }) {
@@ -105,17 +122,18 @@ function VenueCardItem({ venue }: { venue: VenueCard }) {
 export default function VenueSearchPage() {
   const [query, setQuery]             = useState("");
   const [city, setCity]               = useState("");
+  const [venueType, setVenueType]     = useState("");
   const [venues, setVenues]           = useState<VenueCard[]>([]);
   const [total, setTotal]             = useState(0);
   const [loading, setLoading]         = useState(false);
   const [offline, setOffline]         = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const doSearch = useCallback(async (q: string, c: string) => {
+  const doSearch = useCallback(async (q: string, c: string, vt: string) => {
     setLoading(true);
     setOffline(false);
     try {
-      const data = await searchVenues(q, c || undefined);
+      const data = await searchVenues(q, c || undefined, vt || undefined);
       setVenues(data.venues);
       setTotal(data.total);
       setHasSearched(true);
@@ -128,12 +146,12 @@ export default function VenueSearchPage() {
     }
   }, []);
 
-  useEffect(() => { doSearch("", ""); }, [doSearch]);
+  useEffect(() => { doSearch("", "", ""); }, [doSearch]);
 
   useEffect(() => {
-    const t = setTimeout(() => doSearch(query, city), 280);
+    const t = setTimeout(() => doSearch(query, city, venueType), 280);
     return () => clearTimeout(t);
-  }, [query, city, doSearch]);
+  }, [query, city, venueType, doSearch]);
 
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "#0A0A0A", color: "#F5F5F5", position: "relative" }}>
@@ -241,6 +259,34 @@ export default function VenueSearchPage() {
                 </button>
               )}
             </div>
+
+            <div className="relative mt-3">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                <span className="material-symbols-outlined text-[16px]" style={{ color: "#71717A" }}>category</span>
+              </div>
+              <select
+                value={venueType}
+                onChange={(e) => setVenueType(e.target.value)}
+                className="w-full rounded-lg pl-10 pr-8 py-3 text-sm appearance-none focus:outline-none transition-all cursor-pointer"
+                style={{
+                  background: "rgba(39,39,42,0.5)",
+                  border: `1px solid ${venueType ? "rgba(230,211,163,0.4)" : "rgba(39,39,42,0.8)"}`,
+                  color: venueType ? "#F5F5F5" : "#71717A",
+                  fontFamily: "'Inter', sans-serif",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "rgba(230,211,163,0.4)")}
+                onBlur={(e) => (e.target.style.borderColor = venueType ? "rgba(230,211,163,0.4)" : "rgba(39,39,42,0.8)")}
+              >
+                {TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} style={{ background: "#18181B", color: "#F5F5F5" }}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                <span className="material-symbols-outlined text-[14px]" style={{ color: "#71717A" }}>expand_more</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -311,6 +357,7 @@ export default function VenueSearchPage() {
                   <span style={{ color: "#E6D3A3" }}>{total}</span>{" "}
                   venues
                   {query && <> for <span style={{ color: "#E6D3A3" }}>&ldquo;{query}&rdquo;</span></>}
+                  {venueType && <> · <span style={{ color: "#E6D3A3" }}>{TYPE_OPTIONS.find(o => o.value === venueType)?.label}</span></>}
                 </p>
               </div>
 

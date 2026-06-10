@@ -18,10 +18,13 @@ interface GeneratedToken {
   url: string;
   generatedAt: string;
   expiresHours: number;
+  demoLevel: 1 | 2 | 3 | 4;
 }
 
 const STORAGE_KEY = "polynovea_admin_key";
 const HISTORY_KEY = "polynovea_demo_history";
+const DEFAULT_EXPIRES_HOURS = 720;
+const HOUR_PRESETS = [168, 336, 720, 2160];
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
@@ -37,7 +40,8 @@ export default function AdminDemoPage() {
   const [selectedVenue, setSelectedVenue] = useState<VenueResult | null>(null);
   const [searching, setSearching]         = useState(false);
   const [prospectName, setProspectName]   = useState("");
-  const [hours, setHours]                 = useState(72);
+  const [hours, setHours]                 = useState(DEFAULT_EXPIRES_HOURS);
+  const [demoLevel, setDemoLevel]         = useState<1 | 2 | 3 | 4>(1);
   const [generating, setGenerating]       = useState(false);
   const [error, setError]                 = useState<string | null>(null);
 
@@ -110,6 +114,7 @@ export default function AdminDemoPage() {
           venue_id:      selectedVenue.id,
           prospect_name: prospectName.trim(),
           expires_hours: hours,
+          demo_level:    demoLevel,
         }),
       });
 
@@ -136,6 +141,7 @@ export default function AdminDemoPage() {
         url:          data.demo_url,
         generatedAt:  new Date().toISOString(),
         expiresHours: hours,
+        demoLevel,
       };
 
       setResult(token);
@@ -147,7 +153,7 @@ export default function AdminDemoPage() {
       setSelectedVenue(null);
       setVenueQuery("");
       setProspectName("");
-      setHours(72);
+      setHours(DEFAULT_EXPIRES_HOURS);
 
     } catch {
       setError("Could not reach the server.");
@@ -292,7 +298,7 @@ export default function AdminDemoPage() {
               Link expiry
             </label>
             <div className="flex gap-sm">
-              {[24, 48, 72, 168].map((h) => (
+              {HOUR_PRESETS.map((h) => (
                 <button
                   key={h}
                   onClick={() => setHours(h)}
@@ -302,7 +308,39 @@ export default function AdminDemoPage() {
                       : "bg-surface text-on-surface-variant border-outline-variant hover:border-primary"
                   }`}
                 >
-                  {h === 24 ? "24h" : h === 48 ? "48h" : h === 72 ? "72h" : "1 week"}
+                  {h === 168 ? "1 week" : h === 336 ? "2 weeks" : h === 720 ? "1 month" : "3 months"}
+                </button>
+              ))}
+            </div>
+            <input
+              type="number"
+              min={1}
+              max={8760}
+              value={hours}
+              onChange={(e) => setHours(Math.max(1, Number(e.target.value) || DEFAULT_EXPIRES_HOURS))}
+              className="bg-surface border border-outline-variant rounded-lg px-md py-sm text-[15px] text-on-surface placeholder-on-surface-variant/50 focus:outline-none focus:border-primary"
+            />
+          </div>
+
+          <div className="flex flex-col gap-xs">
+            <label className="text-[12px] font-label-sm uppercase tracking-wide text-on-surface-variant">
+              Demo mode
+            </label>
+            <div className="grid grid-cols-2 gap-sm">
+              {([1, 2, 3, 4] as const).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setDemoLevel(level)}
+                  className={`px-md py-sm rounded-lg text-left border transition-colors ${
+                    demoLevel === level
+                      ? "bg-primary text-surface border-primary"
+                      : "bg-surface text-on-surface-variant border-outline-variant hover:border-primary"
+                  }`}
+                >
+                  <p className="text-[13px] font-medium">Level {level}</p>
+                  <p className="text-[11px] opacity-80">
+                    {level === 1 ? "Single model" : level === 2 ? "Council" : level === 3 ? "Prism" : "Council + Prism"}
+                  </p>
                 </button>
               ))}
             </div>
@@ -341,7 +379,7 @@ export default function AdminDemoPage() {
               <p className="text-[15px] font-bold">Link generated for {result.prospectName}</p>
             </div>
             <p className="text-[13px] text-on-surface-variant">
-              {result.venueName} · expires in {result.expiresHours}h
+              {result.venueName} · expires in {result.expiresHours}h · L{result.demoLevel}
             </p>
             <div className="bg-surface-dim border border-outline-variant rounded-xl px-md py-sm flex items-center gap-sm">
               <p className="flex-1 text-[13px] text-on-surface font-data-mono break-all">{result.url}</p>
@@ -376,7 +414,7 @@ export default function AdminDemoPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-[14px] font-medium text-on-surface truncate">{h.prospectName}</p>
-                    <p className="text-[12px] text-on-surface-variant truncate">{h.venueName} · {h.expiresHours}h</p>
+                    <p className="text-[12px] text-on-surface-variant truncate">{h.venueName} · {h.expiresHours}h · L{h.demoLevel ?? 1}</p>
                   </div>
                   <button
                     onClick={() => copyUrl(h.url)}

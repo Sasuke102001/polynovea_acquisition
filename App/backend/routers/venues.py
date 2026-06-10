@@ -15,10 +15,11 @@ router = APIRouter()
 
 @router.get("/search", response_model=SearchResponse)
 async def search_venues(
-    q:      str = Query(default="",  description="Name or area search term"),
-    city:   str = Query(default="",  description="City filter (partial match)"),
-    limit:  int = Query(default=20,  ge=1, le=100),
-    offset: int = Query(default=0,   ge=0),
+    q:           str = Query(default="",  description="Name or area search term"),
+    city:        str = Query(default="",  description="City filter (partial match)"),
+    venue_type:  str = Query(default="",  description="Venue type filter (raw Google Places key, e.g. 'cafe', 'bar')"),
+    limit:       int = Query(default=20,  ge=1, le=100),
+    offset:      int = Query(default=0,   ge=0),
 ):
     """
     Full-text search across venue name + area.
@@ -45,8 +46,9 @@ async def search_venues(
                     )
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
+              AND  ($3 = '' OR $3 = ANY(v.types))
             """,
-            like, clike,
+            like, clike, venue_type,
         )
 
         rows = await conn.fetch(
@@ -80,11 +82,12 @@ async def search_venues(
                     )
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
+              AND  ($3 = '' OR $3 = ANY(v.types))
             ORDER BY (COALESCE(fd.operational_quality, 0) + COALESCE(fd.retention_strength, 0)) DESC
-            LIMIT  $3
-            OFFSET $4
+            LIMIT  $4
+            OFFSET $5
             """,
-            like, clike, limit, offset,
+            like, clike, venue_type, limit, offset,
         )
 
     cards = []

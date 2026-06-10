@@ -387,7 +387,7 @@ export default function DemoChat({ token }: DemoChatProps) {
         </h1>
         <p className="text-sm max-w-[400px]" style={{ color: "#71717A" }}>
           {isExpired
-            ? "Demo links are valid for 72 hours. Ask your Polynovea contact for a fresh link."
+            ? "This demo link has expired. Ask your Polynovea contact for a fresh link."
             : loadError.detail}
         </p>
         <a href="https://polynovea.in" className="mt-8 text-sm gold-glow hover:underline">

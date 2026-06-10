@@ -15,20 +15,28 @@ Run after: 018_add_source_columns.py
 import json
 import os
 import sys
+from pathlib import Path
 import psycopg2
+from dotenv import load_dotenv
 
 sys.stdout.reconfigure(encoding='utf-8')
+
+for _p in [Path(__file__).parent.parent.parent.parent / ".env",
+           Path(__file__).parent.parent.parent.parent.parent / "App" / "backend" / ".env"]:
+    if _p.exists():
+        load_dotenv(_p)
+        break
 
 BASE_PATH        = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'magicpin')
 REGIONS          = ['mumbai', 'navi-mumbai', 'sobo', 'thane']
 PIPELINE_VERSION = 'magicpin-bif-1.0'
 
 DB_CONFIG = {
-    'host':     os.getenv('PG_HOST',     'your-db-instance.ap-south-1.rds.amazonaws.com'),
+    'host':     os.getenv('PG_HOST',     'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
     'dbname':   os.getenv('PG_DB',       'polynovea_module2'),
-    'user':     os.getenv('PG_USER',     'your_user'),
-    'password': os.getenv('PG_PASSWORD', 'your_password'),
+    'user':     os.getenv('PG_USER',     'polynovea_admin'),
+    'password': os.getenv('PG_PASSWORD', ''),
     'sslmode':  'require',
 }
 
@@ -39,8 +47,8 @@ FITNESS_SQL = """
          fitness_for_social_dwell, fitness_for_group_energy,
          fitness_for_destination_visit,
          operational_quality, retention_strength, monetization_potential,
-         fitness_details, pipeline_version, schema_version)
-    VALUES (%s, 'magicpin_upper', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)
+         fitness_details, evidence_count, pipeline_version, schema_version)
+    VALUES (%s, 'magicpin_upper', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)
     ON CONFLICT (venue_id, source) DO UPDATE SET
         fitness_for_office_lunch      = EXCLUDED.fitness_for_office_lunch,
         fitness_for_repeat_habit      = EXCLUDED.fitness_for_repeat_habit,
@@ -51,9 +59,21 @@ FITNESS_SQL = """
         retention_strength            = EXCLUDED.retention_strength,
         monetization_potential        = EXCLUDED.monetization_potential,
         fitness_details               = EXCLUDED.fitness_details,
+        evidence_count                = EXCLUDED.evidence_count,
         pipeline_version              = EXCLUDED.pipeline_version,
         computed_at                   = NOW();
 """
+
+EVIDENCE_DIMS = (
+    'fitness_for_office_lunch', 'fitness_for_repeat_habit',
+    'fitness_for_social_dwell', 'fitness_for_group_energy',
+    'fitness_for_destination_visit',
+)
+
+
+def fd_evidence(fd):
+    """evidence_count proxy: total matched behavioral signals across all dims."""
+    return sum(len(fd.get(d, {}).get('matched_signals', []) or []) for d in EVIDENCE_DIMS)
 
 SUMMARY_SQL = """
     INSERT INTO behavioral_summary
@@ -136,6 +156,7 @@ def load_region(cursor, region, lookup):
             float(bs.get('retention_strength',     0.0)),
             float(bs.get('monetization_potential', 0.0)),
             fd_details(fd),
+            fd_evidence(fd),
             PIPELINE_VERSION,
         ))
 

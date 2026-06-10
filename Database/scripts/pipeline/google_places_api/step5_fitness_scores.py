@@ -10,10 +10,18 @@ Run after 002_load_venues.py
 import json
 import os
 import sys
+from pathlib import Path
 import psycopg2
 import psycopg2.extras
+from dotenv import load_dotenv
 
 sys.stdout.reconfigure(encoding='utf-8')
+
+for _p in [Path(__file__).parent.parent.parent.parent / ".env",
+           Path(__file__).parent.parent.parent.parent.parent / "App" / "backend" / ".env"]:
+    if _p.exists():
+        load_dotenv(_p)
+        break
 
 BASE_PATH  = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'raw', 'google_places')
 CITIES     = ['navi-mumbai', 'mumbai-sobo', 'mumbai-main', 'thane']
@@ -27,11 +35,11 @@ CITY_LABEL = {
 }
 
 DB_CONFIG = {
-    'host':     os.getenv('PG_HOST',     'your-db-instance.xxxxxxxxxxxx.ap-south-1.rds.amazonaws.com'),
+    'host':     os.getenv('PG_HOST',     'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
     'dbname':   os.getenv('PG_DB',       'polynovea_module2'),
-    'user':     os.getenv('PG_USER',     'your_user'),
-    'password': os.getenv('PG_PASSWORD', 'your_password'),
+    'user':     os.getenv('PG_USER',     'polynovea_admin'),
+    'password': os.getenv('PG_PASSWORD', ''),
     'sslmode':  'require',
 }
 
@@ -40,8 +48,8 @@ FITNESS_SQL = """
         (venue_id, source, fitness_for_office_lunch, fitness_for_repeat_habit,
          fitness_for_social_dwell, fitness_for_group_energy, fitness_for_destination_visit,
          operational_quality, retention_strength, monetization_potential,
-         fitness_details)
-    SELECT v.id, 'google', %s, %s, %s, %s, %s, %s, %s, %s, %s
+         fitness_details, evidence_count)
+    SELECT v.id, 'google', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     FROM venues v
     WHERE v.name_normalized = LOWER(TRIM(%s)) AND v.city = %s
     ON CONFLICT (venue_id, source) DO UPDATE SET
@@ -53,8 +61,21 @@ FITNESS_SQL = """
         operational_quality           = EXCLUDED.operational_quality,
         retention_strength            = EXCLUDED.retention_strength,
         monetization_potential        = EXCLUDED.monetization_potential,
-        fitness_details               = EXCLUDED.fitness_details;
+        fitness_details               = EXCLUDED.fitness_details,
+        evidence_count                = EXCLUDED.evidence_count;
 """
+
+# Fitness dimensions whose matched_signals collectively measure evidence volume.
+EVIDENCE_DIMS = (
+    'fitness_for_office_lunch', 'fitness_for_repeat_habit',
+    'fitness_for_social_dwell', 'fitness_for_group_energy',
+    'fitness_for_destination_visit',
+)
+
+
+def fd_evidence(fd: dict) -> int:
+    """evidence_count proxy: total matched behavioral signals across all dims."""
+    return sum(len(fd.get(d, {}).get('matched_signals', []) or []) for d in EVIDENCE_DIMS)
 
 INTERVENTION_SQL = """
     INSERT INTO intervention_triggers
@@ -136,7 +157,7 @@ def load_city(cursor, city: str) -> dict:
         mp = bs.get('monetization_potential', 0.0)
         details = json.dumps(build_fitness_details(fd))
 
-        cursor.execute(FITNESS_SQL, (ol, rh, sd, ge, dv, oq, rs, mp, details, name, city_label))
+        cursor.execute(FITNESS_SQL, (ol, rh, sd, ge, dv, oq, rs, mp, details, fd_evidence(fd), name, city_label))
         cursor.execute(SUMMARY_SQL, (oq, rs, mp, name, city_label))
 
         if cursor.rowcount > 0:

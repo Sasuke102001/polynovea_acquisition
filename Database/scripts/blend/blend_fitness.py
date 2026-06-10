@@ -33,17 +33,25 @@ Run after any source loader. Re-run every time new data is added.
 
 import os
 import sys
+from pathlib import Path
 import psycopg2
 import psycopg2.extras
+from dotenv import load_dotenv
 
 sys.stdout.reconfigure(encoding='utf-8')
+
+# Load database environment variables from .env
+for p in [Path(__file__).parent.parent.parent / ".env", Path(__file__).parent.parent.parent.parent / "App" / "backend" / ".env"]:
+    if p.exists():
+        load_dotenv(p)
+        break
 
 DB_CONFIG = {
     'host':     os.getenv('PG_HOST',     'polynovea-module2.cxeo8066g8t2.ap-south-1.rds.amazonaws.com'),
     'port':     int(os.getenv('PG_PORT', 5432)),
     'dbname':   os.getenv('PG_DB',       'polynovea_module2'),
     'user':     os.getenv('PG_USER',     'polynovea_admin'),
-    'password': os.getenv('PG_PASSWORD', 'REDACTED_DB_PASSWORD'),
+    'password': os.getenv('PG_PASSWORD', ''),
     'sslmode':  'require',
 }
 
@@ -63,11 +71,17 @@ FETCH_SQL = """
            fitness_for_office_lunch, fitness_for_repeat_habit,
            fitness_for_social_dwell, fitness_for_group_energy,
            fitness_for_destination_visit,
-           operational_quality, retention_strength, monetization_potential
+           operational_quality, retention_strength, monetization_potential,
+           confidence, evidence_count
     FROM venue_fitness_dimensions
     WHERE source NOT IN ('blended', 'manual_bif')
     ORDER BY venue_id, source
 """
+
+# Confidence proxy tuning. Saturation points: 3 distinct sources agreeing, and
+# ~50 reviews of evidence, each count as "fully confident" on their axis.
+CONF_SOURCE_SATURATION   = 3.0
+CONF_EVIDENCE_SATURATION = 50.0
 
 UPSERT_FITNESS_SQL = """
     INSERT INTO venue_fitness_dimensions
@@ -76,6 +90,7 @@ UPSERT_FITNESS_SQL = """
          fitness_for_social_dwell, fitness_for_group_energy,
          fitness_for_destination_visit,
          operational_quality, retention_strength, monetization_potential,
+         confidence, evidence_count,
          pipeline_version, schema_version)
     VALUES %s
     ON CONFLICT (venue_id, source) DO UPDATE SET
@@ -87,6 +102,8 @@ UPSERT_FITNESS_SQL = """
         operational_quality           = EXCLUDED.operational_quality,
         retention_strength            = EXCLUDED.retention_strength,
         monetization_potential        = EXCLUDED.monetization_potential,
+        confidence                    = EXCLUDED.confidence,
+        evidence_count                = EXCLUDED.evidence_count,
         pipeline_version              = EXCLUDED.pipeline_version,
         computed_at                   = NOW();
 """
@@ -172,6 +189,46 @@ def blend_venue(source_rows: list[dict], source_variances: dict | None = None) -
     return result
 
 
+def blend_confidence(source_rows: list[dict]) -> tuple[float, int]:
+    """
+    A: Derive a blended confidence in [0,1] and a total evidence_count.
+
+    Two independent axes of trust, averaged:
+      - source agreement : more distinct platforms carrying signal → more trust
+      - evidence volume   : more reviews/mentions behind the venue → more trust
+
+    If raw sources have already emitted per-source confidence (BIF step_4), we
+    fold their evidence-weighted mean in as a floor so real signal confidence is
+    never thrown away. Until then this proxy still rises automatically as new
+    sources and reviews load — the "grows better over time" property.
+    """
+    sources_with_signal = {
+        row["source"]
+        for row in source_rows
+        if any(float(row.get(d) or 0.0) > 0.0 for d in FITNESS_DIMS)
+    }
+    source_count = len(sources_with_signal)
+
+    evidence_total = sum(int(row.get("evidence_count") or 0) for row in source_rows)
+
+    source_factor   = min(1.0, source_count / CONF_SOURCE_SATURATION)
+    evidence_factor = min(1.0, evidence_total / CONF_EVIDENCE_SATURATION)
+    proxy = 0.5 * source_factor + 0.5 * evidence_factor
+
+    # Fold in real per-source confidence if any source emitted it.
+    real_confs = [float(row["confidence"]) for row in source_rows
+                  if row.get("confidence") is not None]
+    if real_confs:
+        evidenced_mean = sum(real_confs) / len(real_confs)
+        # agreement across sources lifts a single-source confidence ceiling
+        confidence = min(1.0, evidenced_mean * (0.7 + 0.3 * source_factor))
+        confidence = max(confidence, proxy * 0.5)  # proxy as a soft floor
+    else:
+        confidence = proxy
+
+    return round(confidence, 3), evidence_total
+
+
 def main():
     print("\n027_blend_fitness.py — Blending fitness dimensions across all sources\n")
 
@@ -208,6 +265,7 @@ def main():
             source_breakdown[key] = source_breakdown.get(key, 0) + 1
 
             blended = blend_venue(source_rows, src_variances)
+            conf, evidence_total = blend_confidence(source_rows)
             blended_fitness.append((
                 venue_id,
                 'blended',
@@ -219,7 +277,9 @@ def main():
                 blended['operational_quality'],
                 blended['retention_strength'],
                 blended['monetization_potential'],
-                'blend-runner-3.0-kalman-iv',
+                conf,
+                evidence_total,
+                'blend-runner-3.1-kalman-iv-conf',
                 1,
             ))
             blended_summary.append((

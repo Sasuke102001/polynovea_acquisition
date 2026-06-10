@@ -28,16 +28,27 @@ except ImportError:
     sys.exit(1)
 
 
-def _generate(venue_id: int, prospect_name: str, expires_hours: int) -> dict:
+DEFAULT_EXPIRES_HOURS = 720
+MAX_EXPIRES_HOURS = 24 * 365
+
+
+def _generate(venue_id: int, prospect_name: str, expires_hours: int, demo_level: int) -> dict:
     secret = os.getenv("DEMO_JWT_SECRET", "")
     if not secret:
         print("ERROR: DEMO_JWT_SECRET not set in .env")
+        sys.exit(1)
+    if expires_hours < 1 or expires_hours > MAX_EXPIRES_HOURS:
+        print(f"ERROR: --hours must be between 1 and {MAX_EXPIRES_HOURS}")
+        sys.exit(1)
+    if demo_level not in (1, 2, 3, 4):
+        print("ERROR: --demo-level must be 1, 2, 3, or 4")
         sys.exit(1)
 
     now = int(time.time())
     payload = {
         "venue_id":      venue_id,
         "prospect_name": prospect_name,
+        "demo_level":    demo_level,
         "exp":           now + expires_hours * 3600,
         "iat":           now,
     }
@@ -68,17 +79,22 @@ if __name__ == "__main__":
         help='Prospect name — shown in the AI chat CTA (e.g. "John Smith")'
     )
     parser.add_argument(
-        "--hours", type=int, default=72,
-        help="How long the link stays valid in hours (default: 72)"
+        "--hours", type=int, default=DEFAULT_EXPIRES_HOURS,
+        help=f"How long the link stays valid in hours (default: {DEFAULT_EXPIRES_HOURS})"
+    )
+    parser.add_argument(
+        "--demo-level", type=int, default=1,
+        help="Demo mode: 1=single model, 2=council, 3=prism, 4=council+prism"
     )
     args = parser.parse_args()
 
-    result = _generate(args.venue_id, args.prospect, args.hours)
+    result = _generate(args.venue_id, args.prospect, args.hours, args.demo_level)
 
     print()
     print("Demo token generated")
     print(f"  Prospect  : {args.prospect}")
     print(f"  Venue ID  : {args.venue_id}")
+    print(f"  Mode      : {args.demo_level}")
     print(f"  Expires   : {result['expires_at']}  ({args.hours}h)")
     print()
     print("Demo URL (send this to the prospect):")

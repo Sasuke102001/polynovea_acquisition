@@ -30,7 +30,8 @@ from routers.council import run_council
 
 router = APIRouter()
 
-_DEFAULT_EXPIRES_HOURS = 72
+_DEFAULT_EXPIRES_HOURS = 720
+_MAX_EXPIRES_HOURS = 24 * 365
 
 
 # ─── Supabase demo logging ─────────────────────────────────────────────────────
@@ -48,35 +49,62 @@ def _supabase_headers() -> tuple[str, str, dict] | None:
     }
 
 
+def _mode_label(demo_level: int) -> str:
+    return {
+        1: "single_model",
+        2: "council",
+        3: "prism",
+        4: "council_prism",
+    }.get(demo_level, "unknown")
+
+
+def _chat_log_table(demo_level: int) -> str:
+    return {
+        1: "demo_single_model_logs",
+        2: "demo_council_logs",
+        3: "demo_prism_logs",
+        4: "demo_council_prism_logs",
+    }[demo_level]
+
+
+def _prism_session_table(demo_level: int) -> str:
+    return {
+        3: "demo_prism_sessions",
+        4: "demo_council_prism_sessions",
+    }[demo_level]
+
+
 async def log_demo_chat(
     venue_id: int,
     venue_name: str,
     prospect_name: str,
     question: str,
     response: str,
-    demo_mode: str = "single_model",
+    demo_level: int,
 ) -> None:
-    """Fire-and-forget: log demo chat exchange to demo_chat_logs table."""
+    """Fire-and-forget: log a demo chat exchange to the mode-specific table."""
     creds = _supabase_headers()
     if not creds:
         return
     url, _, headers = creds
+    table = _chat_log_table(demo_level)
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            await client.post(
-                f"{url}/rest/v1/demo_chat_logs",
+            res = await client.post(
+                f"{url}/rest/v1/{table}",
                 json={
                     "venue_id":      str(venue_id),
                     "venue_name":    venue_name,
                     "prospect_name": prospect_name,
                     "question":      question,
                     "response":      response,
-                    "demo_mode":     demo_mode,
+                    "demo_mode":     _mode_label(demo_level),
                 },
                 headers=headers,
             )
+            res.raise_for_status()
     except Exception as e:
-        print(f"[demo] demo_chat_logs write failed: {e}")
+        print(f"[demo] {table} write failed: {e}")
 
 
 async def log_prism_session(
@@ -88,15 +116,16 @@ async def log_prism_session(
     full_response: str,
     duration_ms: int | None,
 ) -> None:
-    """Fire-and-forget: log a completed Prism pipeline run to prism_sessions."""
+    """Fire-and-forget: log a completed Prism pipeline run to the mode-specific table."""
     creds = _supabase_headers()
     if not creds:
         return
     url, _, headers = creds
+    table = _prism_session_table(demo_level)
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            await client.post(
-                f"{url}/rest/v1/prism_sessions",
+            res = await client.post(
+                f"{url}/rest/v1/{table}",
                 json={
                     "venue_id":        str(venue_id),
                     "venue_name":      venue_name,
@@ -108,8 +137,9 @@ async def log_prism_session(
                 },
                 headers=headers,
             )
+            res.raise_for_status()
     except Exception as e:
-        print(f"[demo] prism_sessions write failed: {e}")
+        print(f"[demo] {table} write failed: {e}")
 
 
 def _secret() -> str:
@@ -154,15 +184,6 @@ async def call_m3_prism(
             async for chunk in response.aiter_text():
                 if chunk:
                     yield chunk
-
-
-def _mode_label(demo_level: int) -> str:
-    return {
-        1: "single_model",
-        2: "council",
-        3: "prism",
-        4: "council_prism",
-    }.get(demo_level, "unknown")
 
 
 def _decode(token: str) -> dict:
@@ -212,6 +233,11 @@ async def generate_token(
 
     if req.demo_level not in [1, 2, 3, 4]:
         raise HTTPException(status_code=400, detail="demo_level must be 1, 2, 3, or 4")
+    if req.expires_hours < 1 or req.expires_hours > _MAX_EXPIRES_HOURS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"expires_hours must be between 1 and {_MAX_EXPIRES_HOURS}",
+        )
 
     now = int(time.time())
     payload = {
@@ -360,7 +386,7 @@ async def demo_chat(token: str, req: DemoChatRequest):
                         prospect,
                         req.question,
                         full_response,
-                        demo_mode=mode,
+                        demo_level=demo_level,
                     )
                 )
             if prism_buffer:

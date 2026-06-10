@@ -1,7 +1,8 @@
 -- ============================================================
 -- Polynovea Module 2 — PostgreSQL Schema
 -- 001_init_schema.sql
--- Run once on a fresh Azure PostgreSQL instance
+-- Consolidated schema with all columns, constraints, scaffolds,
+-- materialized views, and indexes.
 -- ============================================================
 
 -- Enable extensions
@@ -43,7 +44,8 @@ CREATE TABLE IF NOT EXISTS primitives_scores (
 
 CREATE TABLE IF NOT EXISTS venue_fitness_dimensions (
     id                            SERIAL PRIMARY KEY,
-    venue_id                      INTEGER NOT NULL UNIQUE REFERENCES venues(id) ON DELETE CASCADE,
+    venue_id                      INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    source                        VARCHAR(50) NOT NULL DEFAULT 'google',
     fitness_for_office_lunch      DECIMAL(4,3),
     fitness_for_repeat_habit      DECIMAL(4,3),
     fitness_for_social_dwell      DECIMAL(4,3),
@@ -52,24 +54,31 @@ CREATE TABLE IF NOT EXISTS venue_fitness_dimensions (
     operational_quality           DECIMAL(4,3),
     retention_strength            DECIMAL(4,3),
     monetization_potential        DECIMAL(4,3),
-    fitness_details               JSONB  -- match_ratio, confidence_basis, matched_signals per dimension
+    fitness_details               JSONB,  -- match_ratio, confidence_basis, matched_signals per dimension
+    computed_at                   TIMESTAMPTZ DEFAULT NOW(),
+    pipeline_version              TEXT DEFAULT '1.0',
+    schema_version                INTEGER DEFAULT 1,
+    UNIQUE (venue_id, source)
 );
 
 CREATE TABLE IF NOT EXISTS behavioral_summary (
     id                     SERIAL PRIMARY KEY,
-    venue_id               INTEGER NOT NULL UNIQUE REFERENCES venues(id) ON DELETE CASCADE,
+    venue_id               INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    source                 VARCHAR(50) NOT NULL DEFAULT 'google',
     operational_quality    DECIMAL(4,3),
     retention_strength     DECIMAL(4,3),
-    monetization_potential DECIMAL(4,3)
+    monetization_potential DECIMAL(4,3),
+    UNIQUE (venue_id, source)
 );
 
 -- ============================================================
--- PATTERN TABLES (step_4_patterns_recognized + step_5_patterns_scored)
+-- PATTERN TABLES
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS behavioral_patterns (
     id                      SERIAL PRIMARY KEY,
     area                    VARCHAR(100) NOT NULL,
+    source                  VARCHAR(50) NOT NULL DEFAULT 'google',
     pattern_name            VARCHAR(500),
     co_occurring_primitives JSONB NOT NULL,
     total_venues_in_city    INTEGER,
@@ -87,7 +96,8 @@ CREATE TABLE IF NOT EXISTS pattern_venues (
 
 CREATE TABLE IF NOT EXISTS pattern_scores (
     id                   SERIAL PRIMARY KEY,
-    pattern_id           INTEGER NOT NULL UNIQUE REFERENCES behavioral_patterns(id) ON DELETE CASCADE,
+    pattern_id           INTEGER NOT NULL REFERENCES behavioral_patterns(id) ON DELETE CASCADE,
+    source               VARCHAR(50) NOT NULL DEFAULT 'google',
     confidence_score     DECIMAL(6,3),
     evidence_density     DECIMAL(4,3),
     temporal_consistency DECIMAL(4,3),
@@ -95,14 +105,14 @@ CREATE TABLE IF NOT EXISTS pattern_scores (
     commercial_reliability DECIMAL(4,3),
     venue_count          INTEGER,
     prevalence           DECIMAL(5,4),
-    friction_severity    VARCHAR(20)
+    friction_severity    VARCHAR(20),
+    UNIQUE (pattern_id, source)
 );
-
--- pattern_fitness_dimensions intentionally omitted (Phase 2: computed from pattern_venues → venue_fitness_dimensions)
 
 CREATE TABLE IF NOT EXISTS intervention_triggers (
     id                   SERIAL PRIMARY KEY,
     venue_id             INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    source               VARCHAR(50) NOT NULL DEFAULT 'google',
     intervention_type    VARCHAR(100) NOT NULL,
     description          TEXT,
     fit_score            DECIMAL(4,3),
@@ -115,66 +125,77 @@ CREATE TABLE IF NOT EXISTS intervention_triggers (
     match_ratio          DECIMAL(4,3),
     confidence_basis     DECIMAL(4,3),
     expected_roi_impact  VARCHAR(100),
-    UNIQUE (venue_id, intervention_type)
+    UNIQUE (venue_id, source, intervention_type)
 );
 
 -- ============================================================
--- SIMILARITY TABLES (step_5b_similarity_enriched)
+-- SIMILARITY TABLES
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS venue_vectors (
     id            SERIAL PRIMARY KEY,
-    venue_id      INTEGER NOT NULL UNIQUE REFERENCES venues(id) ON DELETE CASCADE,
+    venue_id      INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    source        VARCHAR(50) NOT NULL DEFAULT 'google',
     fitness_vector DECIMAL(5,4)[],
     vector_source VARCHAR(50),
-    last_computed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    vector_confidence TEXT DEFAULT 'behavioral_evidence',
+    last_computed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (venue_id, source)
 );
 
 CREATE TABLE IF NOT EXISTS venue_similarity (
     id                    SERIAL PRIMARY KEY,
     venue_id              INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    source                VARCHAR(50) NOT NULL DEFAULT 'google',
     similar_venue_id      INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
     similarity_score      DECIMAL(5,4),
     shared_primitives     JSONB,
     shared_primitive_count INTEGER,
-    UNIQUE (venue_id, similar_venue_id)
+    rank                  INTEGER,
+    UNIQUE (venue_id, source, similar_venue_id)
 );
 
 -- ============================================================
--- DATA QUALITY TABLES (step_4b_governance_report)
+-- DATA QUALITY TABLES
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS data_quality_metrics (
     id                       SERIAL PRIMARY KEY,
-    area                     VARCHAR(100) UNIQUE NOT NULL,
+    area                     VARCHAR(100) NOT NULL,
+    source                   VARCHAR(50) NOT NULL DEFAULT 'google',
     avg_confidence           DECIMAL(5,4),
     avg_reliability          DECIMAL(5,4),
     reliability_score        DECIMAL(5,4),
     high_reliability_clusters INTEGER,
     total_clusters           INTEGER,
-    measured_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    measured_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (area, source)
 );
 
 CREATE TABLE IF NOT EXISTS drift_signals (
     id                  SERIAL PRIMARY KEY,
     area                VARCHAR(100) NOT NULL,
+    source              VARCHAR(50) NOT NULL DEFAULT 'google',
     pattern_description TEXT NOT NULL,
     confidence_score    DECIMAL(4,3),
     trend_direction     VARCHAR(50) DEFAULT 'emerging',
-    detected_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    detected_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (area, source, pattern_description)
 );
 
 CREATE TABLE IF NOT EXISTS cluster_quality (
     id                    SERIAL PRIMARY KEY,
     area                  VARCHAR(100) NOT NULL,
+    source                VARCHAR(50) NOT NULL DEFAULT 'google',
     total_clusters        INTEGER,
     high_reliability      INTEGER,
     low_confidence        INTEGER,
-    measured_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    measured_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (area, source)
 );
 
 -- ============================================================
--- USER / SURVEY TABLES
+-- USER / SURVEY / DEMOGRAPHIC TABLES
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS survey_responses_canonical (
@@ -207,10 +228,6 @@ CREATE TABLE IF NOT EXISTS user_archetypes (
     secondary_traits JSONB,
     computed_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- ============================================================
--- DEMOGRAPHIC-ARCHETYPE BRIDGE TABLES
--- ============================================================
 
 CREATE TABLE IF NOT EXISTS demographic_segments (
     id                  SERIAL PRIMARY KEY,
@@ -251,6 +268,19 @@ CREATE TABLE IF NOT EXISTS demographic_behavioral_alignment (
     secondary_primitives      JSONB,
     critical_fitness_dimension VARCHAR(100),
     UNIQUE (segment_id, archetype_name)
+);
+
+CREATE TABLE IF NOT EXISTS venue_demographic_scores (
+    id               SERIAL PRIMARY KEY,
+    venue_id         INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    segment_id       VARCHAR(50) NOT NULL,
+    alignment_score  FLOAT NOT NULL DEFAULT 0.0,
+    segment_rank     INTEGER,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    computed_at      TIMESTAMPTZ DEFAULT NOW(),
+    pipeline_version TEXT DEFAULT '1.0',
+    schema_version   INTEGER DEFAULT 1,
+    UNIQUE(venue_id, segment_id)
 );
 
 -- ============================================================
@@ -307,6 +337,186 @@ CREATE TABLE IF NOT EXISTS venue_marketing_recommendations (
     confidence_score_overall        DECIMAL(4,3)
 );
 
+CREATE TABLE IF NOT EXISTS behavioral_districts (
+    district_id               VARCHAR(160) PRIMARY KEY,
+    source                    VARCHAR(50) NOT NULL DEFAULT 'blended',
+    city                      VARCHAR(100) NOT NULL,
+    geo_cell                  VARCHAR(80),
+    district_label            VARCHAR(200) NOT NULL,
+    behavioral_signature      JSONB NOT NULL,
+    venue_count               INTEGER NOT NULL,
+    avg_state_energy          DECIMAL(6,4),
+    avg_behavioral_entropy    DECIMAL(6,4),
+    avg_niche_saturation      DECIMAL(6,4),
+    centroid_lat              DECIMAL(9,6),
+    centroid_lng              DECIMAL(9,6),
+    top_dimensions            JSONB,
+    details                   JSONB,
+    pipeline_version          VARCHAR(80),
+    computed_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS venue_behavioral_market_position (
+    venue_id                  INTEGER PRIMARY KEY REFERENCES venues(id) ON DELETE CASCADE,
+    source                    VARCHAR(50) NOT NULL DEFAULT 'blended',
+    district_id               VARCHAR(160) REFERENCES behavioral_districts(district_id) ON DELETE SET NULL,
+    behavioral_district       VARCHAR(200) NOT NULL,
+    state_energy              DECIMAL(6,4),
+    energy_band               VARCHAR(20),
+    anomaly_score             DECIMAL(8,4),
+    is_anomaly                BOOLEAN DEFAULT FALSE,
+    behavioral_entropy        DECIMAL(6,4),
+    niche_saturation          DECIMAL(6,4),
+    district_size             INTEGER,
+    signature_family          VARCHAR(120),
+    local_density             DECIMAL(6,4),
+    top_dimensions            JSONB,
+    details                   JSONB,
+    pipeline_version          VARCHAR(80),
+    computed_at               TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- PROVENANCE & SCATTERED PIPELINE TABLES
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS venue_platform_ids (
+    id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    venue_id         INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    platform         TEXT NOT NULL CHECK (platform IN ('google', 'zomato', 'swiggy', 'magicpin', 'instagram', 'dineout', 'other')),
+    platform_id      TEXT NOT NULL,
+    platform_url     TEXT,
+    name_on_platform TEXT,
+    last_verified_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at       TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (platform, platform_id)
+);
+
+CREATE TABLE IF NOT EXISTS raw_venue_data (
+    id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    venue_id         INTEGER REFERENCES venues(id) ON DELETE SET NULL,
+    platform         TEXT NOT NULL,
+    data_type        TEXT NOT NULL CHECK (data_type IN ('api_response', 'html_scrape', 'review_batch', 'geocode_response', 'search_result')),
+    raw_payload      JSONB NOT NULL,
+    collected_at     TIMESTAMPTZ DEFAULT NOW(),
+    collector_version TEXT DEFAULT '1.0',
+    query_params     JSONB,
+    schema_version   INTEGER DEFAULT 1,
+    is_deleted       BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS venue_platform_data (
+    id                      SERIAL PRIMARY KEY,
+    venue_id                INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    platform                VARCHAR(20) NOT NULL,   -- 'zomato' | 'swiggy'
+    opt_in_date             DATE,
+    current_rating          FLOAT,
+    rating_30d_ago          FLOAT,
+    rating_delta            FLOAT GENERATED ALWAYS AS (current_rating - rating_30d_ago) STORED,
+    total_review_count      INTEGER,
+    reviews_last_30d        INTEGER,
+    monthly_covers          INTEGER,
+    avg_covers_per_day      FLOAT,
+    peak_day                VARCHAR(20),             -- e.g. 'Saturday'
+    peak_hour_range         VARCHAR(30),             -- e.g. '12:00-14:00'
+    avg_order_value         FLOAT,
+    avg_table_spend         FLOAT,
+    photo_count             INTEGER,
+    last_photo_updated      DATE,
+    dineout_enabled         BOOLEAN DEFAULT FALSE,
+    promoted_placement      BOOLEAN DEFAULT FALSE,
+    data_as_of              DATE,
+    created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(venue_id, platform)
+);
+
+CREATE TABLE IF NOT EXISTS venue_pos_summary (
+    id                      SERIAL PRIMARY KEY,
+    venue_id                INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    monthly_revenue         FLOAT,
+    avg_daily_revenue       FLOAT,
+    revenue_per_cover       FLOAT,
+    monthly_covers          INTEGER,
+    avg_table_size          FLOAT,
+    avg_visit_duration_mins INTEGER,
+    repeat_customer_rate    FLOAT,    -- 0-1
+    avg_visits_per_customer FLOAT,    -- in 30 days
+    customer_lifetime_value FLOAT,    -- estimated ₹
+    peak_day                VARCHAR(20),
+    peak_hour_range         VARCHAR(30),
+    lunch_revenue_pct       FLOAT,    -- % of revenue from lunch
+    dinner_revenue_pct      FLOAT,    -- % of revenue from dinner
+    data_source             VARCHAR(50) DEFAULT 'module3_field',
+    data_as_of              DATE,
+    created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(venue_id)
+);
+
+CREATE TABLE IF NOT EXISTS platform_performance_benchmarks (
+    id                      SERIAL PRIMARY KEY,
+    platform                VARCHAR(20) NOT NULL,
+    city                    VARCHAR(50),
+    venue_type              VARCHAR(50),     -- casual_dine, fine_dine, bar, cafe, lounge
+    sample_size             INTEGER DEFAULT 0,
+    avg_rating              FLOAT,
+    avg_monthly_covers      INTEGER,
+    avg_review_velocity     FLOAT,           -- reviews per month
+    avg_photo_count         INTEGER,
+    pct_with_dineout        FLOAT,           -- % of venues with Dineout enabled
+    confidence              VARCHAR(10) DEFAULT 'LOW',  -- LOW/MEDIUM/HIGH based on sample_size
+    last_updated            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(platform, city, venue_type)
+);
+
+CREATE TABLE IF NOT EXISTS venue_subdimension_scores (
+    id               SERIAL PRIMARY KEY,
+    venue_id         INTEGER NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+    source           TEXT    NOT NULL,
+    food_score       NUMERIC(4, 3),
+    service_score    NUMERIC(4, 3),
+    atmosphere_score NUMERIC(4, 3),
+    sample_size      INTEGER NOT NULL DEFAULT 0,
+    pipeline_version TEXT,
+    computed_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_venue_subdimension_source UNIQUE (venue_id, source)
+);
+
+CREATE TABLE IF NOT EXISTS venue_council_sessions (
+    id               uuid        default gen_random_uuid() primary key,
+    created_at       timestamptz default now(),
+    venue_id         text        not null,
+    tab              text        not null,
+    question         text        not null,
+    nemotron_r1      text,
+    deepseek_r1      text,
+    qwen_r1          text,
+    nemotron_r2      text,
+    deepseek_r2      text,
+    qwen_r2          text,
+    synthesis        text,
+    consensus_reached boolean,
+    duration_ms      integer
+);
+
+-- ============================================================
+-- MATERIALIZED VIEWS
+-- ============================================================
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS pattern_agreement AS
+SELECT
+    area,
+    pattern_name,
+    COUNT(DISTINCT source)                               AS source_count,
+    ROUND(AVG(prevalence_percentage)::numeric, 4)        AS avg_prevalence,
+    ROUND((AVG(prevalence_percentage) * COUNT(DISTINCT source))::numeric, 4)
+                                                         AS agreement_score,
+    ARRAY_AGG(DISTINCT source ORDER BY source)           AS sources
+FROM behavioral_patterns
+GROUP BY area, pattern_name
+WITH DATA;
+
 -- ============================================================
 -- INDEXES
 -- ============================================================
@@ -324,6 +534,9 @@ CREATE INDEX IF NOT EXISTS idx_prim_id            ON primitives_scores(primitive
 
 -- patterns
 CREATE INDEX IF NOT EXISTS idx_bp_area            ON behavioral_patterns(area);
+CREATE INDEX IF NOT EXISTS idx_bp_source          ON behavioral_patterns(source);
+CREATE INDEX IF NOT EXISTS idx_behavioral_districts_city_source ON behavioral_districts(city, source);
+CREATE INDEX IF NOT EXISTS idx_vbmp_source_district ON venue_behavioral_market_position(source, district_id);
 CREATE INDEX IF NOT EXISTS idx_pv_venue           ON pattern_venues(venue_id);
 CREATE INDEX IF NOT EXISTS idx_pv_pattern         ON pattern_venues(pattern_id);
 CREATE INDEX IF NOT EXISTS idx_it_venue           ON intervention_triggers(venue_id);
@@ -333,19 +546,41 @@ CREATE INDEX IF NOT EXISTS idx_it_tier            ON intervention_triggers(prior
 CREATE INDEX IF NOT EXISTS idx_vs_venue           ON venue_similarity(venue_id);
 CREATE INDEX IF NOT EXISTS idx_vs_similar         ON venue_similarity(similar_venue_id);
 CREATE INDEX IF NOT EXISTS idx_vs_score           ON venue_similarity(similarity_score DESC);
+CREATE INDEX IF NOT EXISTS idx_vs_venue_rank      ON venue_similarity(venue_id, rank);
 
--- surveys
+-- surveys & archetypes
 CREATE INDEX IF NOT EXISTS idx_survey_city        ON survey_responses_canonical(city);
 CREATE INDEX IF NOT EXISTS idx_archetypes_name    ON user_archetypes(archetype_name);
 
 -- demographic bridge
 CREATE INDEX IF NOT EXISTS idx_demo_area          ON demographic_segments(area);
 CREATE INDEX IF NOT EXISTS idx_demo_map_segment   ON demographic_archetype_mapping(segment_id);
+CREATE INDEX IF NOT EXISTS idx_vds_venue_id       ON venue_demographic_scores(venue_id);
+CREATE INDEX IF NOT EXISTS idx_vds_venue_rank     ON venue_demographic_scores(venue_id, segment_rank);
+CREATE INDEX IF NOT EXISTS idx_vds_segment        ON venue_demographic_scores(segment_id, alignment_score DESC);
 
 -- marketing
 CREATE INDEX IF NOT EXISTS idx_vmr_venue          ON venue_marketing_recommendations(venue_id);
 CREATE INDEX IF NOT EXISTS idx_ct_segment         ON campaign_templates(demographic_segment);
 CREATE INDEX IF NOT EXISTS idx_ct_archetype       ON campaign_templates(target_archetype);
+
+-- provenance & scaffolds
+CREATE INDEX IF NOT EXISTS idx_vpi_venue_id       ON venue_platform_ids(venue_id);
+CREATE INDEX IF NOT EXISTS idx_vpi_platform       ON venue_platform_ids(platform, platform_id);
+CREATE INDEX IF NOT EXISTS idx_rvd_venue_id       ON raw_venue_data(venue_id);
+CREATE INDEX IF NOT EXISTS idx_rvd_platform       ON raw_venue_data(platform, data_type);
+CREATE INDEX IF NOT EXISTS idx_rvd_collected_at   ON raw_venue_data(collected_at DESC);
+CREATE INDEX IF NOT EXISTS idx_vpd_venue           ON venue_platform_data(venue_id);
+CREATE INDEX IF NOT EXISTS idx_vpd_platform        ON venue_platform_data(platform, current_rating DESC);
+CREATE INDEX IF NOT EXISTS idx_vps_venue           ON venue_pos_summary(venue_id);
+CREATE INDEX IF NOT EXISTS idx_ppb_platform_city   ON platform_performance_benchmarks(platform, city);
+CREATE INDEX IF NOT EXISTS idx_venue_subdimension_venue_id ON venue_subdimension_scores(venue_id);
+CREATE INDEX IF NOT EXISTS idx_council_venue      ON venue_council_sessions (venue_id);
+CREATE INDEX IF NOT EXISTS idx_council_tab        ON venue_council_sessions (tab);
+CREATE INDEX IF NOT EXISTS idx_council_consensus  ON venue_council_sessions (consensus_reached);
+CREATE INDEX IF NOT EXISTS idx_council_created    ON venue_council_sessions (created_at desc);
+
+CREATE UNIQUE INDEX IF NOT EXISTS pattern_agreement_area_pattern_idx ON pattern_agreement (area, pattern_name);
 
 -- ============================================================
 -- END OF SCHEMA
