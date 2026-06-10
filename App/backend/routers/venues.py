@@ -46,7 +46,7 @@ async def search_venues(
                     )
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
-              AND  ($3::text = '' OR $3::text = ANY(v.types))
+              AND  ($3::text = '' OR v.types @> to_jsonb($3::text))
             """,
             like, clike, venue_type,
         )
@@ -82,7 +82,7 @@ async def search_venues(
                     )
             WHERE  (v.name ILIKE $1 OR v.area ILIKE $1)
               AND  v.city ILIKE $2
-              AND  ($3::text = '' OR $3::text = ANY(v.types))
+              AND  ($3::text = '' OR v.types @> to_jsonb($3::text))
             ORDER BY (COALESCE(fd.operational_quality, 0) + COALESCE(fd.retention_strength, 0)) DESC
             LIMIT  $4
             OFFSET $5
