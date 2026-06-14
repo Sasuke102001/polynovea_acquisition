@@ -22,8 +22,9 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load .env BEFORE importing routers (so Supabase client can initialize)
 
+import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import init_pool, close_pool
@@ -50,13 +51,34 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_ALLOWED_ORIGINS = [
+    "http://localhost:3000",                       # local dev
+    "https://acquisition.polynovearecords.in",     # production frontend
+]
+# Allow additional origins via env var (space-separated) for staging/preview deployments
+_extra = os.getenv("EXTRA_CORS_ORIGINS", "")
+if _extra:
+    _ALLOWED_ORIGINS += [o.strip() for o in _extra.split() if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],   # Next.js dev server
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Admin-Key"],
 )
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next) -> Response:
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    # HSTS — only sent over HTTPS; harmless if Nginx terminates TLS
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 app.include_router(venues.router,       prefix="/api/venues", tags=["venues"])
 app.include_router(overview.router,     prefix="/api/venues", tags=["overview"])
@@ -74,6 +96,7 @@ app.include_router(demo.router,           prefix="/api/demo",   tags=["demo"])
 
 
 @app.get("/health")
+@app.get("/api/health")
 async def health():
     return {"status": "ok", "service": "polynovea-acquisition-api"}
 

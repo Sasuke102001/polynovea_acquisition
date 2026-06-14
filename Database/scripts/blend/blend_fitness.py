@@ -151,15 +151,25 @@ def blend_venue(source_rows: list[dict], source_variances: dict | None = None) -
     """
     E10: Inverse-variance (Kalman) weighted blend per dimension.
 
-    Each source's weight = 1/variance for that dimension, normalised so weights sum to 1.
-    A consistent source (low variance across all venues) contributes more than a noisy one.
-    Falls back to equal weight when variance data is unavailable.
+    Effective weight = (1/variance) × confidence, normalised so weights sum to 1.
+    - variance:   cross-venue consistency of this source (low = more trusted)
+    - confidence: per-row trust in this source's readings (0–1)
+                  Sources without a confidence value (None) default to 1.0 —
+                  platform sources (google, magicpin) are considered fully trusted.
+                  M3 sources populate confidence from session_count/k, so a single
+                  M3 session (confidence≈0.07) gets ~7% weight rather than 50%.
 
-    A 0.0 value means "no signal detected" and is excluded from the blend (same as before).
+    A 0.0 value means "no signal detected" and is excluded from the blend.
     If ALL sources are 0.0 → blended stays 0.0.
     """
     if not source_rows:
         return {d: 0.0 for d in FITNESS_DIMS}
+
+    # Per-source confidence: None → 1.0 (fully trusted, e.g. google/magicpin)
+    source_conf = {
+        row["source"]: float(row.get("confidence") or 1.0)
+        for row in source_rows
+    }
 
     result = {}
     for dim in FITNESS_DIMS:
@@ -173,9 +183,11 @@ def blend_venue(source_rows: list[dict], source_variances: dict | None = None) -
             continue
 
         if source_variances:
-            # Inverse-variance weights — clamp variance floor at 0.001 to avoid division by zero
+            # Effective weight = (1/variance) × confidence
+            # Variance floor at 0.001 prevents division-by-zero for single-venue sources
             inv_vars = [
-                1.0 / max(source_variances.get(src, {}).get(dim, 1.0), 0.001)
+                (1.0 / max(source_variances.get(src, {}).get(dim, 1.0), 0.001))
+                * source_conf.get(src, 1.0)
                 for _, src in active
             ]
             total_inv = sum(inv_vars)
