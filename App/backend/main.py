@@ -53,7 +53,7 @@ app = FastAPI(
 
 _ALLOWED_ORIGINS = [
     "http://localhost:3000",                       # local dev
-    "https://acquisition.polynovearecords.in",     # production frontend
+    "https://acquisition.polynovea.in",             # production frontend
 ]
 # Allow additional origins via env var (space-separated) for staging/preview deployments
 _extra = os.getenv("EXTRA_CORS_ORIGINS", "")
